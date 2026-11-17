@@ -7,6 +7,7 @@
 #include "display/eyes.h"
 #include "display/oled.h"
 #include "display/oled_internal.h"
+#include "display/oled_zones.h"
 #include "network/wifi_connect.h"
 #include "settings/settings.h"
 
@@ -66,6 +67,11 @@ void showOledText(
   const char* line2
 ) {
   if (!oledAvailable) {
+    return;
+  }
+
+  if (kOledTwoZone) {
+    showZonedScreen(line1, line2);
     return;
   }
 

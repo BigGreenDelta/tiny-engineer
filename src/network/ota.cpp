@@ -12,6 +12,7 @@
 
 #include "audio/audio.h"
 #include "display/oled.h"
+#include "display/oled_zones.h"
 #include "settings/settings.h"
 #include "serial_log.h"
 
@@ -33,6 +34,10 @@ void showOtaProgress(unsigned int progress, unsigned int total) {
 
   char line[8];
   snprintf(line, sizeof(line), "%d%%", percent);
+  if (kOledTwoZone) {
+    showZonedScreen("OTA UPDATE", line, percent, 100);
+    return;
+  }
   showOledText("OTA UPDATE", line);
 }
 

@@ -1,10 +1,7 @@
 #include "display/eyes/styles/eye_style.h"
 
-#include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-#include <cctype>
-#include <cstring>
 
 #include "animation.h"
 #include "animation/dead.h"
@@ -27,6 +24,7 @@
 #include "display/eyes/styles/kawaii/tracker.h"
 #include "display/oled.h"
 #include "display/oled_internal.h"
+#include "display/oled_zones.h"
 #include "pins.h"
 
 // Firmware glue for the kawaii style: picks the mood for the current
@@ -328,9 +326,7 @@ void stepAnimator(const kawaii::Expression& target, uint32_t now) {
 }
 
 // Status strip above a face shorter than the panel (the yellow band of
-// two-colour OLEDs): the current animation in large text, centered in a
-// rounded box.
-constexpr int kStripRows = 16;
+// two-colour OLEDs): the current animation in a thought box (oled_zones.h).
 
 const char* activityLabel(AnimationId animation) {
   switch (animation) {
@@ -343,64 +339,19 @@ const char* activityLabel(AnimationId animation) {
   }
 }
 
-// The label sits in a rounded box, like a thought: 1 px border, 1 px gap,
-// then 12 px capitals. The built-in 5x7 font is drawn 2x wide, and its 7
-// rows 2,2,1,2,1,2,2 px tall (12 px), since 2x tall (14 px) would leave no
-// gap inside the 16-row band. Capitals only: descenders (g, p, q, y) need
-// an 8th row.
-constexpr uint8_t kStripRowHeights[7] = {2, 2, 1, 2, 1, 2, 2};
-constexpr int kStripGlyphW = 10;  // 5 columns, 2 px each
-constexpr int kStripLetterGap = 2;
-
-void drawStripChar(int x, int y, char c) {
-  static GFXcanvas1 glyph(6, 8);
-  glyph.fillScreen(0);
-  glyph.drawChar(0, 0, (unsigned char)toupper((unsigned char)c), 1, 0, 1);
-
-  int py = y;
-  for (int row = 0; row < 7; row++) {
-    for (int col = 0; col < 5; col++) {
-      if (glyph.getPixel(col, row)) {
-        display.fillRect(x + col * 2, py, 2, kStripRowHeights[row], SSD1306_WHITE);
-      }
-    }
-    py += kStripRowHeights[row];
-  }
-}
-
 // A new label types itself in, one letter per kStripTypeMs, behind a bar
 // cursor; the box is drawn at the final size from the start.
-constexpr uint32_t kStripTypeMs = 70;
-constexpr int kStripCursorW = 2;
+constexpr uint32_t kStripTypeMs = 100;
 const char* g_stripLabel = nullptr;
 uint32_t g_stripTypedFromMs = 0;
 
 void drawStatusStrip(AnimationId animation, uint32_t now) {
-  constexpr int kPadX = 6;
-  constexpr int kRadius = 5;
-  constexpr int kTextTop = 2;  // border row 0, gap row 1
-
   const char* label = activityLabel(animation);
   if (label != g_stripLabel) {
     g_stripLabel = label;
     g_stripTypedFromMs = now;
   }
-  const int n = (int)strlen(label);
-  const uint32_t typed = (now - g_stripTypedFromMs) / kStripTypeMs;
-  const int shown = typed < (uint32_t)n ? (int)typed : n;
-  const int textW = n > 0 ? n * (kStripGlyphW + kStripLetterGap) - kStripLetterGap : 0;
-  int boxW = textW + 2 * kPadX;
-  boxW = boxW > OLED_WIDTH ? OLED_WIDTH : boxW;
-
-  display.drawRoundRect((OLED_WIDTH - boxW) / 2, 0, boxW, kStripRows, kRadius, SSD1306_WHITE);
-  int x = (OLED_WIDTH - textW) / 2;
-  for (int i = 0; i < shown; i++) {
-    drawStripChar(x, kTextTop, label[i]);
-    x += kStripGlyphW + kStripLetterGap;
-  }
-  if (shown < n) {
-    display.fillRect(x, kTextTop, kStripCursorW, 12, SSD1306_WHITE);
-  }
+  drawThoughtBox(label, (int)((now - g_stripTypedFromMs) / kStripTypeMs));
 }
 
 // Center of an eye; integer halves, so a height change alone does not read
@@ -456,7 +407,7 @@ void drawFrame(EyeMode mode, AnimationId animation, uint32_t now) {
   // OLEDs the top 16 rows are the yellow band.
   display.clearDisplay();
   display.drawBitmap(0, OLED_HEIGHT - kawaii::kHeight, g_frame, kawaii::kWidth, kawaii::kHeight, SSD1306_WHITE);
-  if (OLED_HEIGHT - kawaii::kHeight >= kStripRows) {
+  if (OLED_HEIGHT - kawaii::kHeight >= kOledBandRows) {
     drawStatusStrip(animation, now);
   }
   display.display();

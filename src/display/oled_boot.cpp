@@ -1,10 +1,12 @@
 #include <Arduino.h>
 #include <Adafruit_SSD1306.h>
+#include <cstdio>
 #include <cstring>
 
 #include "pins.h"
 #include "display/oled.h"
 #include "display/oled_internal.h"
+#include "display/oled_zones.h"
 
 namespace {
 
@@ -51,6 +53,11 @@ void showBootProgress(
     return;
   }
 
+  if (kOledTwoZone) {
+    showZonedScreen("TINY ENGINEER", label, step, totalSteps);
+    return;
+  }
+
   display.clearDisplay();
 
   display.setTextColor(SSD1306_WHITE);
@@ -86,6 +93,12 @@ void showBootIp(const char* ip) {
 
   const char* text =
     (ip != nullptr && ip[0] != '\0') ? ip : "No IP";
+
+  if (kOledTwoZone) {
+    showZonedScreen("ADDRESS", text);
+    return;
+  }
+
   const size_t len = strlen(text);
 
   // Default GFX glyph is 6×8 at size 1. Pick largest integer size that
@@ -130,6 +143,13 @@ void showServoProgress(
     return;
   }
 
+  if (kOledTwoZone) {
+    char line[32];
+    snprintf(line, sizeof(line), "%d/%d %s", step, totalSteps, action != nullptr ? action : "");
+    showZonedScreen("SERVO TEST", line, step, totalSteps);
+    return;
+  }
+
   display.clearDisplay();
 
   display.setTextColor(SSD1306_WHITE);
@@ -161,6 +181,11 @@ void showServoProgress(
 
 void showServoTestFinished() {
   if (!oledAvailable) {
+    return;
+  }
+
+  if (kOledTwoZone) {
+    showZonedScreen("SERVO TEST", "5 SERVOS OK");
     return;
   }
 
