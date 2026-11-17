@@ -26,7 +26,11 @@ const ROUTES = [
   ["POST", "/test/movement", "All servos exercise"],
   ["POST", "/test/led", "RGB LED cycle"],
   ["POST", "/test/servo", "Move one servo (see parameters below)"],
-  ["POST", "/setup/servo", "Setup AP only: slow 0–180° move (see parameters below)"],
+  [
+    "POST",
+    "/setup/servo",
+    "Slow 0–180° move for calibration, in setup AP or after setup (see parameters below)",
+  ],
   [
     "POST",
     "/setup/led",
@@ -221,7 +225,7 @@ export function ApiReference() {
         <code>not provisioned</code>; <code>POST /setup/servo</code>, <code>POST /setup/led</code>,{" "}
         <code>POST /setup/audio</code>, and <code>POST /setup/oled</code> stay available. Servo
         ranges, RGB mapping, and screen rotation survive factory reset and can be retuned in the
-        setup wizard.
+        setup wizard. Servo ranges can also be retuned from the main screen (Servo calibration).
       </p>
       <p>
         <code>GET</code>/<code>PUT /settings/actions</code> — JSON object with array{" "}

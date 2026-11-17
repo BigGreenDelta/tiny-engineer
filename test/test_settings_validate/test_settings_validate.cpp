@@ -168,11 +168,12 @@ void test_patch_names_its_setup_only_step() {
   patch.hostname = "tiny-engineer";
   TEST_ASSERT_NULL(patch.setupOnlyStep());
 
+  // Servo ranges are saved from the main-screen calibration as well.
+  patch.servoRanges = ServoRanges{{10, 20, 30, 40, 50}, {20, 30, 40, 50, 60}};
+  TEST_ASSERT_NULL(patch.setupOnlyStep());
+
   patch.oledRotate180 = false;
   TEST_ASSERT_EQUAL_STRING("oled", patch.setupOnlyStep());
-
-  patch.servoRanges = ServoRanges{{10, 20, 30, 40, 50}, {20, 30, 40, 50, 60}};
-  TEST_ASSERT_EQUAL_STRING("servo", patch.setupOnlyStep());
 }
 
 void test_rgb_order() {

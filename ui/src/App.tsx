@@ -9,6 +9,7 @@ import { RobotProvider, useRobot } from "./robot";
 import { StatusProvider } from "./status/status";
 import { Actions } from "./views/Actions";
 import { Animations } from "./views/Animations";
+import { Calibration } from "./views/Calibration";
 import { ApiReference } from "./views/ApiReference";
 import { Extensions } from "./views/Extensions";
 import { Home } from "./views/Home";
@@ -47,6 +48,7 @@ function Shell() {
         <Route path="/animations" component={Animations} />
         <Route path="/tests" component={Tests} />
         <Route path="/servo" component={ServoControl} />
+        <Route path="/calibrate" component={Calibration} />
         <Route path="/extensions" component={Extensions} />
         <Route path="/actions" component={Actions} />
         <Route path="/config" component={ConfigPage} />

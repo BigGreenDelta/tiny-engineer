@@ -21,6 +21,7 @@ constexpr Route kRoutes[] = {
   {"/", HTTP_GET, handleIndex, Access::Public},
   {"/animations", HTTP_GET, handleIndex, Access::Public},
   {"/servo", HTTP_GET, handleIndex, Access::Public},
+  {"/calibrate", HTTP_GET, handleIndex, Access::Public},
   {"/tests", HTTP_GET, handleIndex, Access::Public},
   {"/extensions", HTTP_GET, handleIndex, Access::Public},
   {"/actions", HTTP_GET, handleIndex, Access::Public},
@@ -43,7 +44,8 @@ constexpr Route kRoutes[] = {
   {"/test/movement", HTTP_POST, handleMovementTest, Access::Configured},
   {"/test/led", HTTP_POST, handleLedTest, Access::Configured},
   {"/test/servo", HTTP_POST, handleServoTest, Access::Configured},
-  {"/setup/servo", HTTP_POST, handleSetupServo, Access::Setup},
+  // Also open after setup, so servos can be recalibrated without a factory reset.
+  {"/setup/servo", HTTP_POST, handleSetupServo, Access::Token},
   {"/setup/led", HTTP_POST, handleSetupLed, Access::Setup},
   {"/setup/audio", HTTP_POST, handleSetupAudio, Access::Setup},
   {"/setup/oled", HTTP_POST, handleSetupOled, Access::Setup},

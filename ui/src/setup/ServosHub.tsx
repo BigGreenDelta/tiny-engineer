@@ -7,9 +7,14 @@ import { useSetupServo } from "./useSetupServo";
 export function ServosHub({
   calibration,
   onSkip,
+  skipTitle = "Skip",
+  skipHint = "Keep the servo limits already loaded",
 }: {
   calibration: Calibration;
   onSkip: () => void;
+  /** The main-screen calibration page relabels Skip as its exit. */
+  skipTitle?: string;
+  skipHint?: string;
 }) {
   const moveServos = useSetupServo();
   const stockDefaults = isStockServoRanges(calibration.ranges);
@@ -49,9 +54,9 @@ export function ServosHub({
           <span className="btn-title">Assembly support</span>
           <span className="btn-hint">Center shafts and identify plugs before seating parts</span>
         </Button>
-        <Button id="setup-skip-calib" aria-label="Skip" onClick={onSkip}>
-          <span className="btn-title">Skip</span>
-          <span className="btn-hint">Keep the servo limits already loaded</span>
+        <Button id="setup-skip-calib" aria-label={skipTitle} onClick={onSkip}>
+          <span className="btn-title">{skipTitle}</span>
+          <span className="btn-hint">{skipHint}</span>
         </Button>
       </div>
       {stockDefaults && (

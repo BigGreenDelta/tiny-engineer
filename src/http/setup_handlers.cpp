@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+#include "animation.h"
 #include "audio/audio.h"
 #include "display/oled.h"
 #include "hardware/pca9685_servos.h"
@@ -7,7 +8,9 @@
 #include "http/handlers.h"
 #include "http/request.h"
 #include "http/response.h"
+#include "network/wifi_connect.h"
 #include "settings/settings.h"
+#include "sleep.h"
 
 namespace {
 
@@ -64,6 +67,13 @@ void handleSetupServo(WebServer& server) {
 
   if (!readJsonBody(server, body)) {
     return;
+  }
+
+  // Outside setup AP an animation or the idle sleep timer would fight the
+  // calibration moves: stop the animation and count each move as activity.
+  if (!wifiProvisioningMode()) {
+    setAnimationImmediately(AnimationId::None);
+    noteActivity(millis());
   }
 
   if (!body["all"].isNull()) {
