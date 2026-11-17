@@ -42,7 +42,7 @@ float travelPx(float t) {
 }
 
 bool onScreen(float x, float y) {
-  return x >= -1.0f && x <= kWidth && y >= -1.0f && y <= kHeight;
+  return x >= -1.0f && x <= kWidth && y >= -1.0f && y <= kDesignHeight;  // design units
 }
 
 void add(Face& face, float x, float y, int8_t arm) {

@@ -887,11 +887,30 @@ void toScreen(Face& face) {
 
   Mouth& m = face.mouth;
   m.cy *= kScale;
+
+  // Raised or hopping eyes (welcome, the bell's breath) can run past the top
+  // of a short frame: move the face down so the eyes stay whole; the mouth
+  // check below then keeps the mouth in.
+  const float top = fminf(face.left.cy - face.left.ry, face.right.cy - face.right.ry);
+  if (top < 0.0f) {
+    face.left.cy -= top;
+    face.right.cy -= top;
+    m.cy -= top;
+  }
   m.width *= kSizeScale;
   m.curve *= kSizeScale;
   m.openUp *= kSizeScale;
   m.openDown *= kSizeScale;
   m.wave *= kSizeScale;
+
+  // Big open mouths (the bell's yell, springing past its size, mid-hop) can
+  // run past the bottom of a short frame: lift the mouth so it stays whole.
+  const float lowest = m.cy + fmaxf(0.0f, m.curve) + fabsf(m.wave) +
+    fmaxf(0.0f, m.openDown) + (sizePx(1.0f) - 1);
+  const float overflow = lowest - (kHeight - 1);
+  if (overflow > 0.0f) {
+    m.cy -= overflow;
+  }
 }
 
 }  // namespace
@@ -909,7 +928,7 @@ bool render(const Face& designFace, uint8_t* frame, size_t frameBytes) {
   }
 
   Face face = designFace;
-  if (kScale != 1) {
+  if (kScale != 1.0f || kSizeScale != 1.0f) {
     toScreen(face);
   }
 

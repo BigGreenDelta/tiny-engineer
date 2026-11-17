@@ -22,6 +22,7 @@
 #include "display/eyes/styles/kawaii/tracker.h"
 #include "display/oled.h"
 #include "display/oled_internal.h"
+#include "pins.h"
 
 // Firmware glue for the kawaii style: picks the mood for the current
 // animation, feeds speech, and draws the frame. The face itself lives in
@@ -370,8 +371,10 @@ void drawFrame(EyeMode mode, uint32_t now) {
     return;
   }
 
+  // A face shorter than the panel sits at the bottom: on two-colour 128x64
+  // OLEDs the top 16 rows are the yellow band.
   display.clearDisplay();
-  display.drawBitmap(0, 0, g_frame, kawaii::kWidth, kawaii::kHeight, SSD1306_WHITE);
+  display.drawBitmap(0, OLED_HEIGHT - kawaii::kHeight, g_frame, kawaii::kWidth, kawaii::kHeight, SSD1306_WHITE);
   display.display();
 }
 
