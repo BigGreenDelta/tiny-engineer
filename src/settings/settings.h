@@ -13,9 +13,14 @@ constexpr uint8_t SETTINGS_DEFAULT_VOLUME = 70;
 constexpr bool SETTINGS_DEFAULT_WELCOME = true;
 constexpr bool SETTINGS_DEFAULT_SERIAL_LOG = false;
 constexpr bool SETTINGS_DEFAULT_PUSH_BUTTON = false;
+// GPIOs the push-button extension may use; GET /settings reports them so
+// the web panel offers the right ones.
 #if defined(TE_BOARD_ESP32DEV)
-constexpr uint8_t SETTINGS_DEFAULT_PUSH_BUTTON_PIN = 4;  // GPIO20 does not exist on the classic ESP32
+// Free on the DevKit V1 build; 6/7 are flash pins and 20 does not exist.
+constexpr uint8_t SETTINGS_PUSH_BUTTON_PINS[] = {4, 13, 14, 16, 17};
+constexpr uint8_t SETTINGS_DEFAULT_PUSH_BUTTON_PIN = 4;
 #else
+constexpr uint8_t SETTINGS_PUSH_BUTTON_PINS[] = {6, 7, 20, 21};
 constexpr uint8_t SETTINGS_DEFAULT_PUSH_BUTTON_PIN = 20;
 #endif
 constexpr const char* SETTINGS_DEFAULT_PUSH_BUTTON_SOUND = "none";

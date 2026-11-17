@@ -38,6 +38,8 @@ export interface Settings {
   serial_log: boolean;
   push_button: boolean;
   push_button_pin: number;
+  /** GPIOs this board allows for the push-button (read-only; older firmware omits it). */
+  push_button_pins?: number[];
   continuous_timeout: number;
   loading: LoadingMode;
   eyes_style: string;

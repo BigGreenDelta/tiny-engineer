@@ -130,12 +130,12 @@ bool ServoRanges::valid() const {
 }
 
 bool settingsValidatePushButtonPin(uint8_t pin) {
-#if defined(TE_BOARD_ESP32DEV)
-  // Free on the DevKit V1 build; 6/7 are flash pins and 20 does not exist.
-  return pin == 4 || pin == 13 || pin == 14 || pin == 16 || pin == 17;
-#else
-  return pin == 6 || pin == 7 || pin == 20 || pin == 21;
-#endif
+  for (const uint8_t allowed : SETTINGS_PUSH_BUTTON_PINS) {
+    if (pin == allowed) {
+      return true;
+    }
+  }
+  return false;
 }
 
 bool settingsValidatePushButtonSound(const char* sound) {

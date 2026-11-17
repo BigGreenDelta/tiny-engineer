@@ -126,6 +126,10 @@ JsonDocument settingsJson() {
   doc["serial_log"] = settingsSerialLogEnabled();
   doc["push_button"] = settingsPushButton();
   doc["push_button_pin"] = settingsPushButtonPin();
+  JsonArray pushButtonPins = doc["push_button_pins"].to<JsonArray>();
+  for (const uint8_t pin : SETTINGS_PUSH_BUTTON_PINS) {
+    pushButtonPins.add(pin);
+  }
   doc["continuous_timeout"] = settingsContinuousTimeoutMin();
   doc["loading"] = settingsLoading();
   doc["eyes_style"] = settingsEyesStyle();

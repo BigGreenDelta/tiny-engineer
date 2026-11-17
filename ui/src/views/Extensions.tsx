@@ -7,7 +7,8 @@ import { useRobot } from "../robot";
 import { useStatus } from "../status/status";
 import { useResettableState } from "../useResettableState";
 
-const PUSH_BUTTON_PINS = [6, 7, 20, 21] as const;
+// Firmware without push_button_pins in GET /settings has the C3-Zero pins.
+const DEFAULT_PUSH_BUTTON_PINS = [6, 7, 20, 21];
 
 const BUTTON_EVENT_ROWS = [
   { key: "down", api: "button.down", when: "Press" },
@@ -94,7 +95,7 @@ function ExtensionsForm({
                   <span>Pin</span>
                 </div>
                 <div className="choice-row" role="radiogroup" aria-label="Extension port pin">
-                  {PUSH_BUTTON_PINS.map((pin) => {
+                  {(settings.push_button_pins ?? DEFAULT_PUSH_BUTTON_PINS).map((pin) => {
                     const id = `ext-push-button-pin-${pin}`;
 
                     return (

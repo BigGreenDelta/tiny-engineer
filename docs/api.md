@@ -160,6 +160,7 @@ curl http://tiny-engineer.local/settings
   "serial_log": false,
   "push_button": false,
   "push_button_pin": 20,
+  "push_button_pins": [6, 7, 20, 21],
   "continuous_timeout": 5,
   "loading": "progress",
   "eyes_style": "classic",
@@ -183,6 +184,7 @@ curl http://tiny-engineer.local/settings
 | `serial_log` | USB serial debug logging (default **false**). When off, diagnostic `Serial` output is suppressed |
 | `push_button` | Extension-port push-button reader (default **false**). When on, publishes immediate `button.down` / `button.up` plus `button.click` / `button.double_click` / `button.long_click` (see [Outbound events](#outbound-events)). Applies **immediately**. Local reactions use [Actions](#get-settingsactions) |
 | `push_button_pin` | GPIO on the Extension port for the push-button: **6**, **7**, **20**, or **21** (default **20**). Persists when `push_button` is off. Applies **immediately** when the extension is on |
+| `push_button_pins` | Read-only: the GPIOs `push_button_pin` accepts on this board (C3-Zero: `[6, 7, 20, 21]`; ESP32 DevKit V1 build: `[4, 13, 14, 16, 17]`, default **4**) |
 | `continuous_timeout` | Minutes a continuous animation (`typing` / `reading` / `thinking` / `talking`) may run before the firmware switches to `attention` then idle (default **5**) |
 | `loading` | Boot loading screen: `progress` (bar + large IP for 3 s) or `sleep_inertia` (eyes wake; no bar/IP). Default **`progress`**. Applies on **next reboot** |
 | `eyes_style` | OLED eyes look: `classic` (procedural rounded eyes), `kaomoji` (animated faces), `cover` (full-half bars for an eye-hole mask), `dots` (12×12 circles), or `kawaii` (round eyes with big moving pupils, a talking mouth, and blush). Default **`classic`**. Applies **immediately**. Classic, cover, and dots sequences are described under [`POST /anim`](#post-anim); kaomoji face mapping is under [Kaomoji eyes](#kaomoji-eyes); cover drawing is under [Cover eyes](#cover-eyes); dots drawing is under [Dots eyes](#dots-eyes); kawaii moods are under [Kawaii eyes](#kawaii-eyes) |
@@ -245,7 +247,7 @@ curl -X POST "http://192.168.4.1/settings" \
 | `welcome` | boolean | Boot welcome animation |
 | `serial_log` | boolean | USB serial debug logging |
 | `push_button` | boolean | Extension-port push-button (default **false**) |
-| `push_button_pin` | integer | Extension-port GPIO **6**, **7**, **20**, or **21** (default **20**); persists when off |
+| `push_button_pin` | integer | Extension-port GPIO **6**, **7**, **20**, or **21** (default **20**); persists when off. Other boards: one of `push_button_pins` from `GET /settings` |
 | `continuous_timeout` | integer | 1–1440 minutes (positive) |
 | `loading` | string | `progress` or `sleep_inertia` |
 | `eyes_style` | string | `classic`, `kaomoji`, `cover`, `dots`, or `kawaii` |
