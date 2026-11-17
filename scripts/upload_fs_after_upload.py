@@ -26,8 +26,13 @@ def upload_filesystem(source, target, env):
     upload_port = env.subst("$UPLOAD_PORT")
 
     def run_pio(pio_target):
+        # The interpreter running this build, not $PYTHONEXE: the pioarduino
+        # platform repoints $PYTHONEXE at its own penv, whose PlatformIO Core
+        # (6.2.0.post1) fails the platform's ">=6.2.0" check, and PlatformIO
+        # then uninstalls the platform. sys.executable is the PlatformIO
+        # that started this upload, so the child run matches it.
         args = [
-            env.subst("$PYTHONEXE"),
+            sys.executable,
             "-m", "platformio", "run",
             "-t", pio_target,
             "-e", env.subst("$PIOENV"),

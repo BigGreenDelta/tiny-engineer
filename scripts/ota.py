@@ -2,6 +2,7 @@ Import("env")
 
 import os
 import subprocess
+import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -43,8 +44,9 @@ def upload_firmware(source, target, env):
 def upload_filesystem(source, target, env):
     project_dir = env.subst("$PROJECT_DIR")
     # The platform only wires up the LittleFS image builder when buildfs is a command-line target.
+    # sys.executable, not $PYTHONEXE: see run_pio in upload_fs_after_upload.py.
     subprocess.run(
-        [env.subst("$PYTHONEXE"), "-m", "platformio", "run", "-t", "buildfs", "-e", env.subst("$PIOENV"), "-d", project_dir],
+        [sys.executable, "-m", "platformio", "run", "-t", "buildfs", "-e", env.subst("$PIOENV"), "-d", project_dir],
         check=True,
     )
     espota(env.subst("$BUILD_DIR/${ESP32_FS_IMAGE_NAME}.bin"), filesystem=True)
