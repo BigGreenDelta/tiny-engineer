@@ -93,12 +93,43 @@ rgb_led_color_order_t ledColorOrderFromName(const char* order) {
   return LED_COLOR_ORDER_GRB;
 }
 
-// Boards without the WS2812 (env:esp32dev) skip the write entirely.
+// Wire bytes for a logical colour, in the order a WS2812 would receive them.
+static void wireBytes(rgb_led_color_order_t order, uint8_t r, uint8_t g, uint8_t b, uint8_t out[3]) {
+  switch (order) {
+    case LED_COLOR_ORDER_RGB: out[0] = r; out[1] = g; out[2] = b; return;
+    case LED_COLOR_ORDER_RBG: out[0] = r; out[1] = b; out[2] = g; return;
+    case LED_COLOR_ORDER_GBR: out[0] = g; out[1] = b; out[2] = r; return;
+    case LED_COLOR_ORDER_BRG: out[0] = b; out[1] = r; out[2] = g; return;
+    case LED_COLOR_ORDER_BGR: out[0] = b; out[1] = g; out[2] = r; return;
+    case LED_COLOR_ORDER_GRB:
+    default: out[0] = g; out[1] = r; out[2] = b; return;
+  }
+}
+
+// WS2812 boards write the pixel; a discrete RGB LED gets each wire byte as
+// 8-bit PWM on RGB_LED_PINS[i]; boards with neither skip the write.
 static void writeRgbPin(rgb_led_color_order_t order, uint8_t r, uint8_t g, uint8_t b) {
-  if (!RGB_LED_PRESENT) {
+  if (RGB_LED_PRESENT) {
+    rgbLedWriteOrdered(RGB_LED_PIN, order, r, g, b);
     return;
   }
-  rgbLedWriteOrdered(RGB_LED_PIN, order, r, g, b);
+  if (!RGB_LED_DISCRETE) {
+    return;
+  }
+
+  static bool attached = false;
+  if (!attached) {
+    for (const int pin : RGB_LED_PINS) {
+      ledcAttach(pin, 5000, 8);
+    }
+    attached = true;
+  }
+
+  uint8_t bytes[3];
+  wireBytes(order, r, g, b, bytes);
+  for (int i = 0; i < 3; i++) {
+    ledcWrite(RGB_LED_PINS[i], bytes[i]);
+  }
 }
 
 rgb_led_color_order_t ledColorOrderFromSettings() {

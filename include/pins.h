@@ -20,11 +20,17 @@ constexpr int I2S_BCLK = 26;
 constexpr int I2S_LRC  = 25;
 constexpr int I2S_DIN  = 27;
 
-constexpr int PUSH_BUTTON_PIN_DEFAULT = 4;
+constexpr int PUSH_BUTTON_PIN_DEFAULT = 0;  // the on-board BOOT button
 
-// No WS2812 on this board. GPIO10 here is a flash pin: never drive it.
+// No WS2812 on this board (GPIO10 here is a flash pin: never drive it).
+// A plain common-cathode RGB LED instead, one PWM pin per leg through a
+// 220 ohm resistor: red D4 (4, as in kit lesson 2.2), green RX2 (16), blue
+// TX2 (17). Listed in wire-byte order for the default rgb_order GRB, so the
+// setup wizard's order fix still works when legs are swapped.
 constexpr bool RGB_LED_PRESENT = false;
 constexpr int RGB_LED_PIN = -1;
+constexpr bool RGB_LED_DISCRETE = true;
+constexpr int RGB_LED_PINS[3] = {16, 4, 17};
 
 // No PCA9685: servos run on LEDC, one GPIO per servo channel.
 constexpr bool PCA9685_OE_WIRED = false;
@@ -54,6 +60,8 @@ constexpr int PUSH_BUTTON_PIN_DEFAULT = 20;  // GP20
 // Built-in WS2812 RGB
 constexpr bool RGB_LED_PRESENT = true;
 constexpr int RGB_LED_PIN = 10;
+constexpr bool RGB_LED_DISCRETE = false;
+constexpr int RGB_LED_PINS[3] = {-1, -1, -1};
 
 // PCA9685 output enable (active LOW). GP5 → OE; default on.
 // Set PCA9685_OE_WIRED false only if OE is hard-tied off-chip (e.g. to GND).

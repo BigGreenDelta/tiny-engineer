@@ -19,10 +19,11 @@ constexpr bool SETTINGS_DEFAULT_PUSH_BUTTON = false;
 // Free on the DevKit V1 build; 6/7 are flash pins and 20 does not exist.
 // GPIO0 is the on-board BOOT button (pulled up on the board): free once
 // running, but held through a reset it starts the flasher instead.
-constexpr uint8_t SETTINGS_PUSH_BUTTON_PINS[] = {0, 4, 13, 14, 16, 17};
+// D4, RX2 and TX2 drive the RGB LED (pins.h).
+constexpr uint8_t SETTINGS_PUSH_BUTTON_PINS[] = {0, 13, 14};
 // As printed on the board, in the same order.
-constexpr const char* SETTINGS_PUSH_BUTTON_PIN_LABELS[] = {"BOOT", "D4", "D13", "D14", "RX2", "TX2"};
-constexpr uint8_t SETTINGS_DEFAULT_PUSH_BUTTON_PIN = 4;
+constexpr const char* SETTINGS_PUSH_BUTTON_PIN_LABELS[] = {"BOOT", "D13", "D14"};
+constexpr uint8_t SETTINGS_DEFAULT_PUSH_BUTTON_PIN = 0;
 #else
 constexpr uint8_t SETTINGS_PUSH_BUTTON_PINS[] = {6, 7, 20, 21};
 constexpr const char* SETTINGS_PUSH_BUTTON_PIN_LABELS[] = {"GP6", "GP7", "GP20", "GP21"};
