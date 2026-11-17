@@ -93,12 +93,20 @@ rgb_led_color_order_t ledColorOrderFromName(const char* order) {
   return LED_COLOR_ORDER_GRB;
 }
 
+// Boards without the WS2812 (env:esp32dev) skip the write entirely.
+static void writeRgbPin(rgb_led_color_order_t order, uint8_t r, uint8_t g, uint8_t b) {
+  if (!RGB_LED_PRESENT) {
+    return;
+  }
+  rgbLedWriteOrdered(RGB_LED_PIN, order, r, g, b);
+}
+
 rgb_led_color_order_t ledColorOrderFromSettings() {
   return ledColorOrderFromName(settingsRgbOrder());
 }
 
 void writeRgb(uint8_t r, uint8_t g, uint8_t b) {
-  rgbLedWriteOrdered(RGB_LED_PIN, ledColorOrderFromSettings(), r, g, b);
+  writeRgbPin(ledColorOrderFromSettings(), r, g, b);
   g_currentR = r;
   g_currentG = g;
   g_currentB = b;
@@ -233,7 +241,7 @@ void rgbSetupHoldWireByte(uint8_t byteIndex) {
   const uint8_t r = byteIndex == 0 ? 255 : 0;
   const uint8_t g = byteIndex == 1 ? 255 : 0;
   const uint8_t b = byteIndex == 2 ? 255 : 0;
-  rgbLedWriteOrdered(RGB_LED_PIN, LED_COLOR_ORDER_RGB, r, g, b);
+  writeRgbPin(LED_COLOR_ORDER_RGB, r, g, b);
 }
 
 void rgbSetupHoldLogical(uint8_t r, uint8_t g, uint8_t b, const char* order) {
@@ -245,7 +253,7 @@ void rgbSetupHoldLogical(uint8_t r, uint8_t g, uint8_t b, const char* order) {
     use = order;
   }
 
-  rgbLedWriteOrdered(RGB_LED_PIN, ledColorOrderFromName(use), r, g, b);
+  writeRgbPin(ledColorOrderFromName(use), r, g, b);
 }
 
 void rgbSetupRelease() {

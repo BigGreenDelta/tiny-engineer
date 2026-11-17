@@ -34,7 +34,7 @@ void initOled() {
     return;
   }
 
-  display.setRotation(settingsOledRotate180() ? 2 : 0);
+  setOledRotation(settingsOledRotate180());
 
   display.clearDisplay();
   display.display();

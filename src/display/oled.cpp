@@ -12,12 +12,28 @@
 
 Adafruit_SSD1306 display(
   OLED_WIDTH,
-  OLED_HEIGHT,
+  OLED_PANEL_HEIGHT,
   &Wire,
   -1
 );
 
 bool oledAvailable = false;
+
+void setOledRotation(bool rotate180) {
+  display.setRotation(rotate180 ? 2 : 0);
+
+  if (OLED_PANEL_HEIGHT == OLED_HEIGHT) {
+    return;
+  }
+
+  // Layout is OLED_HEIGHT rows at the top of the buffer (bottom when
+  // rotated). Shift the panel start line so those rows sit centred.
+  const int margin = (OLED_PANEL_HEIGHT - OLED_HEIGHT) / 2;
+  const int startLine = rotate180
+    ? (OLED_PANEL_HEIGHT - OLED_HEIGHT - margin)
+    : (OLED_PANEL_HEIGHT - margin);
+  display.ssd1306_command(SSD1306_SETSTARTLINE | (startLine % OLED_PANEL_HEIGHT));
+}
 
 namespace {
 
@@ -132,7 +148,7 @@ void applyOledRotation() {
     return;
   }
 
-  display.setRotation(settingsOledRotate180() ? 2 : 0);
+  setOledRotation(settingsOledRotate180());
 }
 
 void showOledOrientationTest(bool rotate180) {
@@ -142,7 +158,7 @@ void showOledOrientationTest(bool rotate180) {
 
   stopEyes();
   wakeOled();
-  display.setRotation(rotate180 ? 2 : 0);
+  setOledRotation(rotate180);
   showOledText("THIS WAY UP");
 }
 

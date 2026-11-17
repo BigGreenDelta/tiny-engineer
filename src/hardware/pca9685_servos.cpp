@@ -10,7 +10,11 @@
 #include "settings/settings.h"
 
 bool pca9685Connected() {
+#if defined(TE_SERVO_LEDC)
+  return true;  // no PCA9685: servos are driven straight from GPIOs
+#else
   return i2cDeviceConnected(PCA9685_ADDRESS);
+#endif
 }
 
 void initPca9685() {

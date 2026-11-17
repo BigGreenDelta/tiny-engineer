@@ -1,5 +1,7 @@
 #include <Arduino.h>
+#if !defined(TE_SERVO_LEDC)
 #include <Adafruit_PWMServoDriver.h>
+#endif
 #include <Preferences.h>
 #include <cmath>
 #include <cstring>
@@ -11,7 +13,48 @@
 #include "serial_log.h"
 #include "settings/settings.h"
 
+#if defined(TE_SERVO_LEDC)
+// Drop-in for the PCA9685 driver: one LEDC output per servo GPIO.
+// 50 Hz at 12-bit resolution gives the same 4096 counts per 20 ms frame,
+// so angleToPulse() and the full-off value keep their meaning.
+class LedcServoPwm {
+ public:
+  void begin() {
+    for (int ch = 0; ch < SERVO_COUNT; ch++) {
+      ledcAttach(SERVO_GPIO[ch], freqHz_, kResolutionBits);
+      ledcWrite(SERVO_GPIO[ch], 0);
+    }
+    attached_ = true;
+  }
+
+  void setPWMFreq(float freqHz) {
+    freqHz_ = static_cast<uint32_t>(freqHz);
+    if (!attached_) {
+      return;
+    }
+    for (int ch = 0; ch < SERVO_COUNT; ch++) {
+      ledcChangeFrequency(SERVO_GPIO[ch], freqHz_, kResolutionBits);
+    }
+  }
+
+  void setPWM(uint8_t channel, uint16_t /*on*/, uint16_t off) {
+    if (channel >= SERVO_COUNT) {
+      return;
+    }
+    // 4096 is the PCA9685 full-off bit: output held LOW.
+    ledcWrite(SERVO_GPIO[channel], off >= 4096 ? 0 : off);
+  }
+
+ private:
+  static constexpr uint8_t kResolutionBits = 12;
+  uint32_t freqHz_ = 50;
+  bool attached_ = false;
+};
+
+LedcServoPwm pwm;
+#else
 Adafruit_PWMServoDriver pwm(PCA9685_ADDRESS);
+#endif
 
 // PCA9685 LEDn_OFF full-off bit. Do not use (4096, 0) — that is full-on HIGH.
 constexpr uint16_t kPca9685FullOff = 4096;

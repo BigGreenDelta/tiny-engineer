@@ -6,6 +6,39 @@
 // PINOUT
 // =====================================================
 
+#if defined(TE_BOARD_ESP32DEV)
+
+// Classic ESP32 DevKit V1 (ELEGOO kit board), env:esp32dev.
+// Avoids strapping pins 0/2/5/12/15, flash pins 6-11, input-only 34-39.
+
+// I2C -> OLED
+constexpr int I2C_SDA = 21;
+constexpr int I2C_SCL = 22;
+
+// I2S -> MAX98357A (not fitted; pins reserved)
+constexpr int I2S_BCLK = 26;
+constexpr int I2S_LRC  = 25;
+constexpr int I2S_DIN  = 27;
+
+constexpr int PUSH_BUTTON_PIN_DEFAULT = 4;
+
+// No WS2812 on this board. GPIO10 here is a flash pin: never drive it.
+constexpr bool RGB_LED_PRESENT = false;
+constexpr int RGB_LED_PIN = -1;
+
+// No PCA9685: servos run on LEDC, one GPIO per servo channel.
+constexpr bool PCA9685_OE_WIRED = false;
+constexpr int PCA9685_OE_PIN = -1;
+constexpr int SERVO_GPIO[5] = {
+  18,  // HEAD
+  19,  // NECK
+  23,  // HAND_LEFT
+  32,  // HAND_RIGHT
+  33,  // BODY
+};
+
+#else
+
 // I2C -> PCA9685 + OLED
 constexpr int I2C_SDA = 0;   // GP0
 constexpr int I2C_SCL = 1;   // GP1
@@ -19,12 +52,15 @@ constexpr int I2S_DIN  = 4;  // GP4
 constexpr int PUSH_BUTTON_PIN_DEFAULT = 20;  // GP20
 
 // Built-in WS2812 RGB
+constexpr bool RGB_LED_PRESENT = true;
 constexpr int RGB_LED_PIN = 10;
 
 // PCA9685 output enable (active LOW). GP5 → OE; default on.
 // Set PCA9685_OE_WIRED false only if OE is hard-tied off-chip (e.g. to GND).
 constexpr bool PCA9685_OE_WIRED = true;
 constexpr int PCA9685_OE_PIN = 5;
+
+#endif
 
 // =====================================================
 // AUDIO
@@ -53,5 +89,12 @@ constexpr int SERVO_MAX_US = 2200;
 // =====================================================
 
 constexpr int OLED_WIDTH  = 128;
-constexpr int OLED_HEIGHT = 32;
+constexpr int OLED_HEIGHT = 32;  // layout height every face style draws in
+
+#if defined(TE_BOARD_ESP32DEV)
+// 0.96" 128x64 panel: the 32-row layout is shown centred on it.
+constexpr int OLED_PANEL_HEIGHT = 64;
+#else
+constexpr int OLED_PANEL_HEIGHT = OLED_HEIGHT;
+#endif
 constexpr uint8_t OLED_ADDRESS = 0x3C;

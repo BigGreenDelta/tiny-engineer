@@ -38,7 +38,9 @@ void setup() {
   Serial.setRxBufferSize(4096);
   Serial.setTxBufferSize(4096);
   Serial.begin(115200);
-  Serial.setTxTimeoutMs(0);
+#if ARDUINO_USB_CDC_ON_BOOT
+  Serial.setTxTimeoutMs(0);  // HWCDC only; UART Serial has no such call
+#endif
   serialLinkWatchUsb();
   delay(1000);
 

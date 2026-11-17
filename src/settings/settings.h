@@ -13,7 +13,11 @@ constexpr uint8_t SETTINGS_DEFAULT_VOLUME = 70;
 constexpr bool SETTINGS_DEFAULT_WELCOME = true;
 constexpr bool SETTINGS_DEFAULT_SERIAL_LOG = false;
 constexpr bool SETTINGS_DEFAULT_PUSH_BUTTON = false;
+#if defined(TE_BOARD_ESP32DEV)
+constexpr uint8_t SETTINGS_DEFAULT_PUSH_BUTTON_PIN = 4;  // GPIO20 does not exist on the classic ESP32
+#else
 constexpr uint8_t SETTINGS_DEFAULT_PUSH_BUTTON_PIN = 20;
+#endif
 constexpr const char* SETTINGS_DEFAULT_PUSH_BUTTON_SOUND = "none";
 constexpr size_t SETTINGS_PUSH_BUTTON_SOUND_MAX_LEN = 8;
 constexpr uint32_t SETTINGS_DEFAULT_CONTINUOUS_TIMEOUT_MIN = 5;

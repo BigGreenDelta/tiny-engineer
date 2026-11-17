@@ -130,7 +130,12 @@ bool ServoRanges::valid() const {
 }
 
 bool settingsValidatePushButtonPin(uint8_t pin) {
+#if defined(TE_BOARD_ESP32DEV)
+  // Free on the DevKit V1 build; 6/7 are flash pins and 20 does not exist.
+  return pin == 4 || pin == 13 || pin == 14 || pin == 16 || pin == 17;
+#else
   return pin == 6 || pin == 7 || pin == 20 || pin == 21;
+#endif
 }
 
 bool settingsValidatePushButtonSound(const char* sound) {
@@ -227,10 +232,7 @@ const char* settingsLinkModePatchDenied(
 }
 
 const char* SettingsPatch::setupOnlyStep() const {
-  if (servoRanges) {
-    return "servo";
-  }
-
+  // Servo ranges are saved from the main-screen calibration too.
   if (rgbOrder != nullptr) {
     return "rgb";
   }

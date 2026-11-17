@@ -1,8 +1,12 @@
 #include "hardware/chip_temp.h"
 
 #include <Arduino.h>
-#include "driver/temperature_sensor.h"
+#include "soc/soc_caps.h"
 #include "serial_log.h"
+
+// The classic ESP32 has no temperature_sensor driver; report "no reading".
+#if SOC_TEMP_SENSOR_SUPPORTED
+#include "driver/temperature_sensor.h"
 
 namespace {
 
@@ -39,3 +43,15 @@ bool chipTempCelsius(float* out) {
 
   return temperature_sensor_get_celsius(g_tsens, out) == ESP_OK;
 }
+
+#else
+
+void initChipTemp() {
+  serialLogPrintln("Chip temp sensor not available on this chip");
+}
+
+bool chipTempCelsius(float* /*out*/) {
+  return false;
+}
+
+#endif
