@@ -14,11 +14,11 @@ constexpr int kRowBytes = kWidth / 8;
 // ------------------------------------------------------------- tuning ---
 // Sizes are fractions of the eye radii unless they end in Px.
 
-constexpr float kMinEyeRadiusPx = 1.0f;  // smaller eyes are not drawn
+constexpr float kMinEyeRadiusPx = 1.0f * kSizeScale;  // smaller eyes are not drawn
 
 // Closed eye: a "‿" lid line, or "∩" when the eye was smiling as it shut.
 constexpr float kClosedHalfWidth = 0.9f;
-constexpr float kClosedSagPx = 2.2f;
+constexpr float kClosedSagPx = 2.2f * kSizeScale;
 constexpr float kClosedHappyAbove = 0.5f;
 // Round eyes flatter than this (height ÷ width radius) draw the lid line: a
 // thinner ellipse reads as a bar, not a blink. Compared with the width, since
@@ -41,11 +41,11 @@ constexpr float kLidTravel = 1.2f;
 // Pupil: a big dark disc that follows the gaze. Its size never changes with
 // lids, smiles or blinks: they cover it instead, the way eyelids do, and a
 // rim of eye always stays white around it so the outline never notches.
-constexpr int kPupilRimPx = 2;
+constexpr int kPupilRimPx = sizePx(2.0f);
 // How far the pupil may tuck under the rim when looking hard to a side, so a
 // big pupil still moves visibly; the rim covers the tucked part.
-constexpr float kPupilTuckPx = 1.0f;
-constexpr float kMinPupilRadiusPx = 1.6f;
+constexpr float kPupilTuckPx = 1.0f * kSizeScale;
+constexpr float kMinPupilRadiusPx = 1.6f * kSizeScale;
 // Catch-lights: white spots inside the pupil, the same in both eyes (one big
 // round light up and left, two small dots). White on black, so they never
 // read as a second pupil. Offsets and radii are × the pupil radius.
@@ -61,31 +61,31 @@ constexpr Light kCatchLights[] = {
   {0.45f, -0.35f, 0.14f},
   {-0.45f, 0.42f, 0.14f},
 };
-constexpr float kMinCatchLightRadiusPx = 0.5f;
+constexpr float kMinCatchLightRadiusPx = 0.5f * kSizeScale;
 // Heart eyes have no pupil, just a dark highlight hole: offset from the
 // center (× radii) and radius (× the smaller radius).
 constexpr float kHeartHoleDx = -0.45f;
 constexpr float kHeartHoleDy = -0.42f;
 constexpr float kHeartHoleRadius = 0.18f;
-constexpr float kHeartHoleMinEyeHeightPx = 5.0f;  // shorter hearts have no room
+constexpr float kHeartHoleMinEyeHeightPx = 5.0f * kSizeScale;  // shorter hearts have no room
 constexpr float kMinSparkle = 0.05f;
-constexpr float kMinHoleRadiusPx = 1.1f;  // smaller reads as a stray pixel, not a sparkle
+constexpr float kMinHoleRadiusPx = 1.1f * kSizeScale;  // smaller reads as a stray pixel, not a sparkle
 
 // Line shapes: extent within the eye box and stroke half-width.
 constexpr float kChevronHeight = 0.78f;
 constexpr float kChevronWidth = 0.95f;
-constexpr float kChevronHalfStrokePx = 1.5f;
+constexpr float kChevronHalfStrokePx = 1.5f * kSizeScale;
 constexpr float kCrossHeight = 0.68f;
 constexpr float kCrossWidth = 0.62f;
-constexpr float kCrossHalfStrokePx = 1.4f;
+constexpr float kCrossHalfStrokePx = 1.4f * kSizeScale;
 constexpr float kHeartScale = 0.88f;
 constexpr float kHeartScan = 1.05f;  // search box, so the lobes are never clipped
 constexpr float kHeartLift = 0.12f;  // centers lobes + tip in the eye box
 
 // Blush: a dithered oval under the outer eye corner.
-constexpr float kBlushRxPx = 5.5f;
-constexpr float kBlushRyPx = 2.4f;
-constexpr float kBlushOutsetPx = 1.5f;  // past the outer eye edge
+constexpr float kBlushRxPx = 5.5f * kSizeScale;
+constexpr float kBlushRyPx = 2.4f * kSizeScale;
+constexpr float kBlushOutsetPx = 1.5f * kSizeScale;  // past the outer eye edge
 constexpr float kBlushDrop = 0.6f;       // below the eye center, × rx
 constexpr float kBlushEdgeSoftness = 2.2f;
 constexpr float kMinBlush = 0.02f;
@@ -94,13 +94,13 @@ constexpr float kFullBlushCoverage = 0.5f;  // full blush peaks at a checkerboar
 constexpr float kBlushDitherScale = kBayerLevels * kFullBlushCoverage;
 
 // Mouth.
-constexpr int kMaxMouthColumns = 48;  // wider mouths are skipped
-constexpr float kMinMouthWidthPx = 1.0f;
+constexpr int kMaxMouthColumns = sizePx(48.0f) + 1;  // wider mouths are skipped
+constexpr float kMinMouthWidthPx = 1.0f * kSizeScale;
 constexpr float kMouthWaveCycles = 3.0f;
 
 // Twinkle stars beside the eyes.
 constexpr float kMinGlint = 0.3f;
-constexpr float kGlintOutsetPx = 4.5f;  // past the outer eye edge
+constexpr float kGlintOutsetPx = 4.5f * kSizeScale;  // past the outer eye edge
 constexpr float kGlintRise = 0.8f;      // above the eye center, × rx
 
 // 4×4 ordered dither thresholds (0..15).
@@ -275,10 +275,11 @@ void drawClosedEye(Canvas& c, const EyeShape& e) {
   const Span span = pixelSpan(e.cx, halfW);
   for (int x = span.first; x <= span.last; x++) {
     const float u = (center(x) - e.cx) / halfW;
-    // Arc centered on cy; the 2 px line straddles it.
-    const float y = e.cy + sag * (1.0f - u * u) - sag * 0.5f - 0.5f;
+    // Arc centered on cy; the 2-design-px line straddles it.
+    const int thick = sizePx(2.0f);
+    const float y = e.cy + sag * (1.0f - u * u) - sag * 0.5f - (thick * 0.5f - 0.5f);
     const int yi = floorInt(y);
-    c.column(x, yi, yi + 1);
+    c.column(x, yi, yi + thick - 1);
   }
 }
 
@@ -438,7 +439,7 @@ class PixelDisc {
   int halfWidth(int dy) const { return half_[dy < 0 ? -dy : dy]; }
 
  private:
-  static constexpr int kMaxRows = 15;
+  static constexpr int kMaxRows = sizePx(15.0f) + 1;
   int rows_;
   int half_[kMaxRows + 1] = {};
 };
@@ -569,7 +570,7 @@ void drawCross(Canvas& c, const EyeShape& e, float ry) {
   }
 }
 
-constexpr int kMaxHeartHalf = 32;  // half-width columns, more than any eye needs
+constexpr int kMaxHeartHalf = sizePx(32.0f) + 1;  // half-width columns, more than any eye needs
 
 // Inside the unit heart (X² + Y² − 1)³ − X²Y³ ≤ 0, with X² precomputed.
 bool insideHeart(float X2, float Y) {
@@ -687,7 +688,7 @@ void drawEye(Canvas& c, const EyeShape& e) {
 
 constexpr int kBlushMaxCols = (int)(2.0f * kBlushRxPx) + 2;
 constexpr int kBlushMaxRows = (int)(2.0f * kBlushRyPx) + 2;
-static_assert(kBlushMaxCols <= 16, "blush mask rows are 16 bits");
+static_assert(kBlushMaxCols <= 32, "blush mask rows are 32 bits");
 
 bool nearLit(const uint8_t* frame, int x, int y) {
   for (int dy = -1; dy <= 1; dy++) {
@@ -732,7 +733,7 @@ void drawBlush(Canvas& c, const uint8_t* frame, const EyeShape& e, float amount)
     nx2[k] = nx * nx;
   }
 
-  uint16_t mask[kBlushMaxRows] = {};
+  uint32_t mask[kBlushMaxRows] = {};
   for (int r = 0; r < rows && r < kBlushMaxRows; r++) {
     const int y = y0 + r;
     const float ny = (center(y) - by) / kBlushRyPx;
@@ -740,14 +741,14 @@ void drawBlush(Canvas& c, const uint8_t* frame, const EyeShape& e, float amount)
     for (int k = 0; k < cols && k < kBlushMaxCols; k++) {
       const int x = x0 + k;
       if (blushDot(x, y, nx2[k] + ny2, amount) && !nearLit(frame, x, y)) {
-        mask[r] |= (uint16_t)(1u << k);
+        mask[r] |= (uint32_t)1 << k;
       }
     }
   }
 
   for (int r = 0; r < kBlushMaxRows; r++) {
     for (int k = 0; k < kBlushMaxCols; k++) {
-      if (mask[r] & (1u << k)) {
+      if (mask[r] & ((uint32_t)1 << k)) {
         c.plot(x0 + k, y0 + r);
       }
     }
@@ -822,6 +823,7 @@ bool mouthEdges(const Mouth& m, MouthColumns& out) {
   return true;
 }
 
+// Strokes are one design pixel thick.
 void strokeMouth(Canvas& c, const MouthColumns& cols, bool hollow) {
   for (int i = 0; i < cols.count; i++) {
     if (!cols.inside[i]) {
@@ -831,12 +833,12 @@ void strokeMouth(Canvas& c, const MouthColumns& cols, bool hollow) {
     const int x = cols.x0 + i;
     const bool end = !cols.has(i - 1) || !cols.has(i + 1);
     if (!hollow || end) {
-      c.column(x, floorInt(cols.spanTo(cols.top, i, true)), floorInt(cols.spanTo(cols.bottom, i, false)));
+      c.column(x, floorInt(cols.spanTo(cols.top, i, true)), floorInt(cols.spanTo(cols.bottom, i, false)) + sizePx(1.0f) - 1);
       continue;
     }
 
-    c.column(x, floorInt(cols.spanTo(cols.top, i, true)), floorInt(cols.spanTo(cols.top, i, false)));
-    c.column(x, floorInt(cols.spanTo(cols.bottom, i, true)), floorInt(cols.spanTo(cols.bottom, i, false)));
+    c.column(x, floorInt(cols.spanTo(cols.top, i, true)), floorInt(cols.spanTo(cols.top, i, false)) + sizePx(1.0f) - 1);
+    c.column(x, floorInt(cols.spanTo(cols.bottom, i, true)), floorInt(cols.spanTo(cols.bottom, i, false)) + sizePx(1.0f) - 1);
   }
 }
 
@@ -857,8 +859,39 @@ void drawGlint(Canvas& c, const EyeShape& e, float glint) {
   c.star(
     e.cx - e.side * (e.rx + kGlintOutsetPx),
     e.cy - kGlintRise * e.rx,
-    (int)(glint - kMinGlint)
+    sizePx((float)(int)(glint - kMinGlint))
   );
+}
+
+// Design units to screen pixels (see kScale in face.h): heights move by
+// kScale, shapes grow by kSizeScale, eye and mouth centers keep their x, and
+// anything placed beside an eye (the bell's stars) moves out from that eye's
+// center.
+void eyeToScreen(EyeShape& e) {
+  e.cy *= kScale;
+  e.rx *= kSizeScale;
+  e.ry *= kSizeScale;
+  e.pupil *= kSizeScale;
+  e.pupilShake *= kSizeScale;
+}
+
+void toScreen(Face& face) {
+  for (uint8_t i = 0; i < face.sparkCount && i < kMaxSparks; i++) {
+    Spark& s = face.sparks[i];
+    const float eyeX = s.x < kWidth / 2 ? face.left.cx : face.right.cx;
+    s.x = (int16_t)floorf(eyeX + (s.x - eyeX) * kSizeScale);
+    s.y = (int16_t)(s.y * kScale);
+  }
+  eyeToScreen(face.left);
+  eyeToScreen(face.right);
+
+  Mouth& m = face.mouth;
+  m.cy *= kScale;
+  m.width *= kSizeScale;
+  m.curve *= kSizeScale;
+  m.openUp *= kSizeScale;
+  m.openDown *= kSizeScale;
+  m.wave *= kSizeScale;
 }
 
 }  // namespace
@@ -870,9 +903,14 @@ bool pixelAt(const uint8_t* frame, int x, int y) {
   return (frame[y * kRowBytes + x / 8] & (0x80u >> (x & 7))) != 0;
 }
 
-bool render(const Face& face, uint8_t* frame, size_t frameBytes) {
+bool render(const Face& designFace, uint8_t* frame, size_t frameBytes) {
   if (frame == nullptr || frameBytes < kFrameBytes) {
     return false;
+  }
+
+  Face face = designFace;
+  if (kScale != 1) {
+    toScreen(face);
   }
 
   memset(frame, 0, kFrameBytes);
@@ -888,7 +926,7 @@ bool render(const Face& face, uint8_t* frame, size_t frameBytes) {
   drawGlint(canvas, face.right, face.glint);
   for (uint8_t i = 0; i < face.sparkCount && i < kMaxSparks; i++) {
     const Spark& s = face.sparks[i];
-    canvas.star((float)s.x, (float)s.y, s.arm);
+    canvas.star((float)s.x, (float)s.y, sizePx(s.arm));
   }
   return true;
 }

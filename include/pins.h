@@ -89,12 +89,9 @@ constexpr int SERVO_MAX_US = 2200;
 // =====================================================
 
 constexpr int OLED_WIDTH  = 128;
-constexpr int OLED_HEIGHT = 32;  // layout height every face style draws in
-
 #if defined(TE_BOARD_ESP32DEV)
-// 0.96" 128x64 panel: the 32-row layout is shown centred on it.
-constexpr int OLED_PANEL_HEIGHT = 64;
+constexpr int OLED_HEIGHT = 64;  // 0.96" 128x64 panel
 #else
-constexpr int OLED_PANEL_HEIGHT = OLED_HEIGHT;
+constexpr int OLED_HEIGHT = 32;
 #endif
 constexpr uint8_t OLED_ADDRESS = 0x3C;

@@ -8,10 +8,31 @@
 // can ease between moods. Pure C++ (no Arduino), so it builds for native
 // tests and host previews.
 
+#ifndef TE_KAWAII_SCALE
+#define TE_KAWAII_SCALE 1
+#endif
+#ifndef TE_KAWAII_SIZE_SCALE
+#define TE_KAWAII_SIZE_SCALE TE_KAWAII_SCALE
+#endif
+
 namespace kawaii {
 
+// Faces are designed in 32-row units: every coordinate and size in Face,
+// Mouth, Spark and the expressions is a design pixel. render() draws them on
+// a 32 * kScale row screen (2 for a 128x64 OLED): heights move by kScale,
+// shapes (radii, strokes, mouth, blush, stars) grow by kSizeScale, and eye
+// and mouth centers keep their x. kSizeScale stays below kScale so the
+// bigger eyes still fit 128 columns with room for the blush and mouth.
+constexpr int16_t kScale = TE_KAWAII_SCALE;
+constexpr float kSizeScale = TE_KAWAII_SIZE_SCALE;
+
+// A design-pixel length as whole screen pixels.
+constexpr int sizePx(float designPx) {
+  return (int)(designPx * kSizeScale + 0.5f);
+}
+constexpr int16_t kDesignHeight = 32;
 constexpr int16_t kWidth = 128;
-constexpr int16_t kHeight = 32;
+constexpr int16_t kHeight = kDesignHeight * kScale;
 // Row-major, MSB = leftmost pixel: the layout Adafruit_GFX::drawBitmap reads.
 constexpr size_t kFrameBytes = (kWidth / 8) * kHeight;
 

@@ -26,6 +26,32 @@
 
 namespace {
 
+// A reset in the middle of an I2C transfer (flashing, the reset button)
+// can leave a device holding SDA low while it waits for more clock pulses,
+// and then nothing answers at boot. Clock it out and send a STOP.
+void recoverI2cBus() {
+  pinMode(I2C_SDA, INPUT_PULLUP);
+  pinMode(I2C_SCL, OUTPUT_OPEN_DRAIN);
+  digitalWrite(I2C_SCL, HIGH);
+  delayMicroseconds(5);
+
+  for (int i = 0; i < 9 && digitalRead(I2C_SDA) == LOW; i++) {
+    digitalWrite(I2C_SCL, LOW);
+    delayMicroseconds(5);
+    digitalWrite(I2C_SCL, HIGH);
+    delayMicroseconds(5);
+  }
+
+  // STOP: SDA rises while SCL is high.
+  pinMode(I2C_SDA, OUTPUT_OPEN_DRAIN);
+  digitalWrite(I2C_SDA, LOW);
+  delayMicroseconds(5);
+  digitalWrite(I2C_SCL, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(I2C_SDA, HIGH);
+  delayMicroseconds(5);
+}
+
 constexpr int kBootSteps = 6;
 
 }  // namespace
@@ -59,9 +85,12 @@ void setup() {
 
   serialLogPrintln();
   serialLogPrintln("Starting I2C");
-  serialLogPrintln("SDA = GP0");
-  serialLogPrintln("SCL = GP1");
+  serialLogPrint("SDA = GP");
+  serialLogPrintln(I2C_SDA);
+  serialLogPrint("SCL = GP");
+  serialLogPrintln(I2C_SCL);
 
+  recoverI2cBus();
   Wire.begin(
     I2C_SDA,
     I2C_SCL
