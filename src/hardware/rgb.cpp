@@ -391,20 +391,23 @@ void haltWithRgbCode(uint8_t blinks, const char* reason) {
   }
 }
 
+// Long enough to name each colour by eye.
+constexpr uint32_t kRgbTestStepMs = 1000;
+
 void runRgbTest() {
   serialLogPrintln("RGB test");
 
   setRgb(64, 0, 0);
-  delay(300);
+  delay(kRgbTestStepMs);
 
   setRgb(0, 64, 0);
-  delay(300);
+  delay(kRgbTestStepMs);
 
   setRgb(0, 0, 64);
-  delay(300);
+  delay(kRgbTestStepMs);
 
   setRgb(32, 32, 32);
-  delay(300);
+  delay(kRgbTestStepMs);
 
   setRgb(0, 0, 0);
 
