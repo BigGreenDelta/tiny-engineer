@@ -17,9 +17,11 @@ constexpr bool SETTINGS_DEFAULT_PUSH_BUTTON = false;
 // the web panel offers the right ones.
 #if defined(TE_BOARD_ESP32DEV)
 // Free on the DevKit V1 build; 6/7 are flash pins and 20 does not exist.
-constexpr uint8_t SETTINGS_PUSH_BUTTON_PINS[] = {4, 13, 14, 16, 17};
+// GPIO0 is the on-board BOOT button (pulled up on the board): free once
+// running, but held through a reset it starts the flasher instead.
+constexpr uint8_t SETTINGS_PUSH_BUTTON_PINS[] = {0, 4, 13, 14, 16, 17};
 // As printed on the board, in the same order.
-constexpr const char* SETTINGS_PUSH_BUTTON_PIN_LABELS[] = {"D4", "D13", "D14", "RX2", "TX2"};
+constexpr const char* SETTINGS_PUSH_BUTTON_PIN_LABELS[] = {"BOOT", "D4", "D13", "D14", "RX2", "TX2"};
 constexpr uint8_t SETTINGS_DEFAULT_PUSH_BUTTON_PIN = 4;
 #else
 constexpr uint8_t SETTINGS_PUSH_BUTTON_PINS[] = {6, 7, 20, 21};
