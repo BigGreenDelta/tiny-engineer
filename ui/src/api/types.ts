@@ -40,6 +40,8 @@ export interface Settings {
   push_button_pin: number;
   /** GPIOs this board allows for the push-button (read-only; older firmware omits it). */
   push_button_pins?: number[];
+  /** Board names for push_button_pins, same order (read-only; older firmware omits it). */
+  push_button_pin_labels?: string[];
   continuous_timeout: number;
   loading: LoadingMode;
   eyes_style: string;

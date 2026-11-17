@@ -18,11 +18,18 @@ constexpr bool SETTINGS_DEFAULT_PUSH_BUTTON = false;
 #if defined(TE_BOARD_ESP32DEV)
 // Free on the DevKit V1 build; 6/7 are flash pins and 20 does not exist.
 constexpr uint8_t SETTINGS_PUSH_BUTTON_PINS[] = {4, 13, 14, 16, 17};
+// As printed on the board, in the same order.
+constexpr const char* SETTINGS_PUSH_BUTTON_PIN_LABELS[] = {"D4", "D13", "D14", "RX2", "TX2"};
 constexpr uint8_t SETTINGS_DEFAULT_PUSH_BUTTON_PIN = 4;
 #else
 constexpr uint8_t SETTINGS_PUSH_BUTTON_PINS[] = {6, 7, 20, 21};
+constexpr const char* SETTINGS_PUSH_BUTTON_PIN_LABELS[] = {"GP6", "GP7", "GP20", "GP21"};
 constexpr uint8_t SETTINGS_DEFAULT_PUSH_BUTTON_PIN = 20;
 #endif
+static_assert(
+  sizeof(SETTINGS_PUSH_BUTTON_PINS) / sizeof(SETTINGS_PUSH_BUTTON_PINS[0]) ==
+    sizeof(SETTINGS_PUSH_BUTTON_PIN_LABELS) / sizeof(SETTINGS_PUSH_BUTTON_PIN_LABELS[0]),
+  "one label per push-button pin");
 constexpr const char* SETTINGS_DEFAULT_PUSH_BUTTON_SOUND = "none";
 constexpr size_t SETTINGS_PUSH_BUTTON_SOUND_MAX_LEN = 8;
 constexpr uint32_t SETTINGS_DEFAULT_CONTINUOUS_TIMEOUT_MIN = 5;

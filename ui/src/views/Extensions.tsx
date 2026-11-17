@@ -10,6 +10,13 @@ import { useResettableState } from "../useResettableState";
 // Firmware without push_button_pins in GET /settings has the C3-Zero pins.
 const DEFAULT_PUSH_BUTTON_PINS = [6, 7, 20, 21];
 
+/** The pin's name as printed on the board (GP<n> when the firmware does not say). */
+function pinLabel(settings: Settings, pin: number): string {
+  const index = settings.push_button_pins?.indexOf(pin) ?? -1;
+
+  return (index >= 0 ? settings.push_button_pin_labels?.[index] : undefined) ?? `GP${pin}`;
+}
+
 const BUTTON_EVENT_ROWS = [
   { key: "down", api: "button.down", when: "Press" },
   { key: "up", api: "button.up", when: "Release" },
@@ -108,14 +115,14 @@ function ExtensionsForm({
                           checked={draft.pushButtonPin === pin}
                           onChange={() => set({ pushButtonPin: pin })}
                         />
-                        <span>GP{pin}</span>
+                        <span>{pinLabel(settings, pin)}</span>
                       </label>
                     );
                   })}
                 </div>
                 <p className="hint">
-                  Wire a momentary switch between GP{draft.pushButtonPin} and GND on the Extension
-                  port. Active-low with the ESP32 internal pull-up.
+                  Wire a momentary switch between {pinLabel(settings, draft.pushButtonPin)} and GND
+                  on the Extension port. Active-low with the ESP32 internal pull-up.
                 </p>
                 <div className="field-head">
                   <span>Events</span>

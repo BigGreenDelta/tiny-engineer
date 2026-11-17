@@ -130,6 +130,10 @@ JsonDocument settingsJson() {
   for (const uint8_t pin : SETTINGS_PUSH_BUTTON_PINS) {
     pushButtonPins.add(pin);
   }
+  JsonArray pushButtonPinLabels = doc["push_button_pin_labels"].to<JsonArray>();
+  for (const char* label : SETTINGS_PUSH_BUTTON_PIN_LABELS) {
+    pushButtonPinLabels.add(label);
+  }
   doc["continuous_timeout"] = settingsContinuousTimeoutMin();
   doc["loading"] = settingsLoading();
   doc["eyes_style"] = settingsEyesStyle();
