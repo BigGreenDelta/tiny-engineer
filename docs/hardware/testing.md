@@ -124,6 +124,8 @@ curl -X POST "http://tiny-engineer.local/test/servo" -H "Content-Type: applicati
 | `POST` | `/test/screen` | `{"ok":true,"test":"screen"}` after `runOledTest()` |
 | `POST` | `/test/movement` | `{"ok":true,"test":"movement"}` after `runServoTest()` |
 | `POST` | `/test/led` | `{"ok":true,"test":"led"}` after `runRgbTest()` |
+| `POST` | `/test/rgb` | `{"ok":true,"test":"rgb",...}`; holds a colour, `{"release":true}` releases |
+| `POST` | `/test/oled` | `{"ok":true,"test":"oled",...}` after 3 s of text |
 | `POST` | `/test/servo` `{"index","angle"}` | `{"ok":true,"test":"servo","index":N,"angle":A}` after `moveServoSmooth()` |
 | `POST` | `/setup/servo` `{"all":90}` or `{"index","angle"}` | Setup AP only; slow 0–180° move (`SERVO_CALIB_SPEED_DEG_S`) |
 | `POST` | `/setup/led` `{"color":"R"}` / `G` / `B` or `{"byte":0}` / `1` / `2` | Setup AP only; light logical RGB or one WS2812 wire byte; an empty body releases the hold |

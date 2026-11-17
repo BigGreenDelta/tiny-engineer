@@ -25,6 +25,8 @@ const ROUTES = [
   ["POST", "/test/screen", "OLED demo"],
   ["POST", "/test/movement", "All servos exercise"],
   ["POST", "/test/led", "RGB LED cycle"],
+  ["POST", "/test/rgb", "Debug: hold the RGB LED on any colour, or release it"],
+  ["POST", "/test/oled", "Debug: show a title and text on the OLED for 3 s"],
   ["POST", "/test/servo", "Move one servo (see parameters below)"],
   [
     "POST",

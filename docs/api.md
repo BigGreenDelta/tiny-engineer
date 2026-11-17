@@ -423,6 +423,31 @@ curl -X POST http://tiny-engineer.local/test/led
 { "ok": true, "test": "led" }
 ```
 
+### `POST /test/rgb`
+
+Debug: hold the RGB LED on any colour until released; animations stop changing it meanwhile. JSON body `{"r":0-255,"g":0-255,"b":0-255}`. `{"release":true}` hands the LED back to the current animation. A channel that is missing, not an integer, or outside 0-255 → **400** `invalid r` / `invalid g` / `invalid b`.
+
+```bash
+curl -X POST -H 'Content-Type: application/json' -d '{"r":255,"g":128,"b":0}' http://tiny-engineer.local/test/rgb
+curl -X POST -H 'Content-Type: application/json' -d '{"release":true}' http://tiny-engineer.local/test/rgb
+```
+
+```json
+{ "ok": true, "test": "rgb", "r": 255, "g": 128, "b": 0 }
+```
+
+### `POST /test/oled`
+
+Debug: show a title and an optional line of text on the OLED for 3 s, then the eyes again. Handler blocks until the text is gone. JSON body `{"title":"...","text":"..."}`, each 1-21 characters (`text` optional). On a 64-row panel the title sits in the thought box of the top band. Bad title → **400** `invalid title`; bad text → **400** `invalid text`.
+
+```bash
+curl -X POST -H 'Content-Type: application/json' -d '{"title":"HELLO","text":"from the PC"}' http://tiny-engineer.local/test/oled
+```
+
+```json
+{ "ok": true, "test": "oled", "title": "HELLO", "text": "from the PC" }
+```
+
 ### `POST /setup/servo`
 
 Setup AP, or after setup with the access token (main-screen servo calibration). Outside setup AP it first stops the current animation and resets the sleep timer. Slowly move one servo, or all five to 90°, using the full **0–180°** electrical range (no saved safe-range clamp). ~25°/s (`SERVO_CALIB_SPEED_DEG_S`). Used by the setup wizard for seating printed parts at 90° and for range finding. Handler blocks until the move finishes. Does **not** require Wi-Fi credentials.
