@@ -120,3 +120,14 @@ test("describeFiles reports Write tool_input path", () => {
   );
   assert.deepEqual(lines, ["✎  touching: /proj/a.js"]);
 });
+
+test("requester is the session id, labelled with the project folder", async () => {
+  const { claudeCode } = await import("../src/integrations/claude-code/index.js");
+  const input = claudeCode.parseHook(
+    [],
+    JSON.stringify({ hook_event_name: "Stop", session_id: "abc-123", cwd: "/home/u/projects/tmp/" }),
+  );
+  assert.deepEqual(claudeCode.requester(input), { client: "abc-123", label: "tmp" });
+  const bare = claudeCode.parseHook([], JSON.stringify({ hook_event_name: "Stop" }));
+  assert.equal(claudeCode.requester(bare), null);
+});

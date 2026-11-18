@@ -1,0 +1,11 @@
+ARG BUILD_FROM
+FROM $BUILD_FROM
+
+RUN apk add --no-cache nodejs
+
+# app/ is filled by scripts/sync-ha-addon.sh from packages/tiny-engineer-broker.
+COPY app /app
+COPY run.sh /run.sh
+RUN chmod a+x /run.sh
+
+CMD [ "/run.sh" ]

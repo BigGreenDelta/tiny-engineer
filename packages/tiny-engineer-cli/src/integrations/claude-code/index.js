@@ -52,6 +52,20 @@ export const claudeCode = {
   },
 
   /**
+   * Who is asking, for the face broker: the session id, labelled with the
+   * project folder name.
+   * @param {import("../types.js").HookInput} input
+   */
+  requester(input) {
+    const raw = /** @type {Record<string, unknown> | undefined} */ (input.meta?.raw);
+    const client = typeof raw?.session_id === "string" ? raw.session_id : undefined;
+    if (!client) return null;
+    const cwd = typeof raw?.cwd === "string" ? raw.cwd : "";
+    const label = cwd.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || undefined;
+    return { client, label };
+  },
+
+  /**
    * @param {import("../types.js").HookInput} input
    */
   mapToAnim(input) {

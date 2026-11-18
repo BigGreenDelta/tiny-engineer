@@ -1,0 +1,22 @@
+{
+  "name": "@tiny-engineer/broker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Face broker: one writer for the Tiny Engineer face; agent sessions file requests, the broker picks what plays",
+  "bin": {
+    "tiny-engineer-broker": "./bin/tiny-engineer-broker.js"
+  },
+  "scripts": {
+    "start": "node bin/tiny-engineer-broker.js",
+    "test": "node --test"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

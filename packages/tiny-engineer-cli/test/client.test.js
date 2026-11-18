@@ -127,3 +127,15 @@ test("formatRobotError falls back to HTTP status", () => {
   assert.equal(formatRobotError({ ok: false, status: 503 }), "HTTP 503");
   assert.equal(formatRobotError({ ok: false }), "robot request failed");
 });
+
+test("postAnim adds client and label for the face broker", async () => {
+  let seen = "";
+  globalThis.fetch = async (url) => {
+    seen = String(url);
+    return new Response('{"ok":true,"animation":"typing"}', { status: 200 });
+  };
+  await postAnim("http://broker.test", "typing", null, { client: "s 1", label: "tmp" });
+  assert.equal(seen, "http://broker.test/anim?name=typing&client=s+1&label=tmp");
+  await postAnim("http://broker.test", "typing");
+  assert.equal(seen, "http://broker.test/anim?name=typing");
+});

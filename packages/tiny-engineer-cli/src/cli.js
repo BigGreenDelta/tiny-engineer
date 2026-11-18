@@ -153,7 +153,12 @@ async function runHook(out, argv, quietGlobal) {
   const anim = integration.mapToAnim(input);
   if (anim) {
     // Fail-open: ignore result so an offline robot never stalls the agent.
-    await robotSetAnim(anim, { url: opts.url, transport: opts.transport, port: opts.port });
+    await robotSetAnim(anim, {
+      url: opts.url,
+      transport: opts.transport,
+      port: opts.port,
+      who: integration.requester?.(input) ?? null,
+    });
   }
 
   const fileLines = integration.describeFiles?.(input, localOut.style) ?? [];

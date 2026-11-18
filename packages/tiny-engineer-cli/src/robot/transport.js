@@ -10,6 +10,7 @@ import { withTransport } from "./with-transport.js";
  *   transport?: string,
  *   url?: string,
  *   port?: string | null,
+ *   who?: { client?: string, label?: string } | null,
  * }} TransportOpts
  */
 
@@ -52,7 +53,7 @@ export async function robotSetAnim(name, opts = {}) {
     },
     http: async () => {
       const baseUrl = opts.url ?? getBaseUrl();
-      const httpResult = await postAnim(baseUrl, name, httpToken(opts));
+      const httpResult = await postAnim(baseUrl, name, httpToken(opts), opts.who ?? null);
       return { ...httpResult, target: baseUrl };
     },
   });

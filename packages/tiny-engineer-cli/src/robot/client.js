@@ -135,16 +135,22 @@ export function robotFetch(baseUrl, path, init, token = null) {
 
 /**
  * POST /anim?name=…. Never throws — returns a RobotResult.
+ * `who` adds `client` / `label` for the face broker (docs/broker.md); the
+ * robot itself ignores them.
  * @param {string} baseUrl
  * @param {string} animName
  * @param {string | null} [token]
+ * @param {{ client?: string, label?: string } | null} [who]
  * @returns {Promise<RobotResult>}
  */
-export async function postAnim(baseUrl, animName, token = null) {
+export async function postAnim(baseUrl, animName, token = null, who = null) {
+  const query = new URLSearchParams({ name: animName });
+  if (who?.client) query.set("client", who.client);
+  if (who?.label) query.set("label", who.label);
   try {
     const response = await robotFetch(
       baseUrl,
-      `/anim?name=${encodeURIComponent(animName)}`,
+      `/anim?${query}`,
       { method: "POST", signal: AbortSignal.timeout(2000) },
       token,
     );
