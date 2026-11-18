@@ -54,7 +54,7 @@ The robot's own reflexes stay: the push-button Actions, the sleep timer, `contin
 
 ## Settings
 
-Environment variables (the Home Assistant add-on maps its options onto them):
+Environment variables:
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
@@ -74,7 +74,7 @@ Set an `access_token` on the robot (`POST /settings {"access_token":"..."}`) and
 `tiny-engineer hook claude-code` sends `client` (the hook's `session_id`) and `label` (the last folder of the hook's `cwd`) with every `POST /anim`. The robot ignores both, so the same hook works with or without the broker. Point it at the broker:
 
 ```bash
-TINY_ENGINEER_URL=http://192.168.1.252:8790
+TINY_ENGINEER_URL=http://bgd-ws-01:8790
 ```
 
 ## Running it
@@ -84,4 +84,4 @@ cd packages/tiny-engineer-broker
 TE_ROBOT_URL=http://192.168.1.164 node bin/tiny-engineer-broker.js
 ```
 
-Home Assistant: `ha-addon/tiny-engineer-broker/` is a local add-on. Run `scripts/sync-ha-addon.sh` (copies the broker into the add-on's `app/`), copy the folder into the HA `/addons` share, then install it from Settings > Add-ons > Add-on store > Local add-ons (reload with the top-right menu > Check for updates). The add-on also adds a "Face broker" sidebar panel with the status page.
+Docker (BGD-WS-01): `packages/tiny-engineer-broker/compose.yaml`. Put `TE_ROBOT_TOKEN=...` in a `.env` next to it, then `docker compose up -d --build`.

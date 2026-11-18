@@ -1,0 +1,16 @@
+# docker compose up -d --build
+# Robot token: put TE_ROBOT_TOKEN=... in a .env file next to this file (git-ignored).
+services:
+  broker:
+    build: .
+    image: tiny-engineer-broker
+    container_name: tiny-engineer-broker
+    restart: unless-stopped
+    ports:
+      - "8790:8790"
+    environment:
+      TE_ROBOT_URL: http://192.168.1.164
+      TE_ROBOT_TOKEN: ${TE_ROBOT_TOKEN:-}
+      TE_STATE_TTL_S: "300"
+      TE_ATTENTION_REPEAT_S: "30"
+      TE_ATTENTION_MAX_S: "900"
