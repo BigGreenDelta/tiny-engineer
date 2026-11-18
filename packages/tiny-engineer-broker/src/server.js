@@ -1,7 +1,7 @@
 import http from "node:http";
 
 import { renderPage } from "./page.js";
-import { ANIMATIONS, Referee } from "./referee.js";
+import { ANIMATIONS, Referee, STATUS_TTL_S } from "./referee.js";
 
 const POLL_IDLE_MS = 2000;
 const POLL_ALERT_MS = 400;
@@ -28,6 +28,16 @@ export function robotClient({ url, token, fetchImpl = fetch }) {
   }
 
   return {
+    /** @param {string} text @param {number} ttl */
+    async setStatus(text, ttl) {
+      const res = await fetchImpl(`${base}/status`, {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ text, ttl }),
+        signal: AbortSignal.timeout(ROBOT_TIMEOUT_MS),
+      });
+      if (!res.ok) throw new Error(`robot ${res.status} on /status`);
+    },
     getAnim: () => call("/anim", "GET"),
     /** @param {string} name */
     setAnim: (name) => call(`/anim?name=${encodeURIComponent(name)}`, "POST"),
@@ -91,6 +101,17 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
         }
         if (referee.playing) break;
       }
+      const text = referee.nextStatus(now());
+      if (text !== null) {
+        try {
+          await robot.setStatus(text, STATUS_TTL_S);
+          log(`status "${text}"`);
+        } catch (err) {
+          // Old firmware without /status: do not flag the robot offline.
+          log(`status failed: ${err.message}`);
+        }
+        referee.statusSent(text, now());
+      }
     }
   }
 
@@ -129,7 +150,12 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
         if (!name) return send(res, 400, { ok: false, error: "missing name" });
         if (!ANIMATIONS.has(name)) return send(res, 400, { ok: false, error: "unknown animation" });
         const result = referee.request(
-          { name, client: url.searchParams.get("client"), label: url.searchParams.get("label") },
+          {
+            name,
+            client: url.searchParams.get("client"),
+            label: url.searchParams.get("label"),
+            detail: url.searchParams.get("detail"),
+          },
           now(),
         );
         if (!result.ok) return send(res, 400, result);

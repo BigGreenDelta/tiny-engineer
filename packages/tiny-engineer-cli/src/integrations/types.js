@@ -48,7 +48,7 @@
  * @property {boolean} [hardExitAfterPost]
  * @property {(argv: string[], stdinText: string) => HookInput | null} parseHook
  * @property {(input: HookInput) => string | null} mapToAnim
- * @property {(input: HookInput) => { client?: string, label?: string } | null} [requester] Who is asking (Tiny Engineer Broker `client` / `label`)
+ * @property {(input: HookInput) => { client?: string, label?: string, detail?: string } | null} [requester] Who is asking (Tiny Engineer Broker `client` / `label`)
  * @property {(input: HookInput, style: import("../util/style.js").Style) => string[]} [describeFiles]
  * @property {(ctx: HookRespondContext) => void} [respond]
  * @property {(projectRoot: string) => boolean} [detect]

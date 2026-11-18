@@ -190,3 +190,34 @@ test("snapshot hands the face on even while the robot is offline", () => {
   ref.request({ name: "ring", client: "A" }, 20);
   assert.equal(ref.snapshot(30).owner.id, "B");
 });
+
+test("status text: who + what, alerts, waiting sessions, idle clears", () => {
+  const ref = new Referee();
+  assert.equal(ref.statusText(), "");
+  ref.request({ name: "typing", client: "A", label: "tmp", detail: "Edit oled_zones.cpp" }, 0);
+  assert.equal(ref.statusText(), "tmp: Edit oled_zone"); // cut to 19
+  ref.request({ name: "thinking", client: "A", label: "tmp" }, 10);
+  assert.equal(ref.statusText(), "tmp: thinking");
+  ref.request({ name: "attention", client: "B", label: "bh1" }, 20);
+  assert.equal(ref.statusText(), "bh1 NEEDS YOU");
+  ref.request({ name: "attention", client: "C", label: "wiki" }, 30);
+  assert.equal(ref.statusText(), "2 NEED YOU");
+  ref.request({ name: "reading", client: "B", label: "bh1" }, 40);
+  ref.request({ name: "reading", client: "C", label: "wiki" }, 40);
+  ref.request({ name: "ring", client: "A", label: "tmp" }, 50);
+  assert.equal(ref.statusText(), "tmp: done");
+  ref.queue = [];
+  assert.equal(ref.statusText(), "bh1: reading");
+  ref.request({ name: "none", client: "B" }, 60);
+  ref.request({ name: "none", client: "C" }, 60);
+  assert.equal(ref.statusText(), "");
+});
+
+test("status is sent on change and re-sent before its TTL runs out", () => {
+  const ref = new Referee();
+  ref.request({ name: "typing", client: "A", label: "tmp" }, 0);
+  assert.equal(ref.nextStatus(0), "tmp: typing");
+  ref.statusSent("tmp: typing", 0);
+  assert.equal(ref.nextStatus(1000), null);
+  assert.equal(ref.nextStatus(240_000), "tmp: typing");
+});

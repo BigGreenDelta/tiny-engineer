@@ -127,7 +127,21 @@ test("requester is the session id, labelled with the project folder", async () =
     [],
     JSON.stringify({ hook_event_name: "Stop", session_id: "abc-123", cwd: "/home/u/projects/tmp/" }),
   );
-  assert.deepEqual(claudeCode.requester(input), { client: "abc-123", label: "tmp" });
+  assert.deepEqual(claudeCode.requester(input), { client: "abc-123", label: "tmp", detail: undefined });
   const bare = claudeCode.parseHook([], JSON.stringify({ hook_event_name: "Stop" }));
   assert.equal(claudeCode.requester(bare), null);
+});
+
+test("toolDetail: short what for the status strip, no shell arguments", async () => {
+  const { toolDetail } = await import("../src/integrations/claude-code/index.js");
+  const pre = (tool_name, tool_input) => ({ hook_event_name: "PreToolUse", tool_name, tool_input });
+  assert.equal(toolDetail(pre("Edit", { file_path: "/a/b/oled.cpp" })), "Edit oled.cpp");
+  assert.equal(toolDetail(pre("Read", { file_path: "C:\\x\\map.js" })), "Read map.js");
+  assert.equal(toolDetail(pre("Bash", { command: "cd /repo && TOKEN=s3cret pio run -e x" })), "Bash pio run");
+  assert.equal(toolDetail(pre("Bash", { command: "curl -H 'Authorization: Bearer x' http://h" })), "Bash curl");
+  assert.equal(toolDetail(pre("Bash", { command: "/usr/bin/git push origin" })), "Bash git push");
+  assert.equal(toolDetail(pre("Grep", { pattern: "handleAnim" })), "Grep handleAnim");
+  assert.equal(toolDetail(pre("WebFetch", { url: "https://example.com/x" })), "Fetch example.com");
+  assert.equal(toolDetail(pre("WebSearch", { query: "q" })), "Search");
+  assert.equal(toolDetail({ hook_event_name: "Stop" }), undefined);
 });

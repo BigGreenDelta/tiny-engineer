@@ -140,13 +140,14 @@ export function robotFetch(baseUrl, path, init, token = null) {
  * @param {string} baseUrl
  * @param {string} animName
  * @param {string | null} [token]
- * @param {{ client?: string, label?: string } | null} [who]
+ * @param {{ client?: string, label?: string, detail?: string } | null} [who]
  * @returns {Promise<RobotResult>}
  */
 export async function postAnim(baseUrl, animName, token = null, who = null) {
   const query = new URLSearchParams({ name: animName });
   if (who?.client) query.set("client", who.client);
   if (who?.label) query.set("label", who.label);
+  if (who?.detail) query.set("detail", who.detail);
   try {
     const response = await robotFetch(
       baseUrl,

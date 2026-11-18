@@ -448,6 +448,18 @@ curl -X POST -H 'Content-Type: application/json' -d '{"title":"HELLO","text":"fr
 { "ok": true, "test": "oled", "title": "HELLO", "text": "from the PC" }
 ```
 
+### `POST /status`
+
+Set the status strip text above the face (the yellow band of a 64-row panel, kawaii eyes). While set it replaces the animation name; after `ttl` seconds it clears itself and the strip shows the animation name again (`...` when idle). The [Tiny Engineer Broker](broker.md) sends who is doing what, e.g. `tmp: Edit oled.cpp`. JSON body `{"text":"...","ttl":300}`: `text` 0-19 printable ASCII characters, empty clears; `ttl` 1-3600 s, optional, default 300. A new text types itself in like an animation change. Requires Bearer when auth is enabled. Bad text → **400** `invalid text`; bad ttl → **400** `invalid ttl`.
+
+```bash
+curl -X POST -H 'Content-Type: application/json' -d '{"text":"tmp: Edit oled.cpp","ttl":300}' http://tiny-engineer.local/status
+```
+
+```json
+{ "ok": true, "text": "tmp: Edit oled.cpp", "ttl": 300 }
+```
+
 ### `POST /setup/servo`
 
 Setup AP, or after setup with the access token (main-screen servo calibration). Outside setup AP it first stops the current animation and resets the sleep timer. Slowly move one servo, or all five to 90°, using the full **0–180°** electrical range (no saved safe-range clamp). ~25°/s (`SERVO_CALIB_SPEED_DEG_S`). Used by the setup wizard for seating printed parts at 90° and for range finding. Handler blocks until the move finishes. Does **not** require Wi-Fi credentials.

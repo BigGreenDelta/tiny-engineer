@@ -42,6 +42,19 @@ const ALERT_MIN_MS = 1000;
 const ALERT_MAX_MS = 15000;
 const ALERT_UNSEEN_MS = 2500;
 const REFRESH_MS = 30000;
+/** Firmware strip limit (kStatusTextMax). */
+export const STATUS_MAX = 19;
+/** Status TTL sent to the robot; re-sent before it runs out. */
+export const STATUS_TTL_S = 300;
+const STATUS_RESEND_MS = 240_000;
+
+const ALERT_TEXT = new Map([
+  ["ring", "done"],
+  ["error", "error"],
+  ["abort", "stopped"],
+  ["welcome", "hello"],
+  ["wakeup", "hello"],
+]);
 
 /** @param {string} name */
 export function kindOf(name) {
@@ -49,8 +62,8 @@ export function kindOf(name) {
 }
 
 /**
- * @typedef {{ id: string, label: string, state: string | null, stateAt: number,
- *   lastSeen: number, attentionSince: number | null }} Client
+ * @typedef {{ id: string, label: string, state: string | null, detail: string | null,
+ *   stateAt: number, lastSeen: number, attentionSince: number | null }} Client
  * @typedef {{ client: string, label: string, name: string, at: number }} QueueEntry
  */
 
@@ -77,6 +90,9 @@ export class Referee {
     this.refreshWanted = false;
     /** The last client left with `sleep` and nobody else is busy. */
     this.sleepWanted = false;
+    /** Strip text last sent to the robot, or null before the first send. */
+    this.lastStatus = null;
+    this.lastStatusAt = 0;
     /** Robot animation from the last poll, or null when unknown. */
     this.robotAnim = null;
     /** @type {{ at: number, text: string }[]} */
@@ -91,7 +107,7 @@ export class Referee {
 
   /**
    * File one request.
-   * @param {{ name: string, client?: string | null, label?: string | null }} req
+   * @param {{ name: string, client?: string | null, label?: string | null, detail?: string | null }} req
    * @param {number} now
    * @returns {{ ok: true, kind: string } | { ok: false, error: string }}
    */
@@ -125,6 +141,7 @@ export class Referee {
       case "state":
         if (client.state === name && this.owner === id) this.refreshWanted = true;
         client.state = name;
+        client.detail = cleanDetail(req.detail);
         client.stateAt = now;
         if (this.owner === null) this.owner = id;
         break;
@@ -165,6 +182,7 @@ export class Referee {
         id,
         label,
         state: null,
+        detail: null,
         stateAt: 0,
         lastSeen: now,
         attentionSince: null,
@@ -305,6 +323,45 @@ export class Referee {
     this.refreshWanted = false;
   }
 
+  /**
+   * Strip text for the face the robot shows (or is about to): who + what.
+   * Empty clears the strip, so the robot shows its own label (`...` idle).
+   */
+  statusText() {
+    const entry = this.playing?.entry ?? this.queue[0];
+    if (entry) {
+      const what = ALERT_TEXT.get(entry.name);
+      return what ? fit(`${entry.label}: ${what}`) : "";
+    }
+    const waiting = this.waiting();
+    if (waiting.length === 1) return fit(`${waiting[0].label} NEEDS YOU`);
+    if (waiting.length > 1) return `${waiting.length} NEED YOU`;
+    // The owner is handed on in expire(); look ahead so the text never lags.
+    const ownerId = this.owner ?? this.nextOwner();
+    const owner = ownerId ? this.clients.get(ownerId) : null;
+    if (owner?.state) return fit(`${owner.label}: ${owner.detail ?? owner.state}`);
+    return "";
+  }
+
+  /**
+   * Strip text to send now, or null. Call after the animation writes; the
+   * caller must call `statusSent(text, now)` afterwards (also on failure,
+   * so an old firmware without POST /status is not hammered).
+   * @param {number} now
+   */
+  nextStatus(now) {
+    const text = this.statusText();
+    if (text !== this.lastStatus) return text;
+    if (text && now - this.lastStatusAt >= STATUS_RESEND_MS) return text;
+    return null;
+  }
+
+  /** @param {string} text @param {number} now */
+  statusSent(text, now) {
+    this.lastStatus = text;
+    this.lastStatusAt = now;
+  }
+
   /** Snapshot for GET /state. @param {number} now */
   snapshot(now) {
     this.expire(now);
@@ -317,10 +374,12 @@ export class Referee {
         id: c.id,
         label: c.label,
         state: c.state,
+        detail: c.detail,
         attention: c.attentionSince !== null,
         idleS: Math.round((now - c.lastSeen) / 1000),
       })),
       waiting: this.waiting().map((c) => c.label),
+      status: this.statusText(),
       queue: this.queue.map((q) => ({ label: q.label, name: q.name })),
       log: this.log.slice(),
     };
@@ -332,6 +391,21 @@ function cleanId(value) {
   if (typeof value !== "string") return null;
   const v = value.trim();
   return v && v.length <= 64 ? v : null;
+}
+
+/** @param {unknown} value */
+function cleanDetail(value) {
+  if (typeof value !== "string") return null;
+  const v = value.replace(/[^\x20-\x7e]/g, "").trim().slice(0, 40);
+  return v || null;
+}
+
+/**
+ * Cut to the strip width; `label: detail` loses the end of the detail.
+ * @param {string} text
+ */
+function fit(text) {
+  return text.length <= STATUS_MAX ? text : text.slice(0, STATUS_MAX);
 }
 
 /** @param {unknown} value */

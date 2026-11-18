@@ -1,6 +1,7 @@
 #include "display/eyes/styles/eye_style.h"
 
 #include <Adafruit_SSD1306.h>
+#include <cstring>
 
 
 #include "animation.h"
@@ -25,6 +26,7 @@
 #include "display/oled.h"
 #include "display/oled_internal.h"
 #include "display/oled_zones.h"
+#include "display/status_text.h"
 #include "pins.h"
 
 // Firmware glue for the kawaii style: picks the mood for the current
@@ -326,12 +328,13 @@ void stepAnimator(const kawaii::Expression& target, uint32_t now) {
 }
 
 // Status strip above a face shorter than the panel (the yellow band of
-// two-colour OLEDs): the current animation in a thought box (oled_zones.h).
+// two-colour OLEDs): a thought box (oled_zones.h) with the broker's status
+// text (POST /status) while set, else the current animation.
 
 const char* activityLabel(AnimationId animation) {
   switch (animation) {
     case AnimationId::None:
-      return "idle";
+      return "...";
     case AnimationId::Sleep:
       return "sleeping";
     default:
@@ -342,16 +345,18 @@ const char* activityLabel(AnimationId animation) {
 // A new label types itself in, one letter per kStripTypeMs, behind a bar
 // cursor; the box is drawn at the final size from the start.
 constexpr uint32_t kStripTypeMs = 100;
-const char* g_stripLabel = nullptr;
+char g_stripLabel[kStatusTextMax + 1] = {0};
 uint32_t g_stripTypedFromMs = 0;
 
 void drawStatusStrip(AnimationId animation, uint32_t now) {
-  const char* label = activityLabel(animation);
-  if (label != g_stripLabel) {
-    g_stripLabel = label;
+  const char* custom = statusText(now);
+  const char* label = custom != nullptr ? custom : activityLabel(animation);
+  if (strncmp(label, g_stripLabel, kStatusTextMax) != 0) {
+    strncpy(g_stripLabel, label, kStatusTextMax);
+    g_stripLabel[kStatusTextMax] = '\0';
     g_stripTypedFromMs = now;
   }
-  drawThoughtBox(label, (int)((now - g_stripTypedFromMs) / kStripTypeMs));
+  drawThoughtBox(g_stripLabel, (int)((now - g_stripTypedFromMs) / kStripTypeMs));
 }
 
 // Center of an eye; integer halves, so a height change alone does not read

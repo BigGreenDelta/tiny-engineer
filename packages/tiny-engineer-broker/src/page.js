@@ -33,6 +33,7 @@ export function renderPage() {
   <div class="card">
     <div class="muted" id="robot">robot: ...</div>
     <div class="face" id="face">-</div>
+    <div id="strip" class="muted"></div>
     <div id="owner" class="muted"></div>
   </div>
   <h2>Clients</h2>
@@ -50,12 +51,13 @@ async function refresh() {
   try { s = await (await fetch("state")).json(); } catch { document.getElementById("robot").textContent = "broker unreachable"; return; }
   document.getElementById("robot").textContent = s.robotOk ? "robot: online" : "robot: offline " + (s.error || "");
   document.getElementById("face").textContent = s.robot || "-";
+  document.getElementById("strip").textContent = "strip: " + (s.status || "(robot's own label)");
   document.getElementById("owner").textContent = s.playing ? "playing " + s.playing.name + " for " + s.playing.label
     : s.owner ? "owned by " + s.owner.label : "nobody owns the face";
   const ownerId = s.owner && s.owner.id;
   document.getElementById("clients").innerHTML = s.clients.map((c) =>
     "<tr><td class='" + (c.id === ownerId ? "owner" : "") + "'>" + esc(c.label) + "</td><td>" +
-    (c.attention ? "<span class='warn'>needs you</span> " : "") + esc(c.state || "idle") + "</td><td>" + c.idleS + " s</td></tr>"
+    (c.attention ? "<span class='warn'>needs you</span> " : "") + esc(c.state ? c.state + (c.detail ? " - " + c.detail : "") : "idle") + "</td><td>" + c.idleS + " s</td></tr>"
   ).join("") || "<tr><td colspan='3' class='muted'>none</td></tr>";
   document.getElementById("queue").innerHTML = s.queue.map((q) => "<li>" + esc(q.name) + " - " + esc(q.label) + "</li>").join("");
   document.getElementById("queueEmpty").style.display = s.queue.length ? "none" : "";

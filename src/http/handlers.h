@@ -31,6 +31,7 @@ void handleLedTest(WebServer& server);
 void handleServoTest(WebServer& server);
 void handleRgbTest(WebServer& server);
 void handleOledTest(WebServer& server);
+void handleStatusPost(WebServer& server);
 
 void handleSetupServo(WebServer& server);
 void handleSetupLed(WebServer& server);

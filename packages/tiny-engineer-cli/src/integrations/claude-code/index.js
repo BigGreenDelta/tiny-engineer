@@ -22,6 +22,70 @@ function parseStdinJson(stdinText) {
   }
 }
 
+/** Last path segment. @param {unknown} path */
+function baseName(path) {
+  if (typeof path !== "string" || !path) return "";
+  return path.replace(/[\\/]+$/, "").split(/[\\/]/).pop() ?? "";
+}
+
+/**
+ * Program (+ subcommand) of a shell command, skipping `VAR=value` and `cd x &&`
+ * prefixes. Never more: arguments can hold secrets.
+ * @param {unknown} command
+ */
+function shellProgram(command) {
+  if (typeof command !== "string") return "";
+  const segments = command.split(/&&|\|\||;|\|/).map((p) => p.trim()).filter(Boolean);
+  const seg = segments.find((p) => !/^cd(\s|$)/.test(p)) ?? segments[0] ?? "";
+  const words = seg.split(/\s+/).filter((w) => w && !/^[A-Za-z_][A-Za-z0-9_]*=/.test(w));
+  const prog = baseName(words[0] ?? "");
+  const sub = words[1] && /^[a-z][a-z0-9-]*$/.test(words[1]) ? ` ${words[1]}` : "";
+  return prog ? `${prog}${sub}` : "";
+}
+
+/**
+ * Short "what" for the robot's status strip, from a PreToolUse payload:
+ * `Edit oled.cpp`, `Bash pio run`, `Grep handleAnim`.
+ * @param {Record<string, unknown> | undefined} raw
+ * @returns {string | undefined}
+ */
+export function toolDetail(raw) {
+  if (raw?.hook_event_name !== "PreToolUse") return undefined;
+  const tool = typeof raw.tool_name === "string" ? raw.tool_name : "";
+  const input = /** @type {Record<string, unknown>} */ (raw.tool_input ?? {});
+  let arg = "";
+  switch (tool) {
+    case "Read":
+    case "Edit":
+    case "Write":
+      arg = baseName(input.file_path);
+      break;
+    case "NotebookEdit":
+      arg = baseName(input.notebook_path);
+      break;
+    case "Bash":
+    case "PowerShell":
+      arg = shellProgram(input.command);
+      break;
+    case "Grep":
+    case "Glob":
+      arg = typeof input.pattern === "string" ? input.pattern : "";
+      break;
+    case "WebFetch":
+      try {
+        arg = new URL(String(input.url)).hostname;
+      } catch {
+        arg = "";
+      }
+      break;
+    default:
+      arg = "";
+  }
+  if (!tool) return undefined;
+  const label = tool === "WebFetch" ? "Fetch" : tool === "WebSearch" ? "Search" : tool;
+  return arg ? `${label} ${arg}` : label;
+}
+
 /** @type {import("../types.js").Integration} */
 export const claudeCode = {
   id: "claude-code",
@@ -62,7 +126,7 @@ export const claudeCode = {
     if (!client) return null;
     const cwd = typeof raw?.cwd === "string" ? raw.cwd : "";
     const label = cwd.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || undefined;
-    return { client, label };
+    return { client, label, detail: toolDetail(raw) };
   },
 
   /**

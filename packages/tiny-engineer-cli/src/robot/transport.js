@@ -10,7 +10,7 @@ import { withTransport } from "./with-transport.js";
  *   transport?: string,
  *   url?: string,
  *   port?: string | null,
- *   who?: { client?: string, label?: string } | null,
+ *   who?: { client?: string, label?: string, detail?: string } | null,
  * }} TransportOpts
  */
 

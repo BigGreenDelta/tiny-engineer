@@ -15,6 +15,7 @@ curl -X POST "http://broker:8790/anim?name=typing&client=<session id>&label=tmp"
 | `name` | Animation name, same allow-list as the robot (`none`, `typing`, `reading`, `thinking`, `talking`, `ring`, `welcome`, `attention`, `error`, `abort`, `dead`, `wakeup`, `sleep`) |
 | `client` | Who is asking, 1-64 chars. Claude Code hooks send the `session_id` from the hook stdin. Missing: the request counts as client `anon` |
 | `label` | Short display name, 1-20 chars, e.g. the project folder. Missing: the first 8 chars of `client` |
+| `detail` | What the client is doing, 1-40 chars, for the status strip (see below). Optional |
 
 The broker remembers one slot per client. A request only changes the slot of the client that sent it.
 
@@ -28,6 +29,21 @@ The broker remembers one slot per client. A request only changes the slot of the
 | greeting | `welcome`, `wakeup` | Registers the client. Plays only when nobody owns the face and no alert is waiting; otherwise skipped |
 | idle | `none` | Clears the client's state |
 | leave | `sleep` | Removes the client. The robot is sent `sleep` only when no other client has a live state or a pending attention |
+
+## Status strip
+
+On a 64-row panel the robot shows a line of text above the face. The broker writes it with the robot's `POST /status` whenever it changes (and again every 4 min, as the robot clears it after 5 min), cut to 19 characters:
+
+| Face | Strip |
+| --- | --- |
+| owner's state | `<label>: <detail>`, e.g. `tmp: Edit oled.cpp`; without a detail `tmp: typing` |
+| one session waits for you | `<label> NEEDS YOU` |
+| several wait | `2 NEED YOU` |
+| `ring` / `error` / `abort` | `<label>: done` / `error` / `stopped` |
+| `welcome` / `wakeup` | `<label>: hello` |
+| idle, sleep | cleared: the robot shows `...` / `sleeping` |
+
+`detail` is a `POST /anim` param (1-40 printable chars). The Claude Code hook sends it for `PreToolUse`: the tool plus its file (`Edit oled.cpp`), shell program and subcommand only (`Bash pio run`, never arguments, which can hold secrets), search pattern, or fetched host.
 
 ## Who owns the face
 
