@@ -113,13 +113,25 @@ export class Referee {
     this.lastStatusAt = 0;
     /** Robot animation from the last poll, or null when unknown. */
     this.robotAnim = null;
-    /** @type {{ at: number, text: string }[]} */
+    /**
+     * Log rows for the page: `who` asked for `anim` with strip `text`, or the
+     * broker sent `anim` / `text` to the robot (`who` = "robot"), or a note.
+     * @type {{ at: number, who?: string, anim?: string, text?: string, note?: string }[]}
+     */
     this.log = [];
   }
 
-  /** @param {number} now @param {string} text */
-  note(now, text) {
-    this.log.push({ at: now, text });
+  /** @param {number} now @param {string} note @param {string} [who] */
+  note(now, note, who) {
+    this.row(now, { who, note });
+  }
+
+  /**
+   * @param {number} now
+   * @param {{ who?: string, anim?: string, text?: string, note?: string }} fields
+   */
+  row(now, fields) {
+    this.log.push({ at: now, ...fields });
     if (this.log.length > MAX_LOG) this.log.shift();
   }
 
@@ -144,7 +156,7 @@ export class Referee {
       if (this.owner === id) this.owner = null;
       const busy = [...this.clients.values()].some((c) => c.state || c.attentionSince !== null);
       if (!busy) this.sleepWanted = true;
-      this.note(now, `${label}: left`);
+      this.note(now, "left", label);
       return { ok: true, kind };
     }
 
@@ -196,13 +208,13 @@ export class Referee {
         if (this.owner === null && this.queue.length === 0 && !this.playing) {
           this.enqueue({ client: id, label: shown, name, at: now });
         } else {
-          this.note(now, `${shown}: ${name} skipped, face busy`);
+          this.row(now, { who: shown, anim: name, note: "skipped, face busy" });
           return { ok: true, kind };
         }
         break;
     }
     // The request as it came in: animation plus its text, if any.
-    this.note(now, `${shown}: ${name}${detail ? ` "${detail}"` : ""}`);
+    this.row(now, { who: shown, anim: name, text: detail ?? undefined });
     return { ok: true, kind };
   }
 
@@ -259,11 +271,11 @@ export class Referee {
   expire(now) {
     for (const client of this.clients.values()) {
       if (client.state && now - client.stateAt >= this.stateTtlMs) {
-        this.note(now, `${client.label}: ${client.state} timed out`);
+        this.note(now, `${client.state} timed out`, client.label);
         client.state = null;
       }
       if (client.attentionSince !== null && now - client.attentionSince >= this.attentionMaxMs) {
-        this.note(now, `${client.label}: attention gave up`);
+        this.note(now, "attention gave up", client.label);
         client.attentionSince = null;
       }
     }
@@ -378,7 +390,7 @@ export class Referee {
    * @param {number} now
    */
   sent(name, now) {
-    this.note(now, `face -> ${name}`);
+    this.row(now, { who: "robot", anim: name });
     const head = this.queue[0];
     if (head && head.name === name) {
       this.queue.shift();
@@ -432,7 +444,7 @@ export class Referee {
 
   /** @param {string} text @param {number} now */
   statusSent(text, now) {
-    if (text !== this.lastStatus) this.note(now, text ? `strip -> "${text}"` : "strip -> cleared");
+    if (text !== this.lastStatus) this.row(now, text ? { who: "robot", text } : { who: "robot", note: "strip cleared" });
     this.lastStatus = text;
     this.lastStatusAt = now;
   }

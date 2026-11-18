@@ -24,7 +24,11 @@ export function renderPage() {
   .owner { color:var(--accent); font-weight:600; }
   .warn { color:var(--warn); font-weight:600; }
   ol { margin:0; padding-left:20px; }
-  .log { font:12px/1.5 ui-monospace, monospace; max-height:260px; overflow:auto; }
+  .log { max-height:360px; overflow:auto; }
+  .log table { font:12px/1.4 ui-monospace, monospace; }
+  .log td { padding:3px 4px; vertical-align:top; }
+  .robot { color:var(--accent); }
+  .mono { font-family:ui-monospace, monospace; font-size:13px; }
 </style>
 </head>
 <body>
@@ -37,11 +41,11 @@ export function renderPage() {
     <div id="owner" class="muted"></div>
   </div>
   <h2>Clients</h2>
-  <div class="card"><table><thead><tr><th>Who</th><th>State</th><th>Quiet</th></tr></thead><tbody id="clients"></tbody></table></div>
+  <div class="card"><table><thead><tr><th>Who</th><th>Animation</th><th>Strip</th><th>Quiet</th></tr></thead><tbody id="clients"></tbody></table></div>
   <h2>Queue</h2>
   <div class="card"><ol id="queue"></ol><div id="queueEmpty" class="muted">empty</div></div>
   <h2>Log</h2>
-  <div class="card log" id="log"></div>
+  <div class="card log"><table><thead><tr><th>Time</th><th>Who</th><th>Animation</th><th>Strip</th></tr></thead><tbody id="log"></tbody></table></div>
 </main>
 <script>
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -64,11 +68,20 @@ async function refresh() {
   const ownerId = s.owner && s.owner.id;
   document.getElementById("clients").innerHTML = s.clients.map((c) =>
     "<tr><td class='" + (c.id === ownerId ? "owner" : "") + "'>" + esc(c.label) + "</td><td>" +
-    (c.attention ? "<span class='warn'>needs you</span> " : "") + esc(c.state ? c.state + (c.detail ? " - " + c.detail : "") : "idle") + "</td><td>" + c.idleS + " s</td></tr>"
-  ).join("") || "<tr><td colspan='3' class='muted'>none</td></tr>";
+    (c.attention ? "<span class='warn'>needs you</span> " : "") + esc(c.state || "idle") + "</td><td class='mono'>" +
+    esc(c.detail || "") + "</td><td>" + c.idleS + " s</td></tr>"
+  ).join("") || "<tr><td colspan='4' class='muted'>none</td></tr>";
   document.getElementById("queue").innerHTML = s.queue.map((q) => "<li>" + esc(q.name) + " - " + esc(q.label) + "</li>").join("");
   document.getElementById("queueEmpty").style.display = s.queue.length ? "none" : "";
-  document.getElementById("log").innerHTML = s.log.slice().reverse().map((l) => esc(time(l.at) + "  " + l.text)).join("<br>");
+  document.getElementById("log").innerHTML = s.log.slice().reverse().map((l) => {
+    const robot = l.who === "robot";
+    const anim = l.anim ? (robot ? "\u2192 " : "") + l.anim : "";
+    const strip = l.text !== undefined ? (robot ? "\u2192 " : "") + "\u201c" + l.text + "\u201d" : "";
+    const note = l.note ? "<span class='muted'>" + esc(l.note) + "</span>" : "";
+    return "<tr class='" + (robot ? "robot" : "") + "'><td class='muted'>" + esc(time(l.at)) + "</td><td>" +
+      esc(l.who || "") + "</td><td>" + esc(anim) + (anim && note ? " " : "") + (anim ? note : "") +
+      "</td><td>" + esc(strip) + (!anim ? note : "") + "</td></tr>";
+  }).join("");
 }
 refresh();
 setInterval(refresh, 2000);
