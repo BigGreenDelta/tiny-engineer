@@ -263,3 +263,14 @@ test("long strip text is cut at 48, keeping the +N", () => {
   assert.equal(t.length, 48);
   assert.ok(t.endsWith(" +1"), t);
 });
+
+test("face and strip text sent in one step log as one robot row", () => {
+  const ref = new Referee();
+  ref.request({ name: "typing", client: "A", label: "tmp", detail: "Bash ls" }, 0);
+  ref.observe("none");
+  ref.sent(ref.next(0), 0);
+  ref.statusSent(ref.nextStatus(0), 0);
+  ref.flushSent(0);
+  const robotRows = ref.log.filter((l) => l.who === "robot");
+  assert.deepEqual(robotRows.map(({ anim, text }) => ({ anim, text })), [{ anim: "typing", text: "tmp: Bash ls" }]);
+});

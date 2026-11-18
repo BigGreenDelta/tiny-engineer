@@ -119,6 +119,8 @@ export class Referee {
      * @type {{ at: number, who?: string, anim?: string, text?: string, note?: string }[]}
      */
     this.log = [];
+    /** What went to the robot in the current step; one log row per step. */
+    this.sentRow = null;
   }
 
   /** @param {number} now @param {string} note @param {string} [who] */
@@ -390,7 +392,7 @@ export class Referee {
    * @param {number} now
    */
   sent(name, now) {
-    this.row(now, { who: "robot", anim: name });
+    this.sentRow = { ...(this.sentRow ?? {}), anim: name };
     const head = this.queue[0];
     if (head && head.name === name) {
       this.queue.shift();
@@ -444,9 +446,20 @@ export class Referee {
 
   /** @param {string} text @param {number} now */
   statusSent(text, now) {
-    if (text !== this.lastStatus) this.row(now, text ? { who: "robot", text } : { who: "robot", note: "strip cleared" });
+    if (text !== this.lastStatus) {
+      this.sentRow = { ...(this.sentRow ?? {}), ...(text ? { text } : { note: "strip cleared" }) };
+    }
     this.lastStatus = text;
     this.lastStatusAt = now;
+  }
+
+  /**
+   * Log what the step sent to the robot (face and strip text) as one row.
+   * @param {number} now
+   */
+  flushSent(now) {
+    if (this.sentRow) this.row(now, { who: "robot", ...this.sentRow });
+    this.sentRow = null;
   }
 
   /** Snapshot for GET /state. @param {number} now */

@@ -86,6 +86,7 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
       do {
         again = false;
         await stepOnce();
+        referee.flushSent(now());
       } while (again);
     } finally {
       busy = false;
