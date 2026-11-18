@@ -23,7 +23,7 @@ The broker remembers one slot per client. A request only changes the slot of the
 | Kind | Animations | Effect |
 | --- | --- | --- |
 | state | `typing`, `reading`, `thinking`, `talking` | Sets the client's state. Lives until the client posts something else, or until `state_ttl_s` passes with no request from that client |
-| attention | `attention` | Marks the client as waiting for you. Plays at once, even when another client owns the face, and plays again every `attention_repeat_s` until that client posts anything else (you answered) or `attention_max_s` passes |
+| attention | `attention` | Marks the client as waiting for you. The face shows `attention` at once, over the owner's state, until that client posts anything else (you answered) or `attention_max_s` passes. The firmware's attention is a call plus up to 60 s of waiting; once the robot falls back to `none`, the broker shows it again after `attention_repeat_s` |
 | alert | `ring`, `error`, `abort`, `dead` | Plays once, even when another client owns the face. `ring` (turn finished) also clears the client's state |
 | greeting | `welcome`, `wakeup` | Registers the client. Plays only when nobody owns the face and no alert is waiting; otherwise skipped |
 | idle | `none` | Clears the client's state |
@@ -31,11 +31,12 @@ The broker remembers one slot per client. A request only changes the slot of the
 
 ## Who owns the face
 
-1. Alerts and attentions go into one queue, oldest first. A request that is already waiting for the same client and animation is not queued twice. The queue holds at most 32 entries.
+1. Alerts go into one queue, oldest first. A request that is already waiting for the same client and animation is not queued twice. The queue holds at most 32 entries.
 2. While the queue has entries, the broker plays them one by one, back to back. An entry is done once the robot was seen playing it and then reports a different animation (at least 1 s, at most 15 s after it was sent). An entry the robot never shows (for example `wakeup` while awake) stops blocking after 2.5 s.
-3. Otherwise the owner's state is shown. The owner is the client whose state is on the face. With no owner, the first client to post a state becomes the owner.
-4. States never take the face from another client. The owner keeps it until its state ends: `ring`, `none`, `sleep`, or `state_ttl_s` without a request.
-5. When the owner lets go, the client with the most recent live state becomes the owner. With nobody left, the robot is sent `none`.
+3. Otherwise, while any client waits for you, the face shows `attention`.
+4. Otherwise the owner's state is shown. The owner is the client whose state is on the face. With no owner, the first client to post a state becomes the owner.
+5. States never take the face from another client. The owner keeps it until its state ends: `ring`, `none`, `sleep`, or `state_ttl_s` without a request.
+6. When the owner lets go, the client with the most recent live state becomes the owner. With nobody left, the robot is sent `none`.
 
 The broker sends the robot a request only when what the face should show changes, plus a refresh of the owner's state at most every 30 s while the owner keeps posting it (this restarts the robot's `continuous_timeout`). All robot writes go out one at a time.
 
@@ -61,7 +62,7 @@ Environment variables (the Home Assistant add-on maps its options onto them):
 | `TE_ROBOT_TOKEN` | empty | Robot `access_token`, sent as `Authorization: Bearer` |
 | `TE_BROKER_PORT` | `8790` | Listen port |
 | `TE_STATE_TTL_S` | `300` | A state with no new request for this long ends |
-| `TE_ATTENTION_REPEAT_S` | `30` | Replay interval for a pending attention; `0` plays it once |
+| `TE_ATTENTION_REPEAT_S` | `30` | After the robot's own attention wait ends, show it again this long after the last send; `0` shows it once |
 | `TE_ATTENTION_MAX_S` | `900` | A pending attention is dropped after this long |
 
 ## Only writer

@@ -4,8 +4,8 @@ import { test } from "node:test";
 import { Referee } from "../src/referee.js";
 
 /**
- * Drive a referee against a simulated robot. One-shots run `oneShotMs`
- * and fall back to none, like the firmware.
+ * Drive a referee against a simulated robot. One-shots run 3 s and
+ * attention 63 s (call + 60 s wait), then fall back to none, like the firmware.
  */
 function rig(opts = {}) {
   const ref = new Referee(opts);
@@ -21,9 +21,11 @@ function rig(opts = {}) {
     for (let i = 0; i < 3; i++) {
       const want = ref.next(t);
       if (want === null) return;
+      const was = robot.anim;
       robot.anim = want;
-      const kind = ["attention", "ring", "error", "abort", "dead", "welcome", "wakeup"];
-      robot.until = kind.includes(want) ? t + 3000 : 0;
+      const oneShot = ["ring", "error", "abort", "dead", "welcome", "wakeup"];
+      if (want === "attention") robot.until = was === "attention" && robot.until ? robot.until : t + 63_000;
+      else robot.until = oneShot.includes(want) ? t + 3000 : 0;
       ref.observe(robot.anim);
       ref.sent(want, t);
       sent.push(want);
@@ -71,35 +73,51 @@ test("owner finishing hands the face to the next live session", () => {
   assert.equal(r.robot.anim, "reading");
 });
 
-test("attention from a non-owner plays at once, then the owner's state returns", () => {
-  const r = rig({ attentionRepeatMs: 0 });
+test("attention from a non-owner takes the face until that session moves on", () => {
+  const r = rig();
   r.post("A", "typing");
   r.post("B", "attention");
   assert.equal(r.robot.anim, "attention");
-  r.wait(4000);
-  assert.equal(r.robot.anim, "typing");
+  r.post("A", "thinking"); // the owner keeps working: attention stays
+  r.wait(10_000);
+  assert.equal(r.robot.anim, "attention");
+  r.post("B", "reading"); // you answered B
+  r.wait(1000);
+  assert.equal(r.robot.anim, "thinking");
 });
 
-test("pending attention replays until that session moves on", () => {
-  const r = rig({ attentionRepeatMs: 10_000 });
+test("attention is shown again after the robot's own wait ends", () => {
+  const r = rig({ attentionRepeatMs: 30_000 });
+  r.post("B", "attention");
+  r.wait(70_000);
+  assert.equal(r.robot.anim, "attention");
+  assert.equal(r.sent.filter((s) => s === "attention").length, 2);
+});
+
+test("attention once only when attentionRepeatMs is 0", () => {
+  const r = rig({ attentionRepeatMs: 0 });
+  r.post("B", "attention");
+  r.wait(70_000);
+  assert.equal(r.robot.anim, "none");
+  assert.equal(r.sent.filter((s) => s === "attention").length, 1);
+});
+
+test("attention gives up after attentionMaxMs and the face goes back", () => {
+  const r = rig({ attentionMaxMs: 20_000 });
   r.post("A", "typing");
   r.post("B", "attention");
-  r.wait(12_000);
-  const replays = r.sent.filter((s) => s === "attention").length;
-  assert.equal(replays, 2);
-  r.post("B", "reading"); // you answered B
-  r.wait(30_000);
-  assert.equal(r.sent.filter((s) => s === "attention").length, 2);
+  r.wait(21_000);
+  assert.equal(r.ref.clients.get("B").attentionSince, null);
   assert.equal(r.robot.anim, "typing");
 });
 
-test("attention gives up after attentionMaxMs", () => {
-  const r = rig({ attentionRepeatMs: 5_000, attentionMaxMs: 20_000 });
+test("alerts play over a pending attention, then attention returns", () => {
+  const r = rig();
   r.post("B", "attention");
-  r.wait(60_000);
-  const n = r.sent.filter((s) => s === "attention").length;
-  assert.ok(n >= 3 && n <= 5, `played ${n} times`);
-  assert.equal(r.ref.clients.get("B").attentionSince, null);
+  r.post("C", "ring");
+  assert.equal(r.robot.anim, "ring");
+  r.wait(4000);
+  assert.equal(r.robot.anim, "attention");
 });
 
 test("alerts queue, each plays once, back to back", () => {

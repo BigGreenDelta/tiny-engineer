@@ -50,7 +50,7 @@ export function kindOf(name) {
 
 /**
  * @typedef {{ id: string, label: string, state: string | null, stateAt: number,
- *   lastSeen: number, attentionSince: number | null, attentionPlayedAt: number }} Client
+ *   lastSeen: number, attentionSince: number | null }} Client
  * @typedef {{ client: string, label: string, name: string, at: number }} QueueEntry
  */
 
@@ -119,7 +119,6 @@ export class Referee {
     // Any request from a client means you are back with it.
     if (client.attentionSince !== null && kind !== "attention") {
       client.attentionSince = null;
-      this.dropQueued(id, "attention");
     }
 
     switch (kind) {
@@ -134,8 +133,9 @@ export class Referee {
         if (this.owner === id) this.owner = null;
         break;
       case "attention":
+        // Firmware attention is a wait loop (call, then up to 60 s of
+        // waiting), so it is a steady face, not a queued one-shot.
         if (client.attentionSince === null) client.attentionSince = now;
-        this.enqueue({ client: id, label, name, at: now });
         break;
       case "alert":
         if (name === "ring") {
@@ -168,7 +168,6 @@ export class Referee {
         stateAt: 0,
         lastSeen: now,
         attentionSince: null,
-        attentionPlayedAt: 0,
       };
       this.clients.set(id, client);
     }
@@ -200,7 +199,6 @@ export class Referee {
       if (client.attentionSince !== null && now - client.attentionSince >= this.attentionMaxMs) {
         this.note(now, `${client.label}: attention gave up`);
         client.attentionSince = null;
-        this.dropQueued(client.id, "attention");
       }
     }
     if (this.owner !== null && !this.clients.get(this.owner)?.state) this.owner = null;
@@ -215,14 +213,11 @@ export class Referee {
     return best?.id ?? null;
   }
 
-  /** Re-queue pending attentions whose replay interval has passed. @param {number} now */
-  replayAttention(now) {
-    if (this.attentionRepeatMs <= 0) return;
-    for (const client of this.clients.values()) {
-      if (client.attentionSince === null) continue;
-      if (now - client.attentionPlayedAt < this.attentionRepeatMs) continue;
-      this.enqueue({ client: client.id, label: client.label, name: "attention", at: now });
-    }
+  /** Clients waiting for you, oldest first. */
+  waiting() {
+    return [...this.clients.values()]
+      .filter((c) => c.attentionSince !== null)
+      .sort((a, b) => /** @type {number} */ (a.attentionSince) - /** @type {number} */ (b.attentionSince));
   }
 
   /**
@@ -258,25 +253,38 @@ export class Referee {
       this.lastSteady = null;
     }
 
-    if (this.queue.length === 0) this.replayAttention(now);
     if (this.queue.length > 0) return this.queue[0].name;
 
     const steady = this.steadyFace();
     if (steady === null) return null;
     if (steady !== this.lastSteady) return steady;
+    // The robot ends its attention wait after 60 s; show it again while
+    // someone is still waiting for you.
+    if (
+      steady === "attention" &&
+      this.attentionRepeatMs > 0 &&
+      this.robotAnim !== null &&
+      this.robotAnim !== "attention" &&
+      now - this.lastSteadyAt >= this.attentionRepeatMs
+    ) {
+      return steady;
+    }
     if (this.refreshWanted && now - this.lastSteadyAt >= REFRESH_MS) return steady;
     return null;
   }
 
   /**
-   * Steady face: the owner's state; `sleep` after the last busy client left;
-   * `none` once a state the broker drove has ended. Null leaves the robot's
-   * own loop alone (nothing to undo, e.g. after a one-shot fell back to none).
+   * Steady face: `attention` while any client waits for you; else the
+   * owner's state; `sleep` after the last busy client left; `none` once a
+   * face the broker drove has ended. Null leaves the robot's own loop alone
+   * (nothing to undo, e.g. after a one-shot fell back to none).
    */
   steadyFace() {
+    if (this.waiting().length > 0) return "attention";
     if (this.owner !== null) return this.clients.get(this.owner)?.state ?? null;
     if (this.sleepWanted) return "sleep";
-    if (this.lastSteady !== null && kindOf(this.lastSteady) === "state") return "none";
+    const last = this.lastSteady === null ? null : kindOf(this.lastSteady);
+    if (last === "state" || last === "attention") return "none";
     return null;
   }
 
@@ -290,10 +298,6 @@ export class Referee {
     if (head && head.name === name) {
       this.queue.shift();
       this.playing = { entry: head, sentAt: now, seen: this.robotAnim === name };
-      if (name === "attention") {
-        const client = this.clients.get(head.client);
-        if (client) client.attentionPlayedAt = now;
-      }
       return;
     }
     this.lastSteady = name;
@@ -316,6 +320,7 @@ export class Referee {
         attention: c.attentionSince !== null,
         idleS: Math.round((now - c.lastSeen) / 1000),
       })),
+      waiting: this.waiting().map((c) => c.label),
       queue: this.queue.map((q) => ({ label: q.label, name: q.name })),
       log: this.log.slice(),
     };
