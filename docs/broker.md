@@ -113,14 +113,14 @@ Set an `access_token` on the robot (`POST /settings {"access_token":"..."}`) and
 `tiny-engineer hook claude-code` sends `client` (the hook's `session_id`) and `label` (the last folder of the hook's `cwd`) with every `POST /anim`. The robot ignores both, so the same hook works with or without the broker. Point it at the broker:
 
 ```bash
-TINY_ENGINEER_URL=https://teb.int.bgd.team
+TINY_ENGINEER_URL=http://<broker host>:8790
 ```
 
 ## Running it
 
 ```bash
 cd packages/tiny-engineer-broker
-TE_ROBOT_URL=http://192.168.1.164 node bin/tiny-engineer-broker.js
+TE_ROBOT_URL=http://tiny-engineer.local node bin/tiny-engineer-broker.js
 ```
 
 Windows host with rootful podman in WSL: `scripts/deploy-broker.sh` copies this package over WinRM, builds `localhost/tiny-engineer-broker`, installs the Quadlet from `deploy/tiny-engineer-broker.container`, writes `TE_ROBOT_URL` / `TE_ROBOT_TOKEN` into `/etc/tiny-engineer-broker.env` (mode 600), restarts it, and forwards port 8790 to the WSL address (`netsh portproxy` plus a LocalSubnet firewall rule). Host, credentials (values or `op://` references) and robot settings go in the git-ignored `scripts/deploy-broker.local.env`; the script header lists them. Run it again after a host reboot: the WSL address changes and the port forward has to follow. From Node use an IP or a name with an IPv4 record: a bare Windows host name can resolve to an IPv6 link-local address the IPv4 port forward does not answer.
