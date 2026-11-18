@@ -43,10 +43,21 @@ const ALERT_MAX_MS = 15000;
 const ALERT_UNSEEN_MS = 2500;
 const REFRESH_MS = 30000;
 /** Firmware strip limit (kStatusTextMax). */
-export const STATUS_MAX = 19;
+export const STATUS_MAX = 21;
 /** Status TTL sent to the robot; re-sent before it runs out. */
 export const STATUS_TTL_S = 300;
 const STATUS_RESEND_MS = 240_000;
+
+/** Thinking without a detail: one of these per thinking spell. */
+export const THINKING = ["thinking", "hmm...", "pondering", "mulling it over", "connecting dots"];
+
+/** @param {number} ms */
+export function duration(ms) {
+  const s = Math.max(0, Math.round(ms / 1000));
+  if (s < 60) return `${s}s`;
+  if (s < 3600) return `${Math.floor(s / 60)}m${String(s % 60).padStart(2, "0")}s`;
+  return `${Math.floor(s / 3600)}h${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}m`;
+}
 
 const ALERT_TEXT = new Map([
   ["ring", "done"],
@@ -63,8 +74,10 @@ export function kindOf(name) {
 
 /**
  * @typedef {{ id: string, label: string, state: string | null, detail: string | null,
- *   stateAt: number, lastSeen: number, attentionSince: number | null }} Client
- * @typedef {{ client: string, label: string, name: string, at: number }} QueueEntry
+ *   stateAt: number, lastSeen: number, attentionSince: number | null,
+ *   attentionDetail: string | null, turnStart: number | null, phrase: string }} Client
+ * @typedef {{ client: string, label: string, name: string, at: number,
+ *   detail?: string | null }} QueueEntry
  */
 
 export class Referee {
@@ -90,6 +103,8 @@ export class Referee {
     this.refreshWanted = false;
     /** The last client left with `sleep` and nobody else is busy. */
     this.sleepWanted = false;
+    /** Rotates the thinking phrases. */
+    this.phraseN = 0;
     /** Strip text last sent to the robot, or null before the first send. */
     this.lastStatus = null;
     this.lastStatusAt = 0;
@@ -137,30 +152,42 @@ export class Referee {
       client.attentionSince = null;
     }
 
+    const detail = cleanDetail(req.detail);
     switch (kind) {
       case "state":
         if (client.state === name && this.owner === id) this.refreshWanted = true;
+        if (client.turnStart === null) client.turnStart = now;
+        if (name === "thinking" && client.state !== "thinking") {
+          client.phrase = THINKING[this.phraseN++ % THINKING.length];
+        }
         client.state = name;
-        client.detail = cleanDetail(req.detail);
+        client.detail = detail;
         client.stateAt = now;
         if (this.owner === null) this.owner = id;
         break;
       case "idle":
         client.state = null;
+        client.turnStart = null;
         if (this.owner === id) this.owner = null;
         break;
       case "attention":
         // Firmware attention is a wait loop (call, then up to 60 s of
         // waiting), so it is a steady face, not a queued one-shot.
         if (client.attentionSince === null) client.attentionSince = now;
+        client.attentionDetail = detail;
         break;
-      case "alert":
+      case "alert": {
+        let what = detail;
         if (name === "ring") {
+          // Turn finished: say how long it took.
+          if (!what && client.turnStart !== null) what = `done ${duration(now - client.turnStart)}`;
           client.state = null;
+          client.turnStart = null;
           if (this.owner === id) this.owner = null;
         }
-        this.enqueue({ client: id, label, name, at: now });
+        this.enqueue({ client: id, label, name, at: now, detail: what });
         break;
+      }
       case "greeting":
         if (this.owner === null && this.queue.length === 0 && !this.playing) {
           this.enqueue({ client: id, label, name, at: now });
@@ -186,6 +213,9 @@ export class Referee {
         stateAt: 0,
         lastSeen: now,
         attentionSince: null,
+        attentionDetail: null,
+        turnStart: null,
+        phrase: THINKING[0],
       };
       this.clients.set(id, client);
     }
@@ -330,17 +360,24 @@ export class Referee {
   statusText() {
     const entry = this.playing?.entry ?? this.queue[0];
     if (entry) {
-      const what = ALERT_TEXT.get(entry.name);
+      const what = entry.detail ?? ALERT_TEXT.get(entry.name);
       return what ? fit(`${entry.label}: ${what}`) : "";
     }
     const waiting = this.waiting();
-    if (waiting.length === 1) return fit(`${waiting[0].label} NEEDS YOU`);
+    if (waiting.length === 1) {
+      const w = waiting[0];
+      return fit(w.attentionDetail ? `${w.label}: ${w.attentionDetail}` : `${w.label} NEEDS YOU`);
+    }
     if (waiting.length > 1) return `${waiting.length} NEED YOU`;
     // The owner is handed on in expire(); look ahead so the text never lags.
     const ownerId = this.owner ?? this.nextOwner();
     const owner = ownerId ? this.clients.get(ownerId) : null;
-    if (owner?.state) return fit(`${owner.label}: ${owner.detail ?? owner.state}`);
-    return "";
+    if (!owner?.state) return "";
+    const what = owner.detail ?? (owner.state === "thinking" ? owner.phrase : owner.state);
+    // Other sessions busy too: "+N" at the end, cut from the detail.
+    let others = 0;
+    for (const c of this.clients.values()) if (c !== owner && c.state) others++;
+    return fit(`${owner.label}: ${what}`, others ? ` +${others}` : "");
   }
 
   /**
@@ -401,11 +438,14 @@ function cleanDetail(value) {
 }
 
 /**
- * Cut to the strip width; `label: detail` loses the end of the detail.
+ * Cut to the strip width; `label: detail` loses the end of the detail, the
+ * suffix always stays.
  * @param {string} text
+ * @param {string} [suffix]
  */
-function fit(text) {
-  return text.length <= STATUS_MAX ? text : text.slice(0, STATUS_MAX);
+function fit(text, suffix = "") {
+  const room = STATUS_MAX - suffix.length;
+  return (text.length <= room ? text : text.slice(0, room).trimEnd()) + suffix;
 }
 
 /** @param {unknown} value */

@@ -15,6 +15,13 @@ constexpr int kOledBodyRows = OLED_HEIGHT - kOledBandRows;
 // are missing a bar cursor follows the last one (big capitals only).
 void drawThoughtBox(const char* text, int shown = -1);
 
+// Same without the border (the status strip above the face): up to 10 big
+// capitals, else up to 21 small letters.
+void drawBandText(const char* text, int shown = -1);
+
+// Sleep strip: z z z with a 12 px capital Z at index `bigAt` (0-2).
+void drawBandZzz(int bigAt);
+
 // One line centered on row `centerY`, as large as fits the width:
 // 12x16, then 6x16, then 6x8 px per letter.
 void drawBodyText(const char* text, int centerY);

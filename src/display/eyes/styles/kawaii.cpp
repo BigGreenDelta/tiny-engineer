@@ -328,19 +328,20 @@ void stepAnimator(const kawaii::Expression& target, uint32_t now) {
 }
 
 // Status strip above a face shorter than the panel (the yellow band of
-// two-colour OLEDs): a thought box (oled_zones.h) with the broker's status
-// text (POST /status) while set, else the current animation.
+// two-colour OLEDs), no border: the broker's status text (POST /status)
+// while set, else the current animation; idle and sleep animate.
 
 const char* activityLabel(AnimationId animation) {
-  switch (animation) {
-    case AnimationId::None:
-      return "...";
-    case AnimationId::Sleep:
-      return "sleeping";
-    default:
-      return animationName(animation);
-  }
+  return animationName(animation);
 }
+
+// Idle: a dot wave rolls through three places. Same width every frame, so
+// the centered text never shifts.
+constexpr const char* kIdleFrames[] = {"   ", ".  ", ".. ", "...", " ..", "  ."};
+constexpr uint32_t kIdleFrameMs = 350;
+constexpr int kIdleFrameCount = sizeof(kIdleFrames) / sizeof(kIdleFrames[0]);
+// Sleep: Zzz, zZz, zzZ.
+constexpr uint32_t kZzzFrameMs = 700;
 
 // A new label types itself in, one letter per kStripTypeMs, behind a bar
 // cursor; the box is drawn at the final size from the start.
@@ -350,13 +351,23 @@ uint32_t g_stripTypedFromMs = 0;
 
 void drawStatusStrip(AnimationId animation, uint32_t now) {
   const char* custom = statusText(now);
+  if (custom == nullptr && animation == AnimationId::Sleep) {
+    g_stripLabel[0] = '\0';  // the next label types itself in again
+    drawBandZzz((int)((now / kZzzFrameMs) % 3));
+    return;
+  }
+  if (custom == nullptr && animation == AnimationId::None) {
+    g_stripLabel[0] = '\0';
+    drawBandText(kIdleFrames[(now / kIdleFrameMs) % kIdleFrameCount]);
+    return;
+  }
   const char* label = custom != nullptr ? custom : activityLabel(animation);
   if (strncmp(label, g_stripLabel, kStatusTextMax) != 0) {
     strncpy(g_stripLabel, label, kStatusTextMax);
     g_stripLabel[kStatusTextMax] = '\0';
     g_stripTypedFromMs = now;
   }
-  drawThoughtBox(g_stripLabel, (int)((now - g_stripTypedFromMs) / kStripTypeMs));
+  drawBandText(g_stripLabel, (int)((now - g_stripTypedFromMs) / kStripTypeMs));
 }
 
 // Center of an eye; integer halves, so a height change alone does not read

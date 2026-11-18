@@ -32,18 +32,32 @@ The broker remembers one slot per client. A request only changes the slot of the
 
 ## Status strip
 
-On a 64-row panel the robot shows a line of text above the face. The broker writes it with the robot's `POST /status` whenever it changes (and again every 4 min, as the robot clears it after 5 min), cut to 19 characters:
+On a 64-row panel the robot shows a line of text above the face. The broker writes it with the robot's `POST /status` whenever it changes (and again every 4 min, as the robot clears it after 5 min), cut to 21 characters:
 
 | Face | Strip |
 | --- | --- |
-| owner's state | `<label>: <detail>`, e.g. `tmp: Edit oled.cpp`; without a detail `tmp: typing` |
-| one session waits for you | `<label> NEEDS YOU` |
+| owner's state | `<label>: <detail>`, e.g. `tmp: Edit oled.cpp`; without a detail the state, and thinking picks one of `thinking`, `hmm...`, `pondering`, `mulling it over`, `connecting dots` |
+| other sessions busy too | ` +N` at the end, e.g. `tmp: Edit oled.cpp +1` |
+| one session waits for you | `<label>: <detail>` (`tmp: allow Bash?`, `tmp: your turn`) or `<label> NEEDS YOU` |
 | several wait | `2 NEED YOU` |
-| `ring` / `error` / `abort` | `<label>: done` / `error` / `stopped` |
+| `ring` | `<label>: done 3m12s`: time since the turn started (first state after idle) |
+| `error` / `abort` | `<label>: <detail>` (`tmp: Bash failed`, `tmp: Edit denied`), else `error` / `stopped` |
 | `welcome` / `wakeup` | `<label>: hello` |
-| idle, sleep | cleared: the robot shows `...` / `sleeping` |
+| idle, sleep | cleared: the robot animates `...` / `Zzz` itself |
 
-`detail` is a `POST /anim` param (1-40 printable chars). The Claude Code hook sends it for `PreToolUse`: the tool plus its file (`Edit oled.cpp`), shell program and subcommand only (`Bash pio run`, never arguments, which can hold secrets), search pattern, or fetched host.
+`detail` is a `POST /anim` param (1-40 printable chars). The Claude Code hook sends:
+
+| Hook event | detail |
+| --- | --- |
+| `PreToolUse` | tool + file (`Edit oled.cpp`), shell program and subcommand only (`Bash pio run`, never arguments, which can hold secrets), search pattern, or fetched host |
+| `UserPromptSubmit` | `on it` |
+| `SubagentStart` | `agent <type>` or `subagent` |
+| `PreCompact` | `compacting` |
+| `PermissionRequest` | `allow <tool>?` |
+| `PermissionDenied` | `<tool> denied` |
+| `PostToolUseFailure` | `<tool> failed` |
+| `Notification` | `your turn` (idle prompt) or `needs OK` (permission) |
+| `StopFailure` | `turn failed` |
 
 ## Who owns the face
 

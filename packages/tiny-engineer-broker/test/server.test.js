@@ -45,10 +45,10 @@ test("POST /anim takes the robot's query and adds client/label", async () => {
     await fetch(`${base}/anim?name=reading&client=s2&label=other`, { method: "POST" });
     await broker.step();
     assert.deepEqual(robot.posts, ["typing"]);
-    assert.equal(robot.status.at(-1), "tmp: typing");
+    assert.equal(robot.status.at(-1), "tmp: typing +1");
     await fetch(`${base}/anim?name=typing&client=s1&label=tmp&detail=Edit%20oled.cpp`, { method: "POST" });
     await broker.step();
-    assert.equal(robot.status.at(-1), "tmp: Edit oled.cpp");
+    assert.equal(robot.status.at(-1), "tmp: Edit oled.cpp +1");
     assert.ok(robot.auth.every((a) => a === "Bearer s3cret"));
 
     res = await fetch(`${base}/state`);

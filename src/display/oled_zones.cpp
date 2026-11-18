@@ -44,9 +44,9 @@ void drawBox(int textW) {
   display.drawRoundRect((OLED_WIDTH - boxW) / 2, 0, boxW, kOledBandRows, kBoxRadius, SSD1306_WHITE);
 }
 
-}  // namespace
-
-void drawThoughtBox(const char* text, int shown) {
+// Band text with or without the rounded border; without it the band fits
+// one more big capital and four more small letters.
+void drawBand(const char* text, int shown, bool bordered) {
   if (text == nullptr) {
     return;
   }
@@ -54,9 +54,12 @@ void drawThoughtBox(const char* text, int shown) {
   const int n = (int)strlen(text);
   shown = shown < 0 || shown > n ? n : shown;
   const int bigW = n > 0 ? n * (kBigGlyphW + kBigLetterGap) - kBigLetterGap : 0;
+  const int padX = bordered ? kBoxPadX : 0;
 
-  if (bigW + 2 * kBoxPadX <= OLED_WIDTH) {
-    drawBox(bigW);
+  if (bigW + 2 * padX <= OLED_WIDTH) {
+    if (bordered) {
+      drawBox(bigW);
+    }
     int x = (OLED_WIDTH - bigW) / 2;
     for (int i = 0; i < shown; i++) {
       drawBigChar(x, kBigTextTop, text[i]);
@@ -70,13 +73,50 @@ void drawThoughtBox(const char* text, int shown) {
 
   // Small font, 8 rows centered in the band.
   const int smallW = n * kSmallGlyphPitch - 1;
-  drawBox(smallW);
+  if (bordered) {
+    drawBox(smallW);
+  }
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
   display.setTextWrap(false);
   display.setCursor((OLED_WIDTH - smallW) / 2, (kOledBandRows - 8) / 2);
   for (int i = 0; i < shown; i++) {
     display.write((uint8_t)text[i]);
+  }
+}
+
+}  // namespace
+
+void drawThoughtBox(const char* text, int shown) {
+  drawBand(text, shown, true);
+}
+
+void drawBandText(const char* text, int shown) {
+  drawBand(text, shown, false);
+}
+
+void drawBandZzz(int bigAt) {
+  // One 12 px capital Z among small z's, bottoms on the same row.
+  constexpr int kSmallW = 5;
+  constexpr int kGap = 3;
+  constexpr int kCount = 3;
+  constexpr int kWidth = kBigGlyphW + (kCount - 1) * kSmallW + (kCount - 1) * kGap;
+  constexpr int kBottom = kBigTextTop + kBigTextH;  // first row below the glyphs
+  // The 5x7 font's z fills rows 2-6 of its cell.
+  constexpr int kSmallTop = kBottom - 7;
+
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setTextWrap(false);
+  int x = (OLED_WIDTH - kWidth) / 2;
+  for (int i = 0; i < kCount; i++) {
+    if (i == bigAt) {
+      drawBigChar(x, kBigTextTop, 'Z');
+      x += kBigGlyphW + kGap;
+    } else {
+      display.drawChar(x, kSmallTop, 'z', SSD1306_WHITE, SSD1306_BLACK, 1);
+      x += kSmallW + kGap;
+    }
   }
 }
 

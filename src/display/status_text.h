@@ -6,7 +6,7 @@
 // Text for the status strip above the face, set over HTTP (POST /status) by
 // the Tiny Engineer Broker. While set it replaces the animation name; it
 // clears itself after its TTL so a dead broker never leaves stale text.
-constexpr size_t kStatusTextMax = 19;  // small font across the 128 px strip
+constexpr size_t kStatusTextMax = 21;  // small font across the borderless 128 px strip
 constexpr uint32_t kStatusTtlDefaultS = 300;
 constexpr uint32_t kStatusTtlMaxS = 3600;
 

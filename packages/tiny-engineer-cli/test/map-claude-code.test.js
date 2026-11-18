@@ -145,3 +145,18 @@ test("toolDetail: short what for the status strip, no shell arguments", async ()
   assert.equal(toolDetail(pre("WebSearch", { query: "q" })), "Search");
   assert.equal(toolDetail({ hook_event_name: "Stop" }), undefined);
 });
+
+test("eventDetail: what each hook event says on the strip", async () => {
+  const { eventDetail } = await import("../src/integrations/claude-code/index.js");
+  const ev = (hook_event_name, extra = {}) => eventDetail({ hook_event_name, ...extra });
+  assert.equal(ev("UserPromptSubmit"), "on it");
+  assert.equal(ev("PermissionRequest", { tool_name: "Bash" }), "allow Bash?");
+  assert.equal(ev("PostToolUseFailure", { tool_name: "mcp__web__crawl" }), "crawl failed");
+  assert.equal(ev("PermissionDenied", { tool_name: "Edit" }), "Edit denied");
+  assert.equal(ev("PreCompact"), "compacting");
+  assert.equal(ev("SubagentStart", { agent_type: "Explore" }), "agent Explore");
+  assert.equal(ev("Notification", { notification_type: "idle_prompt" }), "your turn");
+  assert.equal(ev("Notification", { message: "Claude needs your permission to use Bash" }), "needs OK");
+  assert.equal(ev("Stop"), undefined);
+  assert.equal(ev("PreToolUse", { tool_name: "Read", tool_input: { file_path: "/a/b.md" } }), "Read b.md");
+});

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { Referee } from "../src/referee.js";
+import { duration, Referee } from "../src/referee.js";
 
 /**
  * Drive a referee against a simulated robot. One-shots run 3 s and
@@ -195,9 +195,11 @@ test("status text: who + what, alerts, waiting sessions, idle clears", () => {
   const ref = new Referee();
   assert.equal(ref.statusText(), "");
   ref.request({ name: "typing", client: "A", label: "tmp", detail: "Edit oled_zones.cpp" }, 0);
-  assert.equal(ref.statusText(), "tmp: Edit oled_zone"); // cut to 19
+  assert.equal(ref.statusText(), "tmp: Edit oled_zones."); // cut to 21
   ref.request({ name: "thinking", client: "A", label: "tmp" }, 10);
   assert.equal(ref.statusText(), "tmp: thinking");
+  ref.request({ name: "attention", client: "B", label: "bh1", detail: "allow Bash?" }, 20);
+  assert.equal(ref.statusText(), "bh1: allow Bash?");
   ref.request({ name: "attention", client: "B", label: "bh1" }, 20);
   assert.equal(ref.statusText(), "bh1 NEEDS YOU");
   ref.request({ name: "attention", client: "C", label: "wiki" }, 30);
@@ -205,9 +207,9 @@ test("status text: who + what, alerts, waiting sessions, idle clears", () => {
   ref.request({ name: "reading", client: "B", label: "bh1" }, 40);
   ref.request({ name: "reading", client: "C", label: "wiki" }, 40);
   ref.request({ name: "ring", client: "A", label: "tmp" }, 50);
-  assert.equal(ref.statusText(), "tmp: done");
+  assert.equal(ref.statusText(), "tmp: done 0s");
   ref.queue = [];
-  assert.equal(ref.statusText(), "bh1: reading");
+  assert.equal(ref.statusText(), "bh1: reading +1");
   ref.request({ name: "none", client: "B" }, 60);
   ref.request({ name: "none", client: "C" }, 60);
   assert.equal(ref.statusText(), "");
@@ -220,4 +222,24 @@ test("status is sent on change and re-sent before its TTL runs out", () => {
   ref.statusSent("tmp: typing", 0);
   assert.equal(ref.nextStatus(1000), null);
   assert.equal(ref.nextStatus(240_000), "tmp: typing");
+});
+
+test("ring says how long the turn took; thinking phrases rotate; +N fits", () => {
+  const ref = new Referee();
+  ref.request({ name: "reading", client: "A", label: "tmp" }, 0);
+  ref.request({ name: "thinking", client: "A", label: "tmp" }, 5_000);
+  const first = ref.statusText();
+  ref.request({ name: "typing", client: "A", label: "tmp" }, 6_000);
+  ref.request({ name: "thinking", client: "A", label: "tmp" }, 7_000);
+  assert.notEqual(ref.statusText(), first);
+  ref.request({ name: "ring", client: "A", label: "tmp" }, 192_000);
+  assert.equal(ref.statusText(), "tmp: done 3m12s");
+  assert.equal(duration(42_000), "42s");
+  assert.equal(duration(3_900_000), "1h05m");
+
+  const r2 = new Referee();
+  r2.request({ name: "typing", client: "A", label: "tiny-engineer", detail: "Edit oled_zones.cpp" }, 0);
+  r2.request({ name: "reading", client: "B", label: "bh1" }, 0);
+  const t = r2.statusText();
+  assert.ok(t.length <= 21 && t.endsWith(" +1"), t);
 });

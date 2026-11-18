@@ -44,9 +44,53 @@ function shellProgram(command) {
 }
 
 /**
- * Short "what" for the robot's status strip, from a PreToolUse payload:
- * `Edit oled.cpp`, `Bash pio run`, `Grep handleAnim`.
+ * Short "what" for the robot's status strip (broker `detail`), per hook event:
+ * `Edit oled.cpp`, `Bash pio run`, `allow Bash?`, `Bash failed`, `compacting`.
+ * Undefined lets the broker say its default for the animation.
  * @param {Record<string, unknown> | undefined} raw
+ * @returns {string | undefined}
+ */
+export function eventDetail(raw) {
+  const tool = typeof raw?.tool_name === "string" ? shortTool(raw.tool_name) : "";
+  switch (raw?.hook_event_name) {
+    case "PreToolUse":
+      return toolDetail(raw);
+    case "UserPromptSubmit":
+      return "on it";
+    case "SubagentStart":
+      return typeof raw.agent_type === "string" && raw.agent_type
+        ? `agent ${raw.agent_type}`
+        : "subagent";
+    case "PreCompact":
+      return "compacting";
+    case "PostToolUseFailure":
+      return tool ? `${tool} failed` : "tool failed";
+    case "PermissionRequest":
+      return tool ? `allow ${tool}?` : "needs OK";
+    case "PermissionDenied":
+      return tool ? `${tool} denied` : "denied";
+    case "Notification": {
+      const type = String(raw.notification_type ?? "");
+      const msg = String(raw.message ?? "");
+      if (type === "idle_prompt" || /waiting for your input/i.test(msg)) return "your turn";
+      if (type === "permission_prompt" || /permission/i.test(msg)) return "needs OK";
+      return undefined;
+    }
+    case "StopFailure":
+      return "turn failed";
+    default:
+      return undefined;
+  }
+}
+
+/** mcp__server__tool -> tool. @param {string} name */
+function shortTool(name) {
+  return name.startsWith("mcp__") ? name.split("__").pop() || name : name;
+}
+
+/**
+ * PreToolUse: the tool plus its file, shell program, pattern or host.
+ * @param {Record<string, unknown>} raw
  * @returns {string | undefined}
  */
 export function toolDetail(raw) {
@@ -126,7 +170,7 @@ export const claudeCode = {
     if (!client) return null;
     const cwd = typeof raw?.cwd === "string" ? raw.cwd : "";
     const label = cwd.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || undefined;
-    return { client, label, detail: toolDetail(raw) };
+    return { client, label, detail: eventDetail(raw) };
   },
 
   /**
