@@ -252,7 +252,8 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
     listen(port, host) {
       return new Promise((resolve) => {
         server.listen(port, host, () => {
-          schedule();
+          // First poll at once, so /health knows the robot right away.
+          void step().then(schedule);
           resolve(server.address());
         });
       });

@@ -103,3 +103,6 @@ hardware/**/~*.lck
 hardware/**/#auto_saved_files#
 hardware/**/*.kicad_pcb-bak
 hardware/**/*.kicad_sch-bak
+
+# Tiny Engineer Broker deploy settings (scripts/deploy-broker.sh)
+scripts/deploy-broker.local.env
