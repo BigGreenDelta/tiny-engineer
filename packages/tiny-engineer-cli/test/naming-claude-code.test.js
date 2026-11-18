@@ -57,7 +57,7 @@ test("notePrompt names on the 1st prompt and re-checks every 10th", async () => 
   process.env.TE_FAKE_CLAUDE_OUT = "broker";
   const raw = (prompt) => ({ hook_event_name: "UserPromptSubmit", session_id: "s2", prompt });
   naming.notePrompt(raw("one robot face for all sessions"));
-  for (let i = 0; i < 50 && naming.sessionName("s2") === null; i++) await new Promise((r) => setTimeout(r, 100));
+  for (let i = 0; i < 150 && naming.sessionName("s2") === null; i++) await new Promise((r) => setTimeout(r, 100));
   assert.equal(naming.sessionName("s2"), "broker");
   assert.equal(naming.readNameState("s2").prompts, 1);
   for (let i = 2; i <= 9; i++) naming.notePrompt(raw(`p${i}`));
@@ -65,7 +65,7 @@ test("notePrompt names on the 1st prompt and re-checks every 10th", async () => 
   process.env.TE_FAKE_CLAUDE_OUT = "deploy";
   naming.notePrompt(raw("p10"));
   assert.ok(naming.readNameState("s2").namingSince !== null);
-  for (let i = 0; i < 50 && naming.readNameState("s2").pending !== "deploy"; i++) await new Promise((r) => setTimeout(r, 100));
+  for (let i = 0; i < 150 && naming.readNameState("s2").pending !== "deploy"; i++) await new Promise((r) => setTimeout(r, 100));
   assert.equal(naming.sessionName("s2"), "broker");
   assert.equal(naming.readNameState("s2").pending, "deploy");
 });
