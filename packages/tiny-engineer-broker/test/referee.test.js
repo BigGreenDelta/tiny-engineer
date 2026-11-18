@@ -274,3 +274,18 @@ test("face and strip text sent in one step log as one robot row", () => {
   const robotRows = ref.log.filter((l) => l.who === "robot");
   assert.deepEqual(robotRows.map(({ anim, text }) => ({ anim, text })), [{ anim: "typing", text: "tmp: Bash ls" }]);
 });
+
+test("idle compaction: compacting ends at the SessionStart wakeup; no stale strip text", () => {
+  const ref = new Referee();
+  ref.request({ name: "thinking", client: "A", label: "tmp", detail: "compacting" }, 0);
+  assert.equal(ref.statusText(), "tmp: compacting");
+  ref.request({ name: "wakeup", client: "A", label: "tmp" }, 5_000);
+  const a = ref.snapshot(5_000).clients[0];
+  assert.equal(a.state, null);
+  assert.equal(a.detail, null);
+  assert.equal(ref.owner, null);
+
+  ref.request({ name: "typing", client: "B", label: "bh1", detail: "Edit x.cpp" }, 0);
+  ref.expire(400_000); // timed out
+  assert.equal(ref.snapshot(400_000).clients.find((c) => c.label === "bh1").detail, null);
+});

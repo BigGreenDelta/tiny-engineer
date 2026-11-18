@@ -184,9 +184,8 @@ export class Referee {
         if (this.owner === null) this.owner = id;
         break;
       case "idle":
-        client.state = null;
+        this.endState(client);
         client.turnStart = null;
-        if (this.owner === id) this.owner = null;
         break;
       case "attention":
         // Firmware attention is a wait loop (call, then up to 60 s of
@@ -199,14 +198,18 @@ export class Referee {
         if (name === "ring") {
           // Turn finished: say how long it took.
           if (!what && client.turnStart !== null) what = `done ${duration(now - client.turnStart)}`;
-          client.state = null;
+          this.endState(client);
           client.turnStart = null;
-          if (this.owner === id) this.owner = null;
         }
         this.enqueue({ client: id, label: shown, name, at: now, detail: what });
         break;
       }
       case "greeting":
+        // A session (re)start (fresh, resume, after compaction) means the
+        // session is back at its prompt: whatever it was doing has ended.
+        // The turn timer stays: an auto-compact mid-turn carries on.
+        this.endState(client);
+        this.expire(now);
         if (this.owner === null && this.queue.length === 0 && !this.playing) {
           this.enqueue({ client: id, label: shown, name, at: now });
         } else {
@@ -248,6 +251,17 @@ export class Referee {
     return client;
   }
 
+  /**
+   * The client stops doing what it did: no state, no strip text, and it
+   * lets go of the face.
+   * @param {Client} client
+   */
+  endState(client) {
+    client.state = null;
+    client.detail = null;
+    if (this.owner === client.id) this.owner = null;
+  }
+
   /** @param {string} id @param {string} base */
   uniqueLabel(id, base) {
     const taken = new Set();
@@ -274,7 +288,7 @@ export class Referee {
     for (const client of this.clients.values()) {
       if (client.state && now - client.stateAt >= this.stateTtlMs) {
         this.note(now, `${client.state} timed out`, client.label);
-        client.state = null;
+        this.endState(client);
       }
       if (client.attentionSince !== null && now - client.attentionSince >= this.attentionMaxMs) {
         this.note(now, "attention gave up", client.label);

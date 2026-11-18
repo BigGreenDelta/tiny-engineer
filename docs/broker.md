@@ -23,10 +23,10 @@ The broker remembers one slot per client. A request only changes the slot of the
 
 | Kind | Animations | Effect |
 | --- | --- | --- |
-| state | `typing`, `reading`, `thinking`, `talking` | Sets the client's state. Lives until the client posts something else, or until `state_ttl_s` passes with no request from that client |
+| state | `typing`, `reading`, `thinking`, `talking` | Sets the client's state and strip detail. Lives until the client posts something else, or until `state_ttl_s` passes with no request from that client; the detail ends with it |
 | attention | `attention` | Marks the client as waiting for you. The face shows `attention` at once, over the owner's state, until that client posts anything else (you answered) or `attention_max_s` passes. The firmware's attention is a call plus up to 60 s of waiting; once the robot falls back to `none`, the broker shows it again after `attention_repeat_s` |
 | alert | `ring`, `error`, `abort`, `dead` | Plays once, even when another client owns the face. `ring` (turn finished) also clears the client's state |
-| greeting | `welcome`, `wakeup` | Registers the client. Plays only when nobody owns the face and no alert is waiting; otherwise skipped |
+| greeting | `welcome`, `wakeup` | Registers the client and ends its state (a session start, resume or finished compaction means it is back at its prompt; the turn timer keeps running). Plays only when nobody owns the face and no alert is waiting; otherwise skipped |
 | idle | `none` | Clears the client's state |
 | leave | `sleep` | Removes the client. The robot is sent `sleep` only when no other client has a live state or a pending attention |
 
