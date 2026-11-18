@@ -5,6 +5,9 @@ import { ANIMATIONS, Referee, STATUS_TTL_S } from "./referee.js";
 
 const POLL_IDLE_MS = 2000;
 const POLL_ALERT_MS = 400;
+const POLL_OFFLINE_MS = 5000;
+/** How often to read the robot's uptime to spot a quick reboot. */
+const HEALTH_EVERY_MS = 10_000;
 const ROBOT_TIMEOUT_MS = 3000;
 
 /**
@@ -39,6 +42,16 @@ export function robotClient({ url, token, fetchImpl = fetch }) {
       if (!res.ok) throw new Error(`robot ${res.status} on /status`);
     },
     getAnim: () => call("/anim", "GET"),
+    /** @returns {Promise<number | null>} uptime_ms */
+    async getUptime() {
+      const res = await fetchImpl(`${base}/health`, {
+        headers,
+        signal: AbortSignal.timeout(ROBOT_TIMEOUT_MS),
+      });
+      if (!res.ok) throw new Error(`robot ${res.status} on /health`);
+      const body = await res.json().catch(() => ({}));
+      return typeof body.uptime_ms === "number" ? body.uptime_ms : null;
+    },
     /** @param {string} name */
     setAnim: (name) => call(`/anim?name=${encodeURIComponent(name)}`, "POST"),
   };
@@ -52,6 +65,11 @@ export function robotClient({ url, token, fetchImpl = fetch }) {
 export function createBroker({ robot, referee = new Referee(), now = Date.now, log = () => {} }) {
   let robotOk = false;
   let lastError = null;
+  /** When the robot went offline (or the broker started without it). */
+  let offlineSince = now();
+  let everOnline = false;
+  let lastUptime = null;
+  let lastHealthAt = 0;
   let busy = false;
   let again = false;
   let timer = null;
@@ -74,18 +92,51 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
     }
   }
 
+  /** @param {Error} err */
+  function markOffline(err) {
+    if (robotOk) {
+      offlineSince = now();
+      referee.note(offlineSince, `robot offline: ${err.message}`);
+      log(`robot offline: ${err.message}`);
+    }
+    robotOk = false;
+    lastError = err.message;
+    referee.observe(null);
+  }
+
+  // The robot may be off for hours (being worked on): requests keep being
+  // refereed, nothing is sent, and the face is re-sent once it is back.
   async function stepOnce() {
     {
+      let anim;
       try {
-        referee.observe(await robot.getAnim());
-        robotOk = true;
-        lastError = null;
+        anim = await robot.getAnim();
       } catch (err) {
-        robotOk = false;
-        lastError = err.message;
-        referee.observe(null);
+        markOffline(err);
         return;
       }
+      if (!robotOk) {
+        robotOk = true;
+        lastError = null;
+        lastHealthAt = 0; // read the uptime now
+        if (everOnline) referee.robotReset(now(), "back");
+        log(everOnline ? "robot back" : "robot online");
+        everOnline = true;
+      }
+      if (now() - lastHealthAt >= HEALTH_EVERY_MS) {
+        lastHealthAt = now();
+        try {
+          const uptime = await robot.getUptime();
+          if (uptime !== null && lastUptime !== null && uptime < lastUptime) {
+            referee.robotReset(now(), "rebooted");
+            log("robot rebooted");
+          }
+          lastUptime = uptime;
+        } catch {
+          // /health failing alone is not worth a state change.
+        }
+      }
+      referee.observe(anim);
       // Several writes can be due at once (alert done, then the owner's state).
       for (let i = 0; i < 3; i++) {
         const want = referee.next(now());
@@ -95,9 +146,8 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
           referee.sent(want, now());
           log(`-> ${want}`);
         } catch (err) {
-          robotOk = false;
-          lastError = err.message;
-          break;
+          markOffline(err);
+          return;
         }
         if (referee.playing) break;
       }
@@ -117,7 +167,11 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
 
   function schedule() {
     if (stopped) return;
-    const delay = referee.playing || referee.queue.length ? POLL_ALERT_MS : POLL_IDLE_MS;
+    const delay = !robotOk
+      ? POLL_OFFLINE_MS
+      : referee.playing || referee.queue.length
+        ? POLL_ALERT_MS
+        : POLL_IDLE_MS;
     timer = setTimeout(async () => {
       await step();
       schedule();
@@ -140,11 +194,23 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
         res.end(renderPage());
         return;
       case "GET /health":
-        return send(res, 200, { ok: true, robot: robotOk, error: lastError });
+        // The broker is healthy whether or not the robot is.
+        return send(res, 200, {
+          ok: true,
+          robot: robotOk,
+          error: lastError,
+          offlineSince: robotOk ? null : offlineSince,
+        });
       case "GET /anim":
         return send(res, 200, { ok: true, animation: referee.robotAnim ?? "none" });
       case "GET /state":
-        return send(res, 200, { ok: true, robotOk, error: lastError, ...referee.snapshot(now()) });
+        return send(res, 200, {
+          ok: true,
+          robotOk,
+          error: lastError,
+          offlineSince: robotOk ? null : offlineSince,
+          ...referee.snapshot(now()),
+        });
       case "POST /anim": {
         const name = url.searchParams.get("name");
         if (!name) return send(res, 400, { ok: false, error: "missing name" });

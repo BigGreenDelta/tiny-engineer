@@ -41,6 +41,8 @@ const MAX_LOG = 50;
 const ALERT_MIN_MS = 1000;
 const ALERT_MAX_MS = 15000;
 const ALERT_UNSEEN_MS = 2500;
+/** An alert that waited longer than this (robot offline) is old news. */
+export const ALERT_STALE_MS = 30_000;
 const REFRESH_MS = 30000;
 /** Firmware strip limit (kStatusTextMax). */
 export const STATUS_MAX = 21;
@@ -301,6 +303,11 @@ export class Referee {
       this.lastSteady = null;
     }
 
+    const fresh = this.queue.filter((q) => now - q.at < ALERT_STALE_MS);
+    if (fresh.length !== this.queue.length) {
+      this.note(now, `dropped ${this.queue.length - fresh.length} stale alert(s)`);
+      this.queue = fresh;
+    }
     if (this.queue.length > 0) return this.queue[0].name;
 
     const steady = this.steadyFace();
@@ -334,6 +341,19 @@ export class Referee {
     const last = this.lastSteady === null ? null : kindOf(this.lastSteady);
     if (last === "state" || last === "attention") return "none";
     return null;
+  }
+
+  /**
+   * The robot came back (reconnect or reboot): it shows its own face and no
+   * status text, so forget what was sent and send it all again.
+   * @param {number} now
+   * @param {string} why
+   */
+  robotReset(now, why) {
+    this.playing = null;
+    this.lastSteady = null;
+    this.lastStatus = null;
+    this.note(now, `robot ${why}, re-sending the face`);
   }
 
   /**

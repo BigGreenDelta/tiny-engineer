@@ -72,6 +72,15 @@ The broker sends the robot a request only when what the face should show changes
 
 The robot's own reflexes stay: the push-button Actions, the sleep timer, `continuous_timeout` and the boot welcome. The broker does not fight them. It polls `GET /anim` (every 2 s, every 0.4 s while an alert plays) to know what the face shows.
 
+## Robot offline
+
+The broker does not depend on the robot being up; it may be off or rebooting for hours while it is worked on.
+
+- Requests are still taken (**200**) and refereed: slots, owner, attentions and TTLs keep running. Nothing is sent.
+- Polls slow to every 5 s while the robot does not answer. `GET /health` stays `ok: true`, with `robot: false` and `offlineSince`.
+- Alerts that waited more than 30 s are dropped instead of playing late.
+- When the robot answers again, or its `uptime_ms` (read every 10 s) went down because it rebooted between polls, the broker forgets what it sent and sends the current face and strip text again.
+
 ## Broker API
 
 | Route | Reply |
@@ -79,7 +88,7 @@ The robot's own reflexes stay: the push-button Actions, the sleep timer, `contin
 | `POST /anim?name=&client=&label=` | `{"ok":true,"animation":"<robot now>","kind":"state","owner":"<label>"}`. Unknown `name` gives **400** `unknown animation` |
 | `GET /anim` | `{"ok":true,"animation":"<robot now>"}`, the robot's reply shape |
 | `GET /state` | Robot view, owner, every client slot, the queue and the last 50 log lines |
-| `GET /health` | `{"ok":true,"robot":true}`; `robot` is false when the last poll failed |
+| `GET /health` | `{"ok":true,"robot":true}`; `robot` is false when the last poll failed, then `offlineSince` says since when |
 | `GET /` | "Who's asking" page: owner, clients, queue and log, refreshed every 2 s |
 
 ## Settings

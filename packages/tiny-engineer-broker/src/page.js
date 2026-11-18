@@ -49,7 +49,8 @@ const time = (ms) => new Date(ms).toLocaleTimeString();
 async function refresh() {
   let s;
   try { s = await (await fetch("state")).json(); } catch { document.getElementById("robot").textContent = "broker unreachable"; return; }
-  document.getElementById("robot").textContent = s.robotOk ? "robot: online" : "robot: offline " + (s.error || "");
+  document.getElementById("robot").textContent = s.robotOk ? "robot: online"
+    : "robot: offline since " + time(s.offlineSince) + " (" + (s.error || "?") + "), requests still refereed";
   document.getElementById("face").textContent = s.robot || "-";
   document.getElementById("strip").textContent = "strip: " + (s.status || "(robot's own label)");
   document.getElementById("owner").textContent = s.playing ? "playing " + s.playing.name + " for " + s.playing.label
