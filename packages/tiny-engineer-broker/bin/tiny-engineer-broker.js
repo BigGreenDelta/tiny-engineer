@@ -29,7 +29,7 @@ const broker = createBroker({
 });
 
 await broker.listen(port);
-console.log(`face broker on :${port}, robot ${url}${token ? " (token set)" : ""}`);
+console.log(`Tiny Engineer Broker on :${port}, robot ${url}${token ? " (token set)" : ""}`);
 
 for (const sig of ["SIGINT", "SIGTERM"]) {
   process.on(sig, async () => {

@@ -5,7 +5,7 @@ export function renderPage() {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Face broker</title>
+<title>Tiny Engineer Broker</title>
 <style>
   :root { --bg:#fbfaf7; --fg:#1f2328; --muted:#6a737d; --line:#e1e4e8; --card:#fff; --accent:#1f6feb; --warn:#d1242f; }
   @media (prefers-color-scheme: dark) {
@@ -29,7 +29,7 @@ export function renderPage() {
 </head>
 <body>
 <main>
-  <h1>Face broker</h1>
+  <h1>Tiny Engineer Broker</h1>
   <div class="card">
     <div class="muted" id="robot">robot: ...</div>
     <div class="face" id="face">-</div>

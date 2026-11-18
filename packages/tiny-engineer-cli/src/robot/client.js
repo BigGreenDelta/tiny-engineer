@@ -135,7 +135,7 @@ export function robotFetch(baseUrl, path, init, token = null) {
 
 /**
  * POST /anim?name=…. Never throws — returns a RobotResult.
- * `who` adds `client` / `label` for the face broker (docs/broker.md); the
+ * `who` adds `client` / `label` for the Tiny Engineer Broker (docs/broker.md); the
  * robot itself ignores them.
  * @param {string} baseUrl
  * @param {string} animName

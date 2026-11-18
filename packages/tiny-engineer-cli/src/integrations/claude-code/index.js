@@ -52,7 +52,7 @@ export const claudeCode = {
   },
 
   /**
-   * Who is asking, for the face broker: the session id, labelled with the
+   * Who is asking, for the Tiny Engineer Broker: the session id, labelled with the
    * project folder name.
    * @param {import("../types.js").HookInput} input
    */

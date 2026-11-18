@@ -1,6 +1,6 @@
-# Face broker
+# Tiny Engineer Broker
 
-The broker is a small service that sits between every agent session and the robot. Sessions file requests with the broker; the broker decides what the face shows and is the only client that writes to the robot. Without it the robot keeps one slot and the last `POST /anim` wins, so two Claude Code sessions fight over the face.
+The Tiny Engineer Broker is a small service that sits between every agent session and the robot. Sessions file requests with the broker; the broker decides what the face shows and is the only client that writes to the robot. Without it the robot keeps one slot and the last `POST /anim` wins, so two Claude Code sessions fight over the face.
 
 The robot firmware is unchanged. The broker speaks the robot's own HTTP API, and its own `POST /anim` takes the same query, so a hook only needs its `TINY_ENGINEER_URL` pointed at the broker.
 

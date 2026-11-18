@@ -54,7 +54,7 @@ test("POST /anim takes the robot's query and adds client/label", async () => {
     assert.equal(res.status, 400);
 
     res = await fetch(`${base}/`);
-    assert.match(await res.text(), /Face broker/);
+    assert.match(await res.text(), /Tiny Engineer Broker/);
   } finally {
     await broker.close();
   }

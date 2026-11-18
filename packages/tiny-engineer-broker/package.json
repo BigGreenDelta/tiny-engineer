@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Face broker: one writer for the Tiny Engineer face; agent sessions file requests, the broker picks what plays",
+  "description": "Tiny Engineer Broker: one writer for the Tiny Engineer face; agent sessions file requests, the broker picks what plays",
   "bin": {
     "tiny-engineer-broker": "./bin/tiny-engineer-broker.js"
   },
