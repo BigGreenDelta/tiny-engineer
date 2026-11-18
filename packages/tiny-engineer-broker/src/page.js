@@ -52,9 +52,15 @@ async function refresh() {
   document.getElementById("robot").textContent = s.robotOk ? "robot: online"
     : "robot: offline since " + time(s.offlineSince) + " (" + (s.error || "?") + "), requests still refereed";
   document.getElementById("face").textContent = s.robot || "-";
-  document.getElementById("strip").textContent = "strip: " + (s.status || "(robot's own label)");
-  document.getElementById("owner").textContent = s.playing ? "playing " + s.playing.name + " for " + s.playing.label
-    : s.owner ? "owned by " + s.owner.label : "nobody owns the face";
+  document.getElementById("strip").textContent = s.status
+    ? "strip: \u201c" + s.status + "\u201d (" + s.status.length + " chars" + (s.status.length > 21 ? ", scrolls" : "") + ")"
+    : "strip: robot's own (... idle, Zzz sleep, else the animation name)";
+  const underneath = s.owner ? "owner underneath: " + s.owner.label : "nobody else busy";
+  document.getElementById("owner").textContent = s.playing
+    ? "playing " + s.playing.name + " for " + s.playing.label + "; " + underneath
+    : s.waiting.length
+      ? "waiting for you: " + s.waiting.join(", ") + " (face shows attention); " + underneath
+      : s.owner ? "owned by " + s.owner.label : "nobody owns the face";
   const ownerId = s.owner && s.owner.id;
   document.getElementById("clients").innerHTML = s.clients.map((c) =>
     "<tr><td class='" + (c.id === ownerId ? "owner" : "") + "'>" + esc(c.label) + "</td><td>" +

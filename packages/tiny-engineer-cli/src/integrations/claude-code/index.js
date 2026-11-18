@@ -8,6 +8,7 @@ import {
   planUninstall,
 } from "./install.js";
 import { animationForEvent } from "./map.js";
+import { notePrompt, sessionName } from "./naming.js";
 
 /**
  * @param {string} stdinText
@@ -169,8 +170,19 @@ export const claudeCode = {
     const client = typeof raw?.session_id === "string" ? raw.session_id : undefined;
     if (!client) return null;
     const cwd = typeof raw?.cwd === "string" ? raw.cwd : "";
-    const label = cwd.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || undefined;
+    const folder = cwd.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || undefined;
+    // Haiku's name for the session (naming.js), else the project folder.
+    const label = sessionName(client) ?? folder;
     return { client, label, detail: eventDetail(raw) };
+  },
+
+  /**
+   * Count user prompts; (re)name the session in the background when due.
+   * @param {import("../types.js").HookInput} input
+   */
+  beforePost(input) {
+    const raw = /** @type {Record<string, unknown> | undefined} */ (input.meta?.raw);
+    if (raw?.hook_event_name === "UserPromptSubmit") notePrompt(raw);
   },
 
   /**

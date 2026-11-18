@@ -367,6 +367,10 @@ void drawStatusStrip(AnimationId animation, uint32_t now) {
     g_stripLabel[kStatusTextMax] = '\0';
     g_stripTypedFromMs = now;
   }
+  if (bandTextScrolls(g_stripLabel)) {
+    drawBandScroll(g_stripLabel, now - g_stripTypedFromMs);
+    return;
+  }
   drawBandText(g_stripLabel, (int)((now - g_stripTypedFromMs) / kStripTypeMs));
 }
 

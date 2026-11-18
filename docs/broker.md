@@ -14,7 +14,7 @@ curl -X POST "http://broker:8790/anim?name=typing&client=<session id>&label=tmp"
 | --- | --- |
 | `name` | Animation name, same allow-list as the robot (`none`, `typing`, `reading`, `thinking`, `talking`, `ring`, `welcome`, `attention`, `error`, `abort`, `dead`, `wakeup`, `sleep`) |
 | `client` | Who is asking, 1-64 chars. Claude Code hooks send the `session_id` from the hook stdin. Missing: the request counts as client `anon` |
-| `label` | Short display name, 1-20 chars, e.g. the project folder. Missing: the first 8 chars of `client` |
+| `label` | Short display name, 1-20 chars. Missing: the first 8 chars of `client`. Two clients with the same label are shown as `tmp`, `tmp2`, ... |
 | `detail` | What the client is doing, 1-40 chars, for the status strip (see below). Optional |
 
 The broker remembers one slot per client. A request only changes the slot of the client that sent it.
@@ -30,15 +30,24 @@ The broker remembers one slot per client. A request only changes the slot of the
 | idle | `none` | Clears the client's state |
 | leave | `sleep` | Removes the client. The robot is sent `sleep` only when no other client has a live state or a pending attention |
 
+## Session names
+
+The Claude Code hook names each session for the strip with the local `claude` CLI (`claude -p --model haiku --tools "" --no-session-persistence`), so prompts never leave the machine except to Claude itself; the broker only gets the name as `label`.
+
+- First prompt: Haiku names the session from it (1-2 lowercase words, at most 12 chars, e.g. `oled-strip`).
+- Every 10th prompt: Haiku sees the current name and the last 10 prompts (only what you typed, from the session transcript) and answers `keep` or a new name. A rename takes two such checks in a row, so a side trip does not rename the session; the second check's name wins.
+- Naming runs in a detached child (`tiny-engineer name-session`), so the hook never waits; the name applies from the next hook event. State lives in `~/.config/tiny-engineer/sessions/<session id>.json`, pruned after 30 days.
+- Until a name exists, and if `claude` fails, the label is the project folder.
+
 ## Status strip
 
-On a 64-row panel the robot shows a line of text above the face. The broker writes it with the robot's `POST /status` whenever it changes (and again every 4 min, as the robot clears it after 5 min), cut to 21 characters:
+On a 64-row panel the robot shows a line of text above the face. The broker writes it with the robot's `POST /status` whenever it changes (and again every 4 min, as the robot clears it after 5 min), cut to 48 characters (the robot scrolls anything over 21):
 
 | Face | Strip |
 | --- | --- |
 | owner's state | `<label>: <detail>`, e.g. `tmp: Edit oled.cpp`; without a detail the state, and thinking picks one of `thinking`, `hmm...`, `pondering`, `mulling it over`, `connecting dots` |
 | other sessions busy too | ` +N` at the end, e.g. `tmp: Edit oled.cpp +1` |
-| one session waits for you | `<label>: <detail>` (`tmp: allow Bash?`, `tmp: your turn`) or `<label> NEEDS YOU` |
+| one session waits for you | `<label>: <detail>` (`tmp: allow Bash?`) or `<label> NEEDS YOU` |
 | several wait | `2 NEED YOU` |
 | `ring` | `<label>: done 3m12s`: time since the turn started (first state after idle) |
 | `error` / `abort` | `<label>: <detail>` (`tmp: Bash failed`, `tmp: Edit denied`), else `error` / `stopped` |
@@ -56,7 +65,7 @@ On a 64-row panel the robot shows a line of text above the face. The broker writ
 | `PermissionRequest` | `allow <tool>?` |
 | `PermissionDenied` | `<tool> denied` |
 | `PostToolUseFailure` | `<tool> failed` |
-| `Notification` | `your turn` (idle prompt) or `needs OK` (permission) |
+| `Notification` | `needs OK` (permission). The idle reminder ("waiting for your input", about 60 s after a turn) posts nothing: `Stop` already rang, and waiting means blocked until you act |
 | `StopFailure` | `turn failed` |
 
 ## Who owns the face
@@ -87,7 +96,7 @@ The broker does not depend on the robot being up; it may be off or rebooting for
 | --- | --- |
 | `POST /anim?name=&client=&label=` | `{"ok":true,"animation":"<robot now>","kind":"state","owner":"<label>"}`. Unknown `name` gives **400** `unknown animation` |
 | `GET /anim` | `{"ok":true,"animation":"<robot now>"}`, the robot's reply shape |
-| `GET /state` | Robot view, owner, every client slot, the queue and the last 50 log lines |
+| `GET /state` | Robot view, owner, every client slot, the queue and the last 200 log lines (each request with its text, each face and strip text sent) |
 | `GET /health` | `{"ok":true,"robot":true}`; `robot` is false when the last poll failed, then `offlineSince` says since when |
 | `GET /` | "Who's asking" page: owner, clients, queue and log, refreshed every 2 s |
 

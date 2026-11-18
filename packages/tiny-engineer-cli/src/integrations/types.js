@@ -48,6 +48,7 @@
  * @property {boolean} [hardExitAfterPost]
  * @property {(argv: string[], stdinText: string) => HookInput | null} parseHook
  * @property {(input: HookInput) => string | null} mapToAnim
+ * @property {(input: HookInput) => void} [beforePost] Side work before the animation is posted (never throws)
  * @property {(input: HookInput) => { client?: string, label?: string, detail?: string } | null} [requester] Who is asking (Tiny Engineer Broker `client` / `label`)
  * @property {(input: HookInput, style: import("../util/style.js").Style) => string[]} [describeFiles]
  * @property {(ctx: HookRespondContext) => void} [respond]

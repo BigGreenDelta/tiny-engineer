@@ -29,7 +29,7 @@ const EVENT_ANIM = new Map([
 
 /**
  * Map a Claude Code hook payload to an animation name, or null to skip.
- * @param {{ hook_event_name?: string, tool_name?: string, source?: string, reason?: string }} event
+ * @param {{ hook_event_name?: string, tool_name?: string, source?: string, reason?: string, notification_type?: string, message?: string }} event
  * @returns {string | null}
  */
 export function animationForEvent(event) {
@@ -56,5 +56,18 @@ export function animationForEvent(event) {
     return event.reason === "clear" || event.reason === "resume" ? null : "sleep";
   }
 
+  // "Needs you" means something blocks until you act (a permission prompt).
+  // The idle reminder ("Claude is waiting for your input", ~60 s after a
+  // turn) is not that: Stop already rang, so skip it.
+  if (name === "Notification" && isIdleReminder(event)) return null;
+
   return EVENT_ANIM.get(name) ?? null;
+}
+
+/**
+ * @param {{ notification_type?: string, message?: string }} event
+ */
+export function isIdleReminder(event) {
+  if (event.notification_type === "idle_prompt") return true;
+  return typeof event.message === "string" && /waiting for your input/i.test(event.message);
 }

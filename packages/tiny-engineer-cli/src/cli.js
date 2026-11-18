@@ -1,3 +1,4 @@
+import { SKIP_ENV, runNameSession } from "./integrations/claude-code/naming.js";
 import { readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -114,6 +115,11 @@ Examples:
  * @param {boolean} quietGlobal
  */
 async function runHook(out, argv, quietGlobal) {
+  // Inside our own `claude -p` naming run: stay out of it.
+  if (process.env[SKIP_ENV]) {
+    process.exitCode = 0;
+    return;
+  }
   const opts = parseCommonArgs(argv);
   const quiet = quietGlobal || opts.quiet;
   const localOut = quiet === out.quiet ? out : createOutput({ quiet, style: out.style });
@@ -150,6 +156,7 @@ async function runHook(out, argv, quietGlobal) {
     return;
   }
 
+  integration.beforePost?.(input);
   const anim = integration.mapToAnim(input);
   if (anim) {
     // Fail-open: ignore result so an offline robot never stalls the agent.
@@ -309,6 +316,15 @@ export async function run(argv) {
     case "hook":
       await runHook(out, rest, global.quiet);
       return;
+    case "name-session": {
+      // Internal: the detached naming child started by the Claude Code hook.
+      if (!rest[0]) {
+        process.exitCode = 1;
+        return;
+      }
+      await runNameSession(rest[0], await readStdin());
+      return;
+    }
     case "anim":
       await runAnim(out, rest, global.quiet);
       return;

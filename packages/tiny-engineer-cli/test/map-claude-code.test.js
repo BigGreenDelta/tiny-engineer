@@ -160,3 +160,16 @@ test("eventDetail: what each hook event says on the strip", async () => {
   assert.equal(ev("Stop"), undefined);
   assert.equal(ev("PreToolUse", { tool_name: "Read", tool_input: { file_path: "/a/b.md" } }), "Read b.md");
 });
+
+test("idle reminder is not 'needs you'; permission notifications are", () => {
+  assert.equal(animationForEvent({ hook_event_name: "Notification", notification_type: "idle_prompt" }), null);
+  assert.equal(
+    animationForEvent({ hook_event_name: "Notification", message: "Claude is waiting for your input" }),
+    null,
+  );
+  assert.equal(
+    animationForEvent({ hook_event_name: "Notification", message: "Claude needs your permission to use Bash" }),
+    "attention",
+  );
+  assert.equal(animationForEvent({ hook_event_name: "PermissionRequest" }), "attention");
+});

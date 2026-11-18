@@ -95,6 +95,40 @@ void drawBandText(const char* text, int shown) {
   drawBand(text, shown, false);
 }
 
+namespace {
+constexpr uint32_t kScrollHoldMs = 1500;
+constexpr uint32_t kScrollMsPerPx = 25;  // 40 px/s
+}  // namespace
+
+bool bandTextScrolls(const char* text) {
+  return text != nullptr && (int)strlen(text) * kSmallGlyphPitch - 1 > OLED_WIDTH;
+}
+
+void drawBandScroll(const char* text, uint32_t elapsedMs) {
+  if (!bandTextScrolls(text)) {
+    drawBandText(text);
+    return;
+  }
+  const int width = (int)strlen(text) * kSmallGlyphPitch - 1;
+  const int travel = width - OLED_WIDTH;
+  const uint32_t moveMs = (uint32_t)travel * kScrollMsPerPx;
+  const uint32_t t = elapsedMs % (kScrollHoldMs + moveMs + kScrollHoldMs);
+  int offset = 0;
+  if (t >= kScrollHoldMs + moveMs) {
+    offset = travel;
+  } else if (t >= kScrollHoldMs) {
+    offset = (int)((t - kScrollHoldMs) / kScrollMsPerPx);
+  }
+
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setTextWrap(false);
+  display.setCursor(-offset, (kOledBandRows - 8) / 2);
+  for (const char* c = text; *c; c++) {
+    display.write((uint8_t)*c);
+  }
+}
+
 void drawBandZzz(int bigAt) {
   // One 12 px capital Z among small z's, bottoms on the same row.
   constexpr int kSmallW = 5;

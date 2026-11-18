@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include "pins.h"
 
 // Two-zone layout for 64-row panels. On two-colour 0.96" modules the top
@@ -21,6 +23,14 @@ void drawBandText(const char* text, int shown = -1);
 
 // Sleep strip: z z z with a 12 px capital Z at index `bigAt` (0-2).
 void drawBandZzz(int bigAt);
+
+// True when `text` is wider than the band even in the small font.
+bool bandTextScrolls(const char* text);
+
+// Small-font text too wide for the band, scrolled sideways: holds at the
+// start, slides left until the end shows, holds, starts over. `elapsedMs`
+// counts from when this text first appeared.
+void drawBandScroll(const char* text, uint32_t elapsedMs);
 
 // One line centered on row `centerY`, as large as fits the width:
 // 12x16, then 6x16, then 6x8 px per letter.

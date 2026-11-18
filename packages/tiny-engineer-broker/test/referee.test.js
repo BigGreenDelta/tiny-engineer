@@ -195,7 +195,7 @@ test("status text: who + what, alerts, waiting sessions, idle clears", () => {
   const ref = new Referee();
   assert.equal(ref.statusText(), "");
   ref.request({ name: "typing", client: "A", label: "tmp", detail: "Edit oled_zones.cpp" }, 0);
-  assert.equal(ref.statusText(), "tmp: Edit oled_zones."); // cut to 21
+  assert.equal(ref.statusText(), "tmp: Edit oled_zones.cpp"); // up to 48, the robot scrolls
   ref.request({ name: "thinking", client: "A", label: "tmp" }, 10);
   assert.equal(ref.statusText(), "tmp: thinking");
   ref.request({ name: "attention", client: "B", label: "bh1", detail: "allow Bash?" }, 20);
@@ -241,5 +241,25 @@ test("ring says how long the turn took; thinking phrases rotate; +N fits", () =>
   r2.request({ name: "typing", client: "A", label: "tiny-engineer", detail: "Edit oled_zones.cpp" }, 0);
   r2.request({ name: "reading", client: "B", label: "bh1" }, 0);
   const t = r2.statusText();
-  assert.ok(t.length <= 21 && t.endsWith(" +1"), t);
+  assert.equal(t, "tiny-engineer: Edit oled_zones.cpp +1");
+});
+
+test("same folder twice: tmp, tmp2", () => {
+  const ref = new Referee();
+  ref.request({ name: "typing", client: "A", label: "tmp" }, 0);
+  ref.request({ name: "reading", client: "B", label: "tmp" }, 0);
+  ref.request({ name: "reading", client: "B", label: "tmp" }, 10);
+  const labels = ref.snapshot(20).clients.map((c) => c.label);
+  assert.deepEqual(labels, ["tmp", "tmp2"]);
+  ref.request({ name: "attention", client: "B", label: "tmp" }, 30);
+  assert.equal(ref.statusText(), "tmp2 NEEDS YOU");
+});
+
+test("long strip text is cut at 48, keeping the +N", () => {
+  const ref = new Referee();
+  ref.request({ name: "typing", client: "A", label: "tiny-engineer", detail: "Grep someVeryLongPatternThatGoesOnAndOn" }, 0);
+  ref.request({ name: "reading", client: "B", label: "bh1" }, 0);
+  const t = ref.statusText();
+  assert.equal(t.length, 48);
+  assert.ok(t.endsWith(" +1"), t);
 });

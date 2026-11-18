@@ -37,15 +37,15 @@ const KINDS = new Map([
 
 export const ANON = "anon";
 const MAX_QUEUE = 32;
-const MAX_LOG = 50;
+const MAX_LOG = 200;
 const ALERT_MIN_MS = 1000;
 const ALERT_MAX_MS = 15000;
 const ALERT_UNSEEN_MS = 2500;
 /** An alert that waited longer than this (robot offline) is old news. */
 export const ALERT_STALE_MS = 30_000;
 const REFRESH_MS = 30000;
-/** Firmware strip limit (kStatusTextMax). */
-export const STATUS_MAX = 21;
+/** Firmware strip limit (kStatusTextMax); longer than 21 scrolls. */
+export const STATUS_MAX = 48;
 /** Status TTL sent to the robot; re-sent before it runs out. */
 export const STATUS_TTL_S = 300;
 const STATUS_RESEND_MS = 240_000;
@@ -77,7 +77,8 @@ export function kindOf(name) {
 /**
  * @typedef {{ id: string, label: string, state: string | null, detail: string | null,
  *   stateAt: number, lastSeen: number, attentionSince: number | null,
- *   attentionDetail: string | null, turnStart: number | null, phrase: string }} Client
+ *   attentionDetail: string | null, turnStart: number | null, phrase: string,
+ *   baseLabel: string }} Client
  * @typedef {{ client: string, label: string, name: string, at: number,
  *   detail?: string | null }} QueueEntry
  */
@@ -148,6 +149,7 @@ export class Referee {
     }
 
     const client = this.touch(id, label, now);
+    const shown = client.label;
     this.sleepWanted = false;
     // Any request from a client means you are back with it.
     if (client.attentionSince !== null && kind !== "attention") {
@@ -187,19 +189,20 @@ export class Referee {
           client.turnStart = null;
           if (this.owner === id) this.owner = null;
         }
-        this.enqueue({ client: id, label, name, at: now, detail: what });
+        this.enqueue({ client: id, label: shown, name, at: now, detail: what });
         break;
       }
       case "greeting":
         if (this.owner === null && this.queue.length === 0 && !this.playing) {
-          this.enqueue({ client: id, label, name, at: now });
+          this.enqueue({ client: id, label: shown, name, at: now });
         } else {
-          this.note(now, `${label}: ${name} skipped, face busy`);
+          this.note(now, `${shown}: ${name} skipped, face busy`);
           return { ok: true, kind };
         }
         break;
     }
-    this.note(now, `${label}: ${name}`);
+    // The request as it came in: animation plus its text, if any.
+    this.note(now, `${shown}: ${name}${detail ? ` "${detail}"` : ""}`);
     return { ok: true, kind };
   }
 
@@ -210,6 +213,7 @@ export class Referee {
       client = {
         id,
         label,
+        baseLabel: "",
         state: null,
         detail: null,
         stateAt: 0,
@@ -221,9 +225,21 @@ export class Referee {
       };
       this.clients.set(id, client);
     }
-    client.label = label;
+    // Two sessions with the same name (same folder): tmp, tmp2, tmp3.
+    if (client.baseLabel !== label) {
+      client.baseLabel = label;
+      client.label = this.uniqueLabel(id, label);
+    }
     client.lastSeen = now;
     return client;
+  }
+
+  /** @param {string} id @param {string} base */
+  uniqueLabel(id, base) {
+    const taken = new Set();
+    for (const c of this.clients.values()) if (c.id !== id) taken.add(c.label);
+    if (!taken.has(base)) return base;
+    for (let n = 2; ; n++) if (!taken.has(`${base}${n}`)) return `${base}${n}`;
   }
 
   /** @param {QueueEntry} entry */
@@ -362,6 +378,7 @@ export class Referee {
    * @param {number} now
    */
   sent(name, now) {
+    this.note(now, `face -> ${name}`);
     const head = this.queue[0];
     if (head && head.name === name) {
       this.queue.shift();
@@ -415,6 +432,7 @@ export class Referee {
 
   /** @param {string} text @param {number} now */
   statusSent(text, now) {
+    if (text !== this.lastStatus) this.note(now, text ? `strip -> "${text}"` : "strip -> cleared");
     this.lastStatus = text;
     this.lastStatusAt = now;
   }
