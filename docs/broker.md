@@ -74,7 +74,7 @@ Set an `access_token` on the robot (`POST /settings {"access_token":"..."}`) and
 `tiny-engineer hook claude-code` sends `client` (the hook's `session_id`) and `label` (the last folder of the hook's `cwd`) with every `POST /anim`. The robot ignores both, so the same hook works with or without the broker. Point it at the broker:
 
 ```bash
-TINY_ENGINEER_URL=http://192.168.1.91:8790
+TINY_ENGINEER_URL=https://teb.int.bgd.team
 ```
 
 ## Running it
@@ -84,4 +84,4 @@ cd packages/tiny-engineer-broker
 TE_ROBOT_URL=http://192.168.1.164 node bin/tiny-engineer-broker.js
 ```
 
-BGD-WS-01: rootful podman Quadlet `/etc/containers/systemd/tiny-engineer-broker.container` in WSL Debian, image `localhost/tiny-engineer-broker` built from this package, token in `/etc/tiny-engineer-broker.env`, Windows `netsh portproxy` 8790 to the WSL IP plus firewall rule "Tiny Engineer broker 8790" (LocalSubnet). Use the IP: Node resolves `bgd-ws-01` to an IPv6 link-local address the IPv4 portproxy does not answer. Elsewhere: `compose.yaml` with `TE_ROBOT_TOKEN` in a `.env`, `docker compose up -d --build`.
+BGD-WS-01: rootful podman Quadlet `/etc/containers/systemd/tiny-engineer-broker.container` in WSL Debian, image `localhost/tiny-engineer-broker` built from this package, token in `/etc/tiny-engineer-broker.env`, Windows `netsh portproxy` 8790 to the WSL IP plus firewall rule "Tiny Engineer broker 8790" (LocalSubnet). nginx on 192.168.1.252 serves it as https://teb.int.bgd.team (status page there too). Direct access: use the IP, Node resolves `bgd-ws-01` to an IPv6 link-local address the IPv4 portproxy does not answer. Elsewhere: `compose.yaml` with `TE_ROBOT_TOKEN` in a `.env`, `docker compose up -d --build`.
