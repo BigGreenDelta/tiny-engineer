@@ -17,7 +17,19 @@ export const CLAUDE_EVENTS = [
   "StopFailure",
 ];
 
-export const MARKERS = ["hook claude-code", "tiny-engineer-claude-code"];
+export const MARKERS = ["hook claude-code", "tiny-engineer-claude-code", "session-title claude-code"];
+
+/** Events of the synchronous title hook (title.js). */
+export const TITLE_EVENTS = ["SessionStart", "UserPromptSubmit"];
+const TITLE_MARKER = "session-title claude-code";
+
+/**
+ * The title hook's command, from the robot hook's `… hook claude-code`.
+ * @param {string} cliCommand
+ */
+export function titleCommand(cliCommand) {
+  return cliCommand.replace(/hook claude-code\b/, TITLE_MARKER);
+}
 
 /**
  * @param {string} projectRoot
@@ -48,19 +60,25 @@ export function isOurCommand(command) {
 
 /**
  * @param {unknown} eventBlock
+ * @param {(command: string) => boolean} match
  * @returns {boolean}
  */
-function blockHasOurs(eventBlock) {
+function blockHas(eventBlock, match) {
   if (!Array.isArray(eventBlock)) return false;
   for (const wrapper of eventBlock) {
     const hooks = wrapper?.hooks;
     if (!Array.isArray(hooks)) continue;
     for (const h of hooks) {
-      if (isOurCommand(h?.command)) return true;
+      if (typeof h?.command === "string" && match(h.command)) return true;
     }
   }
   return false;
 }
+
+/** @param {string} c */
+const isRobotCommand = (c) => isOurCommand(c) && !c.includes(TITLE_MARKER);
+/** @param {string} c */
+const isTitleCommand = (c) => c.includes(TITLE_MARKER);
 
 /**
  * @param {string} path
@@ -117,9 +135,20 @@ export function applyInstall(ctx, existing) {
   };
 
   for (const event of CLAUDE_EVENTS) {
-    if (blockHasOurs(hooks[event])) continue;
+    if (blockHas(hooks[event], isRobotCommand)) continue;
     const list = Array.isArray(hooks[event]) ? [...hooks[event]] : [];
     list.push(structuredClone(entry));
+    hooks[event] = list;
+  }
+
+  // Synchronous: Claude Code ignores the output of async hooks.
+  const titleEntry = {
+    hooks: [{ type: "command", command: titleCommand(ctx.cliCommand), timeout: 5 }],
+  };
+  for (const event of TITLE_EVENTS) {
+    if (blockHas(hooks[event], isTitleCommand)) continue;
+    const list = Array.isArray(hooks[event]) ? [...hooks[event]] : [];
+    list.push(structuredClone(titleEntry));
     hooks[event] = list;
   }
 

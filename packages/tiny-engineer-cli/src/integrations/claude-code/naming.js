@@ -42,7 +42,10 @@ export const SKIP_ENV = "TINY_ENGINEER_HOOK_SKIP";
 
 /**
  * @typedef {{ prompts: number, name: string | null, namingSince: number | null,
- *   pending: string | null, updatedAt: number }} NameState
+ *   pending: string | null, title?: string | null, manualName?: string | null,
+ *   updatedAt: number }} NameState
+ * `title` / `manualName` belong to title.js: the last session title it set,
+ * and the user's own /rename name.
  */
 
 export function sessionsDir() {
@@ -66,10 +69,20 @@ export function readNameState(sessionId) {
       name: typeof data.name === "string" && data.name ? data.name : null,
       namingSince: typeof data.namingSince === "number" ? data.namingSince : null,
       pending: typeof data.pending === "string" && data.pending ? data.pending : null,
+      title: typeof data.title === "string" && data.title ? data.title : null,
+      manualName: typeof data.manualName === "string" && data.manualName ? data.manualName : null,
       updatedAt: typeof data.updatedAt === "number" ? data.updatedAt : 0,
     };
   } catch {
-    return { prompts: 0, name: null, namingSince: null, pending: null, updatedAt: 0 };
+    return {
+      prompts: 0,
+      name: null,
+      namingSince: null,
+      pending: null,
+      title: null,
+      manualName: null,
+      updatedAt: 0,
+    };
   }
 }
 

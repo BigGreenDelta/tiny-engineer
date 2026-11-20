@@ -25,3 +25,16 @@ test("applyInstall keeps unrelated settings keys", () => {
   assert.deepEqual(once.permissions, { allow: ["Bash"] });
   assert.ok(once.hooks.SessionStart);
 });
+
+test("applyInstall adds the sync title hook on SessionStart and UserPromptSubmit", () => {
+  const once = applyInstall(ctx, null);
+  for (const event of ["SessionStart", "UserPromptSubmit"]) {
+    assert.equal(once.hooks[event].length, 2);
+    const title = once.hooks[event][1].hooks[0];
+    assert.equal(title.command, 'node "/x/bin/tiny-engineer.js" session-title claude-code');
+    assert.equal(title.async, undefined);
+  }
+  assert.equal(once.hooks.Stop.length, 1);
+  const twice = applyInstall(ctx, once);
+  assert.equal(twice.hooks.UserPromptSubmit.length, 2);
+});
