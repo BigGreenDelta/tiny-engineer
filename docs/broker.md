@@ -32,12 +32,9 @@ The broker remembers one slot per client. A request only changes the slot of the
 
 ## Session names
 
-The Claude Code hook names each session for the strip with the local `claude` CLI (`claude -p --model haiku --tools "" --no-session-persistence`), so prompts never leave the machine except to Claude itself; the broker only gets the name as `label`.
+Session names come from [cc-namer](https://github.com/BigGreenDelta/cc-namer), a separate Claude Code hook that names each session with the local `claude` CLI (Haiku) and keeps the name current. The Tiny Engineer hook only reads the name from cc-namer's state file (`~/.local/state/cc-namer/sessions/<session id>.json`, field `name`) and sends it as `label`; prompts never reach the broker.
 
-- First prompt: Haiku names the session from it (1-2 lowercase words, at most 12 chars, e.g. `oled-strip`).
-- Every 10th prompt: Haiku sees the current name and the last 10 prompts (only what you typed, from the session transcript) and answers `keep` or a new name. A rename takes two such checks in a row, so a side trip does not rename the session; the second check's name wins.
-- Naming runs in a detached child (`tiny-engineer name-session`), so the hook never waits; the name applies from the next hook event. State lives in `~/.config/tiny-engineer/sessions/<session id>.json`, pruned after 30 days.
-- Until a name exists, and if `claude` fails, the label is the project folder.
+- Without cc-namer, or until a name exists, the label is the project folder.
 
 ## Status strip
 

@@ -1,5 +1,4 @@
-import { SKIP_ENV, runNameSession } from "./integrations/claude-code/naming.js";
-import { runSessionTitle } from "./integrations/claude-code/title.js";
+import { CC_NAMER_CHILD_ENV } from "./integrations/claude-code/session-name.js";
 import { readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -49,7 +48,6 @@ Commands:
   uninstall [ide...]      Remove Tiny Engineer hook entries (keeps other hooks)
   doctor                  Check transport, URL/token, user config, hooks, health
   hook <ide>              Read hook JSON from stdin, map to a pose, set anim
-  session-title claude-code  Sync hook: session title with cache expiry mark
   anim <name>             Set animation pose
   play <clip.wav> [opts]  Stream WAV play (HTTP or serial credits)
   settings [get|set]      Read or write settings
@@ -117,8 +115,8 @@ Examples:
  * @param {boolean} quietGlobal
  */
 async function runHook(out, argv, quietGlobal) {
-  // Inside our own `claude -p` naming run: stay out of it.
-  if (process.env[SKIP_ENV]) {
+  // Inside cc-namer's `claude -p` naming run: stay out of it.
+  if (process.env[CC_NAMER_CHILD_ENV]) {
     process.exitCode = 0;
     return;
   }
@@ -317,24 +315,6 @@ export async function run(argv) {
       return;
     case "hook":
       await runHook(out, rest, global.quiet);
-      return;
-    case "name-session": {
-      // Internal: the detached naming child started by the Claude Code hook.
-      if (!rest[0]) {
-        process.exitCode = 1;
-        return;
-      }
-      await runNameSession(rest[0], await readStdin());
-      return;
-    }
-    case "session-title":
-      // Synchronous Claude Code hook: session title with the cache expiry mark.
-      if (rest[0] !== "claude-code") {
-        process.exitCode = 1;
-        return;
-      }
-      if (process.env[SKIP_ENV]) return; // our own `claude -p` naming run
-      runSessionTitle(await readStdin());
       return;
     case "anim":
       await runAnim(out, rest, global.quiet);
