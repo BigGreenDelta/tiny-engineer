@@ -7,9 +7,10 @@ This page is the pin map. The build happens in two stages:
 | Stage | What | Soldering | Guide |
 | --- | --- | --- | --- |
 | A | Breadboard test: 1-2 servos powered from the ESP32 `VIN` pin | none | [stage-a-breadboard.md](stage-a-breadboard.md) |
+| A5 | Breadboard, all 5 servos + OLED: servo rail from the kit's Power Supply Module, never from the ESP32 | none | [stage-a5-breadboard.md](stage-a5-breadboard.md) |
 | B | Final: all 5 servos on a separate 5 V USB-C rail, OLED, on a perfboard | yes | [stage-b-perfboard.md](stage-b-perfboard.md) |
 
-Also here: [schematic.svg](schematic.svg) (the circuit), [checklist.md](checklist.md) (safety, read before each power-up), and [gen_diagrams.py](gen_diagrams.py), which draws all three SVGs from one table of holes and wires and checks it (`python docs/hardware/esp32dev-wiring/gen_diagrams.py`). Change the layout there, not in the SVGs.
+Also here: [schematic.svg](schematic.svg) (the circuit), [checklist.md](checklist.md) (safety, read before each power-up), and [gen_diagrams.py](gen_diagrams.py), which draws all the SVGs from one table of holes and wires and checks it (`python docs/hardware/esp32dev-wiring/gen_diagrams.py`). Change the layout there, not in the SVGs.
 
 ## How to read the board
 

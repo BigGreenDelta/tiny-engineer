@@ -237,6 +237,265 @@ def stage_a() -> None:
     s.save("stage-a-breadboard.svg")
 
 
+# ------------------------------------------------------- Stage A, 5 servos ---
+
+def stage_a5() -> None:
+    """All 5 servos + OLED on the two breadboards, servo rail from the kit's
+    MB102-type power supply module, never from the ESP32."""
+    s = Svg(1560, 1270)
+    p = 24
+    y0 = 150
+    NR = 30
+    BLUE = "#1e5bd8"
+
+    def ry(r):
+        return y0 + (r - 1) * p
+
+    cols = "abcdefghij"
+
+    def bx(xa, c):
+        i = cols.index(c)
+        return xa + i * p + (p if i >= 5 else 0)
+
+    left_a = 360
+    left_j = bx(left_a, "j")
+    right_a = left_j + 216
+    right_j = bx(right_a, "j")
+
+    def L(c, r):
+        return bx(left_a, c), ry(r)
+
+    def R(c, r):
+        return bx(right_a, c), ry(r)
+
+    # rails: (x of +, x of -) per rail pair
+    rails = {
+        "LO": (left_a - 34, left_a - 58),    # left board, outer
+        "LI": (left_j + 34, left_j + 58),    # left board, inner (under the ESP32)
+        "RI": (right_a - 34, right_a - 58),  # right board, inner (under the ESP32)
+        "RO": (right_j + 34, right_j + 58),  # right board, outer
+    }
+
+    def rail(pair, sign, r):
+        xp, xm = rails[pair]
+        return (xp if sign == "+" else xm), ry(r)
+
+    s.text(780, 32, "Stage A, all 5 servos + OLED on the breadboards (no soldering)", 19,
+           "middle", weight="bold")
+    s.text(780, 54, "Servo power comes from the kit's Power Supply Module on its own rail, "
+           "never from the ESP32. The ESP32 runs from the PC's USB. Grounds joined.", 13,
+           "middle", "#444")
+    s.text(780, 74, "Holes a-e of one row are joined; so are f-j. Each rail (+ or -) is one long "
+           "strip down the board.", 13, "middle", "#444")
+
+    for xa, xj, name, outer in ((left_a, left_j, "left breadboard", "LO"),
+                                (right_a, right_j, "right breadboard", "RO")):
+        s.rect(xa - 76, y0 - 26, xj - xa + 152, NR * p + 20, "#f1efe9", "#bbb", rx=8)
+        s.rect(xa + 4 * p + 15, y0 - 20, 14, NR * p + 8, "#dcd8cf")
+        s.text((xa + xj) / 2, y0 - 50, name, 12, "middle", "#777", "bold")
+        for c in cols:
+            s.text(bx(xa, c), y0 - 32, c, 12, "middle", "#777")
+        for r in range(1, NR + 1):
+            for c in cols:
+                s.rect(bx(xa, c) - 4, ry(r) - 4, 8, 8, "#555", rx=1.5)
+    for pair, (xp, xm) in rails.items():
+        faint = pair in ("LI", "RI")
+        op = ' opacity="0.45"' if faint else ""
+        s.line(xp - 9, y0 - 14, xp - 9, ry(NR) + 10, V5, 2, extra=op)
+        s.line(xm + 9 if xm > xp else xm - 9, y0 - 14, xm + 9 if xm > xp else xm - 9,
+               ry(NR) + 10, BLUE, 2, extra=op)
+        s.text(xp, y0 - 32, "+", 14, "middle", V5, "bold")
+        s.text(xm, y0 - 32, "-", 14, "middle", BLUE, "bold")
+        for r in range(1, NR + 1):
+            for x in (xp, xm):
+                s.rect(x - 4, ry(r) - 4, 8, 8, "#555", rx=1.5, extra=op)
+    for r in range(1, NR + 1):
+        s.text(right_j + 84, ry(r) + 4, str(r), 10, "middle", "#999")
+        s.text(left_a - 84, ry(r) + 4, str(r), 10, "middle", "#999")
+
+    # ESP32 across both boards, over the inner rails
+    xl, xr = left_j, right_a
+    s.rect(xl - 16, ry(1) - 62, xr - xl + 32, ry(15) - ry(1) + 124, "#2b2f36", rx=10,
+           extra=' opacity="0.93"')
+    s.rect(xl + 40, ry(1) - 56, xr - xl - 80, 40, "#9aa0a6", rx=4)
+    s.text((xl + xr) / 2, ry(1) - 31, "antenna end", 12, "middle", "#2b2f36")
+    s.rect((xl + xr) / 2 - 28, ry(15) + 34, 56, 26, "#c9ccd1", rx=3)
+    s.text((xl + xr) / 2, ry(15) + 52, "USB", 11, "middle")
+    s.text((xl + xr) / 2, ry(15) + 78, "to the PC", 11, "middle", "#333")
+    s.text((xl + xr) / 2, ry(8), "ESP32 DevKit V1", 13, "middle", "#fff", "bold")
+    s.text((xl + xr) / 2, ry(9), "(seen from above)", 11, "middle", "#cfd3d8")
+    s.text((xl + xr) / 2, ry(10) + 4, "inner rails under it:", 10, "middle", "#cfd3d8")
+    s.text((xl + xr) / 2, ry(11), "not used", 10, "middle", "#cfd3d8")
+    hl = {"D32": SIG, "D33": SIG, "D18": SIG, "D19": SIG, "D23": SIG, "D21": SDA, "D22": SCL,
+          "3V3": V33}
+    for names, x, anchor, dx in ((LEFT_ROW, xl, "start", 14), (RIGHT_ROW, xr, "end", -14)):
+        for i, name in enumerate(names):
+            col = hl.get(name)
+            if name == "GND" and x == xr:
+                col = GND
+            s.circle(x, ry(i + 1), 6 if col else 5, col or PIN, "#fff", 1.5 if col else 0)
+            s.text(x + dx, ry(i + 1) + 4, name, 12, anchor,
+                   "#fff" if col else "#cfd3d8", "bold" if col else "normal")
+
+    def dot(pt, col):
+        s.circle(pt[0], pt[1], 4.5, col, "#fff", 1)
+
+    def jumper(a, b, col, c0=None, c1=None, sw=3.5):
+        dx = b[0] - a[0]
+        c0 = c0 or (a[0] + dx * 0.5, a[1])
+        c1 = c1 or (b[0] - dx * 0.5, b[1])
+        s.curve(a, b, c0, c1, col, sw)
+        dot(a, col)
+        dot(b, col)
+
+    # power supply module at the bottom end of the right board
+    mx0, mx1 = right_a - 80, right_j + 80
+    my0, my1 = ry(26) - 8, ry(30) + 96
+    s.rect(mx0, my0, mx1 - mx0, my1 - my0, "#151515", "#000", 2, rx=6,
+           extra=' opacity="0.92"')
+    s.text((mx0 + mx1) / 2, ry(28) + 4, "kit Power Supply Module", 13, "middle", "#fff", "bold")
+    s.text((mx0 + mx1) / 2, ry(28) + 20, "(MB102 type, marked 545043)", 10, "middle", "#cfd3d8")
+    for pair in ("RI", "RO"):
+        for sign in "+-":
+            x, y = rail(pair, sign, 29)
+            s.rect(x - 5, y - 5, 10, 10, "#d4af37", "#fff", 1)
+    # jumper selectors
+    for pair, label, on in (("RI", "OFF", False), ("RO", "5V", True)):
+        x = (rails[pair][0] + rails[pair][1]) / 2
+        s.rect(x - 30, ry(27) - 4, 60, 20, "#fff" if on else "#555", V5 if on else "#999",
+               2, rx=3)
+        s.text(x, ry(27) + 11, f"jumper {label}", 10, "middle", "#000" if on else "#fff",
+               "bold")
+    s.text((mx0 + mx1) / 2, ry(30) + 34, "3.3V / GND / 5V header pins: unused", 9, "middle",
+           "#cfd3d8")
+    # sockets hanging off the board end
+    s.rect(right_a + 20, my1 - 40, 70, 44, "#c9ccd1", "#888", 1.5, rx=3)
+    s.text(right_a + 55, my1 - 13, "USB-A", 11, "middle", "#000", "bold")
+    s.rect(right_j - 60, my1 - 44, 52, 48, "#222", "#888", 1.5, rx=6)
+    s.text(right_j - 34, my1 - 16, "DC", 11, "middle", "#fff", "bold")
+    s.rect(bx(right_a, "e"), my1 - 34, 26, 26, "#ddd", "#888", 1, rx=3)
+    s.text(bx(right_a, "e") + 13, my1 - 40, "switch", 9, "middle", "#cfd3d8")
+    s.circle(bx(right_a, "g") + 10, my1 - 22, 7, "#2fb34a")
+    s.text(right_a + 55, my1 + 24, "IN option 1: 5 V charger,", 11, "middle", "#000", "bold")
+    s.text(right_a + 55, my1 + 39, "USB-A to USB-A cable", 11, "middle")
+    s.text(right_j - 34, my1 + 24, "IN option 2: kit 9 V", 11, "middle", "#000", "bold")
+    s.text(right_j - 34, my1 + 39, "battery (interim, weak)", 11, "middle")
+
+    # ground join and rail bridge to the left board
+    jumper(R("b", 14), rail("RO", "-", 15), GND, (R("f", 13)[0], ry(12)),
+           (rail("RO", "-", 13)[0], ry(13)))
+    jumper(rail("RO", "+", 22), rail("LO", "+", 22), V5,
+           (rail("RO", "+", 22)[0] - 200, ry(25)), (rail("LO", "+", 22)[0] + 200, ry(25)))
+    jumper(rail("RO", "-", 24), rail("LO", "-", 24), GND,
+           (rail("RO", "-", 24)[0] - 200, ry(27)), (rail("LO", "-", 24)[0] + 200, ry(27)))
+
+    # capacitors
+    def ecap(pair, r_plus, label, lx, anchor):
+        (xp, yp), (xm, ym) = rail(pair, "+", r_plus), rail(pair, "-", r_plus + 1)
+        cx, cy = (xp + xm) / 2, (yp + ym) / 2
+        s.line(xp, yp, cx, cy, "#888", 2)
+        s.line(xm, ym, cx, cy, "#888", 2)
+        s.circle(cx, cy, 13, "#1a237e", "#000", 1)
+        s.add(f'<path d="M{cx - 13:.1f},{cy:.1f} A13,13 0 0 0 {cx + 13:.1f},{cy:.1f} Z" '
+              f'fill="#9fa8da"/>')
+        s.circle(xp, yp, 3.5, "#888")
+        s.circle(xm, ym, 3.5, "#888")
+        s.label(lx, cy + 4, label, 11, anchor, weight="bold")
+
+    def ccap(pair, r, label, lx, anchor):
+        (xp, yp), (xm, ym) = rail(pair, "+", r), rail(pair, "-", r)
+        s.add(f'<ellipse cx="{(xp + xm) / 2:.1f}" cy="{yp - 9:.1f}" rx="13" ry="7" '
+              f'fill="#ffca28" stroke="#b8860b" stroke-width="1.5"/>')
+        s.line(xp, yp, xp, yp - 6, "#888", 2)
+        s.line(xm, ym, xm, ym - 6, "#888", 2)
+        s.label(lx, yp - 5, label, 11, anchor, weight="bold")
+
+
+    # servos
+    def servo(x0, y, title, holes, mirror=False):
+        """x0 = plug x. holes = (brown, red, orange) hole positions."""
+        bxs = x0 - 250 if mirror else x0 + 60
+        s.rect(bxs, y - 40, 190, 80, "#1565c0", "#0d47a1", 2, rx=6)
+        s.circle(bxs + (160 if mirror else 30), y, 16, "#fff", "#0d47a1", 2)
+        tx = bxs + (72 if mirror else 118)
+        s.text(tx, y - 6, "SG90", 13, "middle", "#fff", "bold")
+        s.text(tx, y + 12, title, 11, "middle", "#fff")
+        s.rect(x0 - 8, y - 34, 20, 68, "#222", rx=3)
+        for k, col in enumerate((GND, V5, SIG)):
+            yy = y - 22 + k * 22
+            if mirror:
+                s.line(x0 - 60, yy, x0 - 8, yy, col, 4)
+            else:
+                s.line(x0 + 12, yy, x0 + 60, yy, col, 4)
+            sock = (x0 + 2, yy)
+            s.rect(x0 - 3, yy - 5, 10, 10, "#000", col, 1.5)
+            a = holes[k]
+            jumper(a, sock, col)
+
+    sx = 1300
+    servo(sx, ry(6), "servo 2 HAND_LEFT",
+          (rail("RO", "-", 2), rail("RO", "+", 2), R("e", 1)))
+    servo(sx, ry(13), "servo 1 NECK",
+          (rail("RO", "-", 7), rail("RO", "+", 7), R("e", 6)))
+    servo(sx, ry(20), "servo 0 HEAD",
+          (rail("RO", "-", 17), rail("RO", "+", 17), R("e", 7)))
+    lx = 270
+    servo(lx, ry(8), "servo 3 HAND_RIGHT",
+          (rail("LO", "-", 5), rail("LO", "+", 5), L("f", 6)), mirror=True)
+    servo(lx, ry(17), "servo 4 BODY",
+          (rail("LO", "-", 15), rail("LO", "+", 15), L("f", 7)), mirror=True)
+
+    # OLED on female-to-male wires
+    ox, oy = 1330, ry(23) - 20
+    s.rect(ox, oy + 20, 120, 62, "#0d47a1", "#000", 1.5, rx=5)
+    s.rect(ox + 40, oy + 28, 74, 46, "#111", rx=2)
+    s.text(ox + 77, oy + 56, "OLED", 11, "middle", "#fff", "bold")
+    for k, (name, col, hole) in enumerate((("GND", GND, R("d", 14)), ("VCC", V33, R("d", 15)),
+                                           ("SCL", SCL, R("d", 2)), ("SDA", SDA, R("d", 5)))):
+        py = oy + 30 + k * 13
+        s.circle(ox + 8, py, 3, "#d4af37")
+        s.text(ox + 15, py + 4, name, 8, "start", "#fff", "bold")
+        jumper(hole, (ox + 8, py), col, sw=3)
+    s.text(ox + 60, oy + 100, "OLED on 4 female-to-male wires", 10, "middle", "#333")
+
+    ecap("RO", 10, "C1 1000 uF", rails["RO"][1] + 18, "start")
+    ccap("RO", 4, "C2 0.1 uF", rails["RO"][1] + 18, "start")
+    ccap("LO", 12, "C3 0.1 uF", rails["LO"][1] - 18, "end")
+
+    # notes
+    x, y = 40, ry(NR) + 170
+    s.text(x, y, "Jumpers (holes on the RIGHT board unless marked L):", 13, weight="bold")
+    rows = [
+        (GND, "ground join: b14 (ESP32 GND row) -> right outer - rail"),
+        (V5, "rail bridge: right outer + -> L outer + (row 22)"),
+        (GND, "rail bridge: right outer - -> L outer - (row 24)"),
+        (SIG, "signals: e7 D18 -> servo 0, e6 D19 -> servo 1, e1 D23 -> servo 2,"),
+        (SIG, "         L f6 D32 -> servo 3, L f7 D33 -> servo 4"),
+        (V5, "each servo red -> + rail, brown -> - rail next to it"),
+        (V33, "OLED: GND d14, VCC d15 (3V3), SCL d2 (D22), SDA d5 (D21)"),
+    ]
+    for i, (col, tx) in enumerate(rows):
+        yy = y + 24 + i * 21
+        s.line(x, yy - 4, x + 28, yy - 4, col, 5)
+        s.text(x + 38, yy, tx, 12, extra=' xml:space="preserve"')
+    x2 = 800
+    s.text(x2, y, "Power Supply Module settings:", 13, weight="bold")
+    notes = [
+        "Plugs onto the bottom end of the RIGHT board: its pins in both rail pairs.",
+        "Match its printed + / - to the board's red (+) and blue (-) lines.",
+        "Outer side jumper (servo rail) on 5V. Inner side jumper on OFF.",
+        "Switch pushed IN. Check the rail with the meter before plugging servos: ~5 V.",
+        "Never feed the module from the PC's USB, never join this rail to VIN.",
+        "9 V battery: about 700 mA at most. Move 1-2 servos at a time.",
+        "C1: long leg in the + rail, striped leg in the - rail.",
+    ]
+    for i, tx in enumerate(notes):
+        s.text(x2, y + 24 + i * 21, tx, 12)
+    s.text(780, 1250, "Unplug USB and the module's power while wiring. Plug servos one at a "
+           "time, test each on the Servo control page.", 13, "middle", "#b71c1c", "bold")
+    s.save("stage-a5-breadboard.svg")
+
+
 # ---------------------------------------------------------------- Stage B ---
 
 COLS = "ABCDEFGHIJKLMNOPQR"  # 18 columns x 24 rows (5 x 7 cm board)
@@ -657,5 +916,6 @@ def schematic() -> None:
 
 if __name__ == "__main__":
     stage_a()
+    stage_a5()
     stage_b()
     schematic()
