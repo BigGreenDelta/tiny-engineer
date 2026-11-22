@@ -26,17 +26,17 @@ Never feed the module from the PC's USB: that is the same weak supply as `VIN`. 
 
 ## The breadboards and their rails
 
-Each 400-hole breadboard has a rail pair down each long edge: a `+` strip (red line) and a `-` strip (blue line). The ESP32 sits over the two inner rail pairs, which stay unused. This layout uses the two **outer** pairs:
+The diagram shows the boards as they lie on the desk: column letters `a`-`j` across the top, row numbers 1-30 down the side. Each board has a rail pair down each long edge, and in every pair the **red `+` strip is on the left and the blue `-` strip on the right**.
 
-- right board, outer pair: the servo rail, fed by the module;
-- left board, outer pair: joined to the right outer pair by two bridge jumpers, for servos 3 and 4.
-
-The diagram draws `+` as the inner strip of each outer pair. On your boards, go by the printed red and blue lines, not by the diagram's left/right.
+- Right board, outer pair (right edge): the servo rail, fed by the module.
+- Right board, inner pair (left edge, under the ESP32): also 5 V from the module, because both module jumpers are on 5V. Nothing plugs into it; it runs under the ESP32, so keep stray jumpers out of it.
+- Left board, outer pair (left edge): joined to the right outer pair by two bridge jumpers, for servos 3 and 4.
+- Left board, inner pair (right edge, under the ESP32): unused.
 
 ## Parts
 
-- ESP32 on the two breadboards as in the kit lessons: left pin row in column `j` of the left board, right pin row in column `a` of the right board, `EN` / `D23` in row 1.
-- Power Supply Module, plugged onto the **bottom end of the right board** (rows 26-30 end), pins in both rail pairs of that board.
+- ESP32 across the two breadboards: left pin row in column `j` of the left board, right pin row in column `a` of the right board, antenna end up, **`EN` / `D23` in row 16, `VIN` / `3V3` in row 30**. Its micro-USB socket then hangs past the bottom end of the boards and the cable plugs in freely. (This is 15 rows lower than in the kit lessons and the 2-servo test.)
+- Power Supply Module, plugged onto the **top end of the right board** (rows 1-5), the end away from the ESP32's USB. Its USB-A and DC sockets face outward, off the board. It has 4 legs per side: 2 in the red `+` strip and 2 in the blue `-` strip, in rows 4 and 5.
 - 1 x 1000 uF 16 V electrolytic (C1), 2 x 0.1 uF ceramic `104` (C2, C3).
 - 5 x SG90.
 - The OLED on 4 female-to-male wires (the kit has 10).
@@ -46,10 +46,10 @@ The diagram draws `+` as the inner strip of each outer pair. On your boards, go 
 
 Done when: the right outer rail reads about 5 V on the meter and the left outer rail matches it.
 
-1. Set the module's jumpers: the side over the right board's **outer** rails on `5V`, the other side on `OFF`.
-2. Plug the module onto the bottom end of the right board. Its `+` and `-` pins must land on the red and blue lines respectively.
-3. Bridges: red jumper from the right outer `+` (row 22) to the left outer `+` (row 22). Brown jumper from the right outer `-` (row 24) to the left outer `-` (row 24).
-4. C1 across the right outer rails at rows 10-11: **long leg in `+`, striped leg in `-`**. C2 across the right outer rails at row 4. C3 across the left outer rails at row 12.
+1. Set **both** module jumpers on `5V` (the jumper on the 5V-VCC pair of each side). Both rail pairs of the right board then carry 5 V.
+2. Plug the module onto the top end of the right board, sockets facing away from the board. On each side its `+` legs go in the red strip and its `-` legs in the blue strip, rows 4-5. If its printed `+` / `-` does not line up with red / blue, stop: turning it round would swap 5 V and ground.
+3. Bridges: red jumper from the right outer `+` (row 8) to the left outer `+` (row 8). Brown jumper from the right outer `-` (row 10) to the left outer `-` (row 10). Both pass above the ESP32's antenna end.
+4. C1 across the right outer rails: **long leg in `+` row 12, striped leg in `-` row 13**. C2 across the right outer rails at row 7. C3 across the left outer rails at row 20.
 5. Feed the module (battery or USB, see above), push the switch in. Meter on DC volts: about 5 V on the right outer rails, and the same on the left outer rails. A minus reading means `+` and `-` are swapped. Switch off.
 
 ## S2. ESP32 side (USB still unplugged)
@@ -58,13 +58,13 @@ Done when: the ground join and the OLED are in.
 
 | Jumper | From | To |
 | --- | --- | --- |
-| ground join, brown | right board `b14` (ESP32 `GND` row) | right outer `-` rail |
-| OLED GND, brown | OLED `GND` | right board `d14` |
-| OLED VCC, purple | OLED `VCC` | right board `d15` (`3V3`) |
-| OLED SCL, blue | OLED `SCL` | right board `d2` (`D22`) |
-| OLED SDA, green | OLED `SDA` | right board `d5` (`D21`) |
+| ground join, brown | right board `b29` (ESP32 `GND` row) | right outer `-` rail, row 28 |
+| OLED GND, brown | OLED `GND` | right board `d29` |
+| OLED VCC, purple | OLED `VCC` | right board `d30` (`3V3`) |
+| OLED SCL, blue | OLED `SCL` | right board `d17` (`D22`) |
+| OLED SDA, green | OLED `SDA` | right board `d20` (`D21`) |
 
-The OLED is on `3V3`, never on the servo rail.
+The OLED stays on the ESP32's `3V3` pin, never on the module's rails. The jumpers in `b29`, `d29` and `d30` sit beside the ESP32, clear of the USB plug.
 
 ## S3. Servos, one at a time
 
@@ -72,13 +72,13 @@ Done when: all five move on the `Servo control` page.
 
 | Servo | Joint | Orange (signal) from | Red to | Brown to |
 | --- | --- | --- | --- | --- |
-| 0 | HEAD | right board `e7` (`D18`) | right outer `+` | right outer `-` |
-| 1 | NECK | right board `e6` (`D19`) | right outer `+` | right outer `-` |
-| 2 | HAND_LEFT | right board `e1` (`D23`) | right outer `+` | right outer `-` |
-| 3 | HAND_RIGHT | left board `f6` (`D32`) | left outer `+` | left outer `-` |
-| 4 | BODY | left board `f7` (`D33`) | left outer `+` | left outer `-` |
+| 0 | HEAD | right board `e22` (`D18`) | right outer `+` row 25 | right outer `-` row 25 |
+| 1 | NECK | right board `e21` (`D19`) | right outer `+` row 20 | right outer `-` row 20 |
+| 2 | HAND_LEFT | right board `e16` (`D23`) | right outer `+` row 15 | right outer `-` row 15 |
+| 3 | HAND_RIGHT | left board `f21` (`D32`) | left outer `+` row 17 | left outer `-` row 17 |
+| 4 | BODY | left board `f22` (`D33`) | left outer `+` row 25 | left outer `-` row 25 |
 
-Any free hole of the right rail strip works for red and brown; the diagram uses rows next to each servo. The servo plug is female: push one male end of each jumper into its socket, matching the colours.
+Any free hole of the same outer rail strip works for red and brown; the diagram uses the rows in the table, next to each servo. The servo plug is female: push one male end of each jumper into its socket, matching the colours.
 
 For each servo:
 
@@ -91,7 +91,7 @@ The firmware on the board already drives all five pins (`esp32dev-ota` build, se
 
 ## Before every power-up
 
-- The module's outer jumper is on `5V`, its other jumper on `OFF`.
+- Both module jumpers are on `5V`.
 - C1's stripe is on the `-` rail.
 - Meter on beep, nothing powered: right outer `+` to `-` does **not** beep.
 - Only one 5 V source per rail: the module (or later the breadboard USB-C) feeds the servo rail; the PC's USB feeds only the ESP32.
