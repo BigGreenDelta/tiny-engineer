@@ -31,7 +31,7 @@ Cold `npx` can be slow: `setup` writes hook **`timeout` ≥ 30**. Prefer registr
 
 Full flag list: `tiny-engineer --help` and `tiny-engineer daemon --help`.
 
-`pause`, `resume` and `status` talk to the [Tiny Engineer Broker](../../docs/broker.md#pause) at `TINY_ENGINEER_URL`: while paused, agent hooks no longer animate the robot, and its own API (servo tests, setup) keeps working. `--for` takes `90s`, `30m`, `2h`, `1h30m` or `1d` (max 7 days). A broker with `TE_BROKER_TOKEN` set needs that token: `TINY_ENGINEER_TOKEN`, or `--token-stdin`.
+`pause`, `resume` and `status` talk to the [Tiny Engineer Broker](../../docs/broker.md#pause) at `TINY_ENGINEER_URL`: while paused, agent hooks no longer animate the robot, and its own API (servo tests, setup) keeps working. `--for` takes `90s`, `30m`, `2h`, `1h30m` or `1d` (max 7 days). A broker with `TE_BROKER_TOKEN` set needs that token: `--token-stdin`, `TINY_ENGINEER_TOKEN`, or a 1Password reference in `TINY_ENGINEER_BROKER_TOKEN_REF` (read with `op read` on each call).
 
 Serial commands auto-start a host **daemon** (local socket) unless disabled or the port is yielded. HTTP `anim` / hooks do not use the daemon. Event rules (`rules add|list|remove`) run a host program when the robot emits an event — see the integration guide.
 

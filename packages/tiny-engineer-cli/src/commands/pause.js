@@ -1,4 +1,11 @@
-import { getBaseUrl, getHttpAuthToken, resolveTransport } from "../config/env.js";
+import { execFile } from "node:child_process";
+
+import {
+  getBaseUrl,
+  getConnectionProvenance,
+  getHttpAuthToken,
+  resolveTransport,
+} from "../config/env.js";
 import { networkErrorDetail, robotFetch } from "../robot/client.js";
 import { parseCommonArgs } from "../util/args.js";
 import { readStdin } from "../util/stdin.js";
@@ -8,6 +15,11 @@ export const PAUSE_MAX_S = 7 * 24 * 3600;
 const TIMEOUT_MS = 3000;
 /** `op read` may wait for an unlock prompt. */
 const TOKEN_STDIN_TIMEOUT_MS = 60_000;
+
+/** 1Password reference (op://vault/item/field) to the broker's TE_BROKER_TOKEN. */
+export const BROKER_TOKEN_REF_KEY = "TINY_ENGINEER_BROKER_TOKEN_REF";
+/** `op` may wait for an unlock prompt. */
+const OP_TIMEOUT_MS = 60_000;
 
 const UNITS = { s: 1, m: 60, h: 3600, d: 86400 };
 
@@ -87,6 +99,52 @@ export function parsePauseArgs(argv, opts = {}) {
 }
 
 /**
+ * Read a secret reference with the 1Password CLI, in memory only.
+ * @param {string} ref
+ * @param {{ execFileImpl?: typeof execFile }} [opts]
+ * @returns {Promise<{ token: string, error?: undefined } | { token?: undefined, error: string }>}
+ */
+export function opRead(ref, { execFileImpl = execFile } = {}) {
+  return new Promise((resolve) => {
+    execFileImpl("op", ["read", "--no-newline", ref], { timeout: OP_TIMEOUT_MS }, (err, stdout, stderr) => {
+      if (err) {
+        const why = String(stderr || "").trim() || (err instanceof Error ? err.message : String(err));
+        resolve({ error: `${BROKER_TOKEN_REF_KEY}: op read failed: ${why}` });
+        return;
+      }
+      const token = String(stdout).trim();
+      resolve(token ? { token } : { error: `${BROKER_TOKEN_REF_KEY}: op read returned nothing` });
+    });
+  });
+}
+
+/**
+ * The token for the broker's control routes: --token-stdin, else
+ * TINY_ENGINEER_TOKEN, else TINY_ENGINEER_BROKER_TOKEN_REF read with `op`.
+ * The reference is not used against a URL that came only from a project .env.
+ * @param {{ tokenStdin?: boolean, url?: string }} opts
+ * @param {{ readStdinImpl?: typeof readStdin, opReadImpl?: typeof opRead }} [deps]
+ * @returns {Promise<{ token: string | null, error?: string }>}
+ */
+export async function brokerToken(opts, deps = {}) {
+  const { readStdinImpl = readStdin, opReadImpl = opRead } = deps;
+  if (opts.tokenStdin) {
+    const token = (await readStdinImpl({ timeoutMs: TOKEN_STDIN_TIMEOUT_MS })).trim();
+    return token ? { token } : { token: null, error: "--token-stdin: nothing on stdin" };
+  }
+  const token = getHttpAuthToken({ urlOverride: opts.url !== undefined });
+  if (token) return { token };
+  const ref = process.env[BROKER_TOKEN_REF_KEY]?.trim();
+  if (!ref) return { token: null };
+  if (opts.url === undefined && getConnectionProvenance().url === "project") {
+    process.stderr.write(`warning: not reading ${BROKER_TOKEN_REF_KEY} for a TINY_ENGINEER_URL from project .env\n`);
+    return { token: null };
+  }
+  const read = await opReadImpl(ref);
+  return read.error ? { token: null, error: read.error } : { token: /** @type {string} */ (read.token) };
+}
+
+/**
  * Call a broker pause route. Never throws.
  * @param {"GET" | "POST"} method
  * @param {string} path
@@ -124,7 +182,7 @@ export async function brokerCall(method, path, opts) {
   if (res.status === 401) {
     return {
       ok: false,
-      error: "broker refused: needs its TE_BROKER_TOKEN (set TINY_ENGINEER_TOKEN, or pipe it in with --token-stdin)",
+      error: `broker refused: needs its TE_BROKER_TOKEN (set ${BROKER_TOKEN_REF_KEY}=op://... in the user config, or TINY_ENGINEER_TOKEN, or pipe it in with --token-stdin)`,
       target,
     };
   }
@@ -172,7 +230,8 @@ robot's own API (servo tests, setup) keeps working while paused.
 
 Options:
   --for <duration>   pause only: resume by itself after 90s, 30m, 2h, 1h30m, 1d (max 7d)
-  --token-stdin      read the broker's TE_BROKER_TOKEN from stdin (else TINY_ENGINEER_TOKEN)
+  --token-stdin      read the broker's TE_BROKER_TOKEN from stdin; else TINY_ENGINEER_TOKEN,
+                     else TINY_ENGINEER_BROKER_TOKEN_REF (op://..., read with the 1Password CLI)
   --url <base>       broker base URL
   -q, --quiet        no success line
 `);
@@ -195,15 +254,14 @@ Options:
     return;
   }
 
-  let token = getHttpAuthToken({ urlOverride: opts.url !== undefined });
-  if (opts.tokenStdin) {
-    token = (await readStdin({ timeoutMs: TOKEN_STDIN_TIMEOUT_MS })).trim() || null;
-    if (!token) {
-      out.error("--token-stdin: nothing on stdin");
-      process.exitCode = 1;
-      return;
-    }
+  // status reads GET /pause, which needs no token: skip the op prompt.
+  const auth = command === "status" ? { token: null } : await brokerToken(opts);
+  if (auth.error) {
+    out.error(auth.error);
+    process.exitCode = 1;
+    return;
   }
+  const token = auth.token;
 
   const result =
     command === "status"

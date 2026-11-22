@@ -105,10 +105,14 @@ tiny-engineer resume
 - With `TE_PAUSE_FILE` (set in the image to `/data/pause.json`; the Quadlet and `compose.yaml` mount a volume there) the switch survives a broker restart, a redeploy and a host reboot. A timed pause that ran out while the broker was down is over.
 - The pause is the broker's, not the robot's: a hook that posts to the robot directly is not paused. The firmware has no pause of its own (it would need a reflash); the broker is the only writer, so pausing it covers every session.
 
-`POST /pause` and `POST /resume` need `Authorization: Bearer <TE_BROKER_TOKEN>` when that variable is set; without it they are open, like `POST /anim`. Hooks never need the token. The CLI sends `TINY_ENGINEER_TOKEN`, or reads the token from stdin with `--token-stdin`:
+`POST /pause` and `POST /resume` need `Authorization: Bearer <TE_BROKER_TOKEN>` when that variable is set; without it they are open, like `POST /anim`. Hooks never need the token. The CLI takes it from, in order: `--token-stdin`, `TINY_ENGINEER_TOKEN`, or a 1Password reference in `TINY_ENGINEER_BROKER_TOKEN_REF`, read with `op read` into memory on each `pause` / `resume` (`status` needs no token). The reference is not used for a `TINY_ENGINEER_URL` that came only from a project `.env`. With the reference in the user config (`~/.config/tiny-engineer/env`) no secret sits on disk:
 
 ```bash
-op read "op://<vault>/<item>/credential" | tiny-engineer pause --for 1h --token-stdin
+TINY_ENGINEER_BROKER_TOKEN_REF='op://<vault>/<item>/password'
+```
+
+```bash
+op read "op://<vault>/<item>/password" | tiny-engineer pause --for 1h --token-stdin   # one-off, no config
 ```
 
 ## Broker API

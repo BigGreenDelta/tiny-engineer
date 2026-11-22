@@ -175,3 +175,37 @@ test("a robot URL (no /pause) and serial transport fail clearly", async () => {
   assert.equal(call.ok, false);
   assert.match(call.ok ? "" : call.error, /broker unreachable/);
 });
+
+test("brokerToken: stdin, then TINY_ENGINEER_TOKEN, then the op:// reference", async () => {
+  const { brokerToken, BROKER_TOKEN_REF_KEY } = await import("../src/commands/pause.js");
+  const saved = { token: process.env.TINY_ENGINEER_TOKEN, ref: process.env[BROKER_TOKEN_REF_KEY] };
+  const reads = [];
+  const opReadImpl = async (ref) => {
+    reads.push(ref);
+    return { token: "from-op" };
+  };
+  try {
+    delete process.env.TINY_ENGINEER_TOKEN;
+    process.env[BROKER_TOKEN_REF_KEY] = "op://v/i/password";
+    assert.deepEqual(await brokerToken({ url: "http://b" }, { opReadImpl }), { token: "from-op" });
+    assert.deepEqual(reads, ["op://v/i/password"]);
+    assert.deepEqual(
+      await brokerToken({ tokenStdin: true }, { readStdinImpl: async () => " piped\n", opReadImpl }),
+      { token: "piped" },
+    );
+    process.env.TINY_ENGINEER_TOKEN = "envtok";
+    assert.deepEqual(await brokerToken({ url: "http://b" }, { opReadImpl }), { token: "envtok" });
+    delete process.env.TINY_ENGINEER_TOKEN;
+    const failed = await brokerToken({ url: "http://b" }, { opReadImpl: async () => ({ error: "op read failed: locked" }) });
+    assert.equal(failed.token, null);
+    assert.match(failed.error ?? "", /locked/);
+    delete process.env[BROKER_TOKEN_REF_KEY];
+    assert.deepEqual(await brokerToken({ url: "http://b" }, { opReadImpl }), { token: null });
+    assert.equal(reads.length, 1);
+  } finally {
+    if (saved.token === undefined) delete process.env.TINY_ENGINEER_TOKEN;
+    else process.env.TINY_ENGINEER_TOKEN = saved.token;
+    if (saved.ref === undefined) delete process.env[BROKER_TOKEN_REF_KEY];
+    else process.env[BROKER_TOKEN_REF_KEY] = saved.ref;
+  }
+});
