@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1560 1590" font-family="DejaVu Sans, Arial, sans-serif" font-size="13">
-<rect width="1560" height="1590" fill="#fbfaf7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1560 1770" font-family="DejaVu Sans, Arial, sans-serif" font-size="13">
+<rect width="1560" height="1770" fill="#fbfaf7"/>
 <text x="780.0" y="32.0" text-anchor="middle" font-size="19" font-weight="bold" fill="#000">Stage A, all 5 servos + OLED on the breadboards (no soldering)</text>
 <text x="780.0" y="54.0" text-anchor="middle" font-size="13" font-weight="normal" fill="#444">Servo power comes from the kit's Power Supply Module on its own rail, never from the ESP32. The ESP32 runs from the PC's USB. Grounds joined.</text>
 <text x="780.0" y="74.0" text-anchor="middle" font-size="13" font-weight="normal" fill="#444">Holes a-e of one row are joined; so are f-j. Each rail (+ or -) is one long strip down the board.</text>
@@ -987,7 +987,7 @@
 <text x="708.0" y="968.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">ESP32 DevKit V1</text>
 <text x="708.0" y="992.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#cfd3d8">(seen from above)</text>
 <text x="708.0" y="1020.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#cfd3d8">inner rails under it:</text>
-<text x="708.0" y="1040.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#cfd3d8">not used</text>
+<text x="708.0" y="1040.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#cfd3d8">nothing plugged in here</text>
 <circle cx="600.0" cy="800.0" r="5" fill="#d4af37" stroke="#fff" stroke-width="0"/>
 <text x="614.0" y="804.0" text-anchor="start" font-size="12" font-weight="normal" fill="#cfd3d8">EN</text>
 <circle cx="600.0" cy="824.0" r="5" fill="#d4af37" stroke="#fff" stroke-width="0"/>
@@ -1082,133 +1082,145 @@
 <text x="1009.0" y="153.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#000">USB-A to USB-A cable</text>
 <text x="858.0" y="138.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">IN option 2: kit 9 V</text>
 <text x="858.0" y="153.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#000">battery (interim, weak)</text>
-<path d="M1090.0,608.0 C890.0,656.0 502.0,656.0 302.0,608.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M1090.0,608.0 C890.0,656.0 502.0,656.0 302.0,608.0" fill="none" stroke="#e53935" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="1090.0" cy="608.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<circle cx="302.0" cy="608.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<path d="M1114.0,656.0 C914.0,704.0 526.0,704.0 326.0,656.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M1114.0,656.0 C914.0,704.0 526.0,704.0 326.0,656.0" fill="none" stroke="#6d4c41" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="1114.0" cy="656.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<circle cx="326.0" cy="656.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<path d="M840.0,1112.0 C977.0,1112.0 977.0,1088.0 1114.0,1088.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M840.0,1112.0 C977.0,1112.0 977.0,1088.0 1114.0,1088.0" fill="none" stroke="#6d4c41" stroke-width="3.5" stroke-linecap="round"/>
+<path d="M840.0,1112.0 C977.0,1112.0 977.0,1112.0 1114.0,1112.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
+<path d="M840.0,1112.0 C977.0,1112.0 977.0,1112.0 1114.0,1112.0" fill="none" stroke="#6d4c41" stroke-width="3.5" stroke-linecap="round"/>
 <circle cx="840.0" cy="1112.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<circle cx="1114.0" cy="1088.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<rect x="1360.0" y="736.0" width="190.0" height="80.0" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
-<circle cx="1390.0" cy="776.0" r="16" fill="#fff" stroke="#0d47a1" stroke-width="2"/>
-<text x="1478.0" y="770.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">SG90</text>
-<text x="1478.0" y="788.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#fff">servo 2 HAND_LEFT</text>
-<rect x="1292.0" y="742.0" width="20.0" height="68.0" rx="3" fill="#222" stroke="none" stroke-width="1"/>
-<line x1="1312.0" y1="754.0" x2="1360.0" y2="754.0" stroke="#6d4c41" stroke-width="4"/>
-<rect x="1297.0" y="749.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#6d4c41" stroke-width="1.5"/>
-<path d="M1114.0,776.0 C1208.0,776.0 1208.0,754.0 1302.0,754.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M1114.0,776.0 C1208.0,776.0 1208.0,754.0 1302.0,754.0" fill="none" stroke="#6d4c41" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="1114.0" cy="776.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<circle cx="1302.0" cy="754.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<line x1="1312.0" y1="776.0" x2="1360.0" y2="776.0" stroke="#e53935" stroke-width="4"/>
-<rect x="1297.0" y="771.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#e53935" stroke-width="1.5"/>
-<path d="M1090.0,776.0 C1196.0,776.0 1196.0,776.0 1302.0,776.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M1090.0,776.0 C1196.0,776.0 1196.0,776.0 1302.0,776.0" fill="none" stroke="#e53935" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="1090.0" cy="776.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<circle cx="1302.0" cy="776.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<line x1="1312.0" y1="798.0" x2="1360.0" y2="798.0" stroke="#fb8c00" stroke-width="4"/>
-<rect x="1297.0" y="793.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#fb8c00" stroke-width="1.5"/>
-<path d="M912.0,800.0 C1107.0,800.0 1107.0,798.0 1302.0,798.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M912.0,800.0 C1107.0,800.0 1107.0,798.0 1302.0,798.0" fill="none" stroke="#fb8c00" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="1114.0" cy="1112.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<rect x="1330.0" y="688.0" width="190.0" height="80.0" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+<circle cx="1360.0" cy="728.0" r="16" fill="#fff" stroke="#0d47a1" stroke-width="2"/>
+<text x="1448.0" y="722.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">SG90</text>
+<text x="1448.0" y="740.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#fff">servo 2 HAND_LEFT</text>
+<path d="M1008.0,704.0 C1169.0,704.0 1169.0,712.0 1330.0,712.0" fill="none" stroke="#6d4c41" stroke-width="3" stroke-opacity="0.55"/>
+<path d="M1008.0,728.0 C1169.0,728.0 1169.0,728.0 1330.0,728.0" fill="none" stroke="#e53935" stroke-width="3" stroke-opacity="0.55"/>
+<path d="M1008.0,752.0 C1169.0,752.0 1169.0,744.0 1330.0,744.0" fill="none" stroke="#fb8c00" stroke-width="3" stroke-opacity="0.55"/>
+<rect x="999.0" y="693.0" width="18.0" height="70.0" rx="2" fill="#222" stroke="#000" stroke-width="1"/>
+<rect x="1004.5" y="700.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="1004.5" y="724.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="1004.5" y="748.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="995.0" y="689.0" width="26.0" height="78.0" rx="3" fill="#000" stroke="#000" stroke-width="1.5" fill-opacity="0.35"/>
+<rect x="1014.0" y="699.0" width="7.0" height="10.0" rx="0" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<rect x="1014.0" y="723.0" width="7.0" height="10.0" rx="0" fill="#e53935" stroke="none" stroke-width="1"/>
+<rect x="1014.0" y="747.0" width="7.0" height="10.0" rx="0" fill="#fb8c00" stroke="none" stroke-width="1"/>
+<path d="M1056.0,704.0 C1085.0,704.0 1085.0,704.0 1114.0,704.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M1056.0,704.0 C1085.0,704.0 1085.0,704.0 1114.0,704.0" fill="none" stroke="#6d4c41" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1056.0" cy="704.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<circle cx="1114.0" cy="704.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<path d="M1056.0,728.0 C1073.0,728.0 1073.0,728.0 1090.0,728.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M1056.0,728.0 C1073.0,728.0 1073.0,728.0 1090.0,728.0" fill="none" stroke="#e53935" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1056.0" cy="728.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
+<circle cx="1090.0" cy="728.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
+<path d="M960.0,752.0 C936.0,752.0 936.0,800.0 912.0,800.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M960.0,752.0 C936.0,752.0 936.0,800.0 912.0,800.0" fill="none" stroke="#fb8c00" stroke-width="3" stroke-linecap="round"/>
+<circle cx="960.0" cy="752.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
 <circle cx="912.0" cy="800.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
-<circle cx="1302.0" cy="798.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
-<rect x="1360.0" y="880.0" width="190.0" height="80.0" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
-<circle cx="1390.0" cy="920.0" r="16" fill="#fff" stroke="#0d47a1" stroke-width="2"/>
-<text x="1478.0" y="914.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">SG90</text>
-<text x="1478.0" y="932.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#fff">servo 1 NECK</text>
-<rect x="1292.0" y="886.0" width="20.0" height="68.0" rx="3" fill="#222" stroke="none" stroke-width="1"/>
-<line x1="1312.0" y1="898.0" x2="1360.0" y2="898.0" stroke="#6d4c41" stroke-width="4"/>
-<rect x="1297.0" y="893.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#6d4c41" stroke-width="1.5"/>
-<path d="M1114.0,896.0 C1208.0,896.0 1208.0,898.0 1302.0,898.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M1114.0,896.0 C1208.0,896.0 1208.0,898.0 1302.0,898.0" fill="none" stroke="#6d4c41" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="1114.0" cy="896.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<circle cx="1302.0" cy="898.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<line x1="1312.0" y1="920.0" x2="1360.0" y2="920.0" stroke="#e53935" stroke-width="4"/>
-<rect x="1297.0" y="915.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#e53935" stroke-width="1.5"/>
-<path d="M1090.0,896.0 C1196.0,896.0 1196.0,920.0 1302.0,920.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M1090.0,896.0 C1196.0,896.0 1196.0,920.0 1302.0,920.0" fill="none" stroke="#e53935" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="1090.0" cy="896.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<circle cx="1302.0" cy="920.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<line x1="1312.0" y1="942.0" x2="1360.0" y2="942.0" stroke="#fb8c00" stroke-width="4"/>
-<rect x="1297.0" y="937.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#fb8c00" stroke-width="1.5"/>
-<path d="M912.0,920.0 C1107.0,920.0 1107.0,942.0 1302.0,942.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M912.0,920.0 C1107.0,920.0 1107.0,942.0 1302.0,942.0" fill="none" stroke="#fb8c00" stroke-width="3.5" stroke-linecap="round"/>
+<rect x="1330.0" y="784.0" width="190.0" height="80.0" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+<circle cx="1360.0" cy="824.0" r="16" fill="#fff" stroke="#0d47a1" stroke-width="2"/>
+<text x="1448.0" y="818.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">SG90</text>
+<text x="1448.0" y="836.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#fff">servo 1 NECK</text>
+<path d="M1008.0,800.0 C1169.0,800.0 1169.0,808.0 1330.0,808.0" fill="none" stroke="#6d4c41" stroke-width="3" stroke-opacity="0.55"/>
+<path d="M1008.0,824.0 C1169.0,824.0 1169.0,824.0 1330.0,824.0" fill="none" stroke="#e53935" stroke-width="3" stroke-opacity="0.55"/>
+<path d="M1008.0,848.0 C1169.0,848.0 1169.0,840.0 1330.0,840.0" fill="none" stroke="#fb8c00" stroke-width="3" stroke-opacity="0.55"/>
+<rect x="999.0" y="789.0" width="18.0" height="70.0" rx="2" fill="#222" stroke="#000" stroke-width="1"/>
+<rect x="1004.5" y="796.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="1004.5" y="820.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="1004.5" y="844.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="995.0" y="785.0" width="26.0" height="78.0" rx="3" fill="#000" stroke="#000" stroke-width="1.5" fill-opacity="0.35"/>
+<rect x="1014.0" y="795.0" width="7.0" height="10.0" rx="0" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<rect x="1014.0" y="819.0" width="7.0" height="10.0" rx="0" fill="#e53935" stroke="none" stroke-width="1"/>
+<rect x="1014.0" y="843.0" width="7.0" height="10.0" rx="0" fill="#fb8c00" stroke="none" stroke-width="1"/>
+<path d="M1056.0,800.0 C1085.0,800.0 1085.0,800.0 1114.0,800.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M1056.0,800.0 C1085.0,800.0 1085.0,800.0 1114.0,800.0" fill="none" stroke="#6d4c41" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1056.0" cy="800.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<circle cx="1114.0" cy="800.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<path d="M1056.0,824.0 C1073.0,824.0 1073.0,824.0 1090.0,824.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M1056.0,824.0 C1073.0,824.0 1073.0,824.0 1090.0,824.0" fill="none" stroke="#e53935" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1056.0" cy="824.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
+<circle cx="1090.0" cy="824.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
+<path d="M960.0,848.0 C936.0,848.0 936.0,920.0 912.0,920.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M960.0,848.0 C936.0,848.0 936.0,920.0 912.0,920.0" fill="none" stroke="#fb8c00" stroke-width="3" stroke-linecap="round"/>
+<circle cx="960.0" cy="848.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
 <circle cx="912.0" cy="920.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
-<circle cx="1302.0" cy="942.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
-<rect x="1360.0" y="1024.0" width="190.0" height="80.0" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
-<circle cx="1390.0" cy="1064.0" r="16" fill="#fff" stroke="#0d47a1" stroke-width="2"/>
-<text x="1478.0" y="1058.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">SG90</text>
-<text x="1478.0" y="1076.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#fff">servo 0 HEAD</text>
-<rect x="1292.0" y="1030.0" width="20.0" height="68.0" rx="3" fill="#222" stroke="none" stroke-width="1"/>
-<line x1="1312.0" y1="1042.0" x2="1360.0" y2="1042.0" stroke="#6d4c41" stroke-width="4"/>
-<rect x="1297.0" y="1037.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#6d4c41" stroke-width="1.5"/>
-<path d="M1114.0,1016.0 C1208.0,1016.0 1208.0,1042.0 1302.0,1042.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M1114.0,1016.0 C1208.0,1016.0 1208.0,1042.0 1302.0,1042.0" fill="none" stroke="#6d4c41" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="1114.0" cy="1016.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<circle cx="1302.0" cy="1042.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<line x1="1312.0" y1="1064.0" x2="1360.0" y2="1064.0" stroke="#e53935" stroke-width="4"/>
-<rect x="1297.0" y="1059.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#e53935" stroke-width="1.5"/>
-<path d="M1090.0,1016.0 C1196.0,1016.0 1196.0,1064.0 1302.0,1064.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M1090.0,1016.0 C1196.0,1016.0 1196.0,1064.0 1302.0,1064.0" fill="none" stroke="#e53935" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="1090.0" cy="1016.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<circle cx="1302.0" cy="1064.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<line x1="1312.0" y1="1086.0" x2="1360.0" y2="1086.0" stroke="#fb8c00" stroke-width="4"/>
-<rect x="1297.0" y="1081.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#fb8c00" stroke-width="1.5"/>
-<path d="M912.0,944.0 C1107.0,944.0 1107.0,1086.0 1302.0,1086.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M912.0,944.0 C1107.0,944.0 1107.0,1086.0 1302.0,1086.0" fill="none" stroke="#fb8c00" stroke-width="3.5" stroke-linecap="round"/>
+<rect x="1330.0" y="880.0" width="190.0" height="80.0" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+<circle cx="1360.0" cy="920.0" r="16" fill="#fff" stroke="#0d47a1" stroke-width="2"/>
+<text x="1448.0" y="914.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">SG90</text>
+<text x="1448.0" y="932.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#fff">servo 0 HEAD</text>
+<path d="M1008.0,896.0 C1169.0,896.0 1169.0,904.0 1330.0,904.0" fill="none" stroke="#6d4c41" stroke-width="3" stroke-opacity="0.55"/>
+<path d="M1008.0,920.0 C1169.0,920.0 1169.0,920.0 1330.0,920.0" fill="none" stroke="#e53935" stroke-width="3" stroke-opacity="0.55"/>
+<path d="M1008.0,944.0 C1169.0,944.0 1169.0,936.0 1330.0,936.0" fill="none" stroke="#fb8c00" stroke-width="3" stroke-opacity="0.55"/>
+<rect x="999.0" y="885.0" width="18.0" height="70.0" rx="2" fill="#222" stroke="#000" stroke-width="1"/>
+<rect x="1004.5" y="892.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="1004.5" y="916.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="1004.5" y="940.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="995.0" y="881.0" width="26.0" height="78.0" rx="3" fill="#000" stroke="#000" stroke-width="1.5" fill-opacity="0.35"/>
+<rect x="1014.0" y="891.0" width="7.0" height="10.0" rx="0" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<rect x="1014.0" y="915.0" width="7.0" height="10.0" rx="0" fill="#e53935" stroke="none" stroke-width="1"/>
+<rect x="1014.0" y="939.0" width="7.0" height="10.0" rx="0" fill="#fb8c00" stroke="none" stroke-width="1"/>
+<path d="M1056.0,896.0 C1085.0,896.0 1085.0,896.0 1114.0,896.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M1056.0,896.0 C1085.0,896.0 1085.0,896.0 1114.0,896.0" fill="none" stroke="#6d4c41" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1056.0" cy="896.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<circle cx="1114.0" cy="896.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<path d="M1056.0,920.0 C1073.0,920.0 1073.0,920.0 1090.0,920.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M1056.0,920.0 C1073.0,920.0 1073.0,920.0 1090.0,920.0" fill="none" stroke="#e53935" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1056.0" cy="920.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
+<circle cx="1090.0" cy="920.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
+<path d="M960.0,944.0 C936.0,944.0 936.0,944.0 912.0,944.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M960.0,944.0 C936.0,944.0 936.0,944.0 912.0,944.0" fill="none" stroke="#fb8c00" stroke-width="3" stroke-linecap="round"/>
+<circle cx="960.0" cy="944.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
 <circle cx="912.0" cy="944.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
-<circle cx="1302.0" cy="1086.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
-<rect x="20.0" y="784.0" width="190.0" height="80.0" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
-<circle cx="180.0" cy="824.0" r="16" fill="#fff" stroke="#0d47a1" stroke-width="2"/>
-<text x="92.0" y="818.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">SG90</text>
-<text x="92.0" y="836.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#fff">servo 3 HAND_RIGHT</text>
-<rect x="262.0" y="790.0" width="20.0" height="68.0" rx="3" fill="#222" stroke="none" stroke-width="1"/>
-<line x1="210.0" y1="802.0" x2="262.0" y2="802.0" stroke="#6d4c41" stroke-width="4"/>
-<rect x="267.0" y="797.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#6d4c41" stroke-width="1.5"/>
-<path d="M326.0,824.0 C299.0,824.0 299.0,802.0 272.0,802.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M326.0,824.0 C299.0,824.0 299.0,802.0 272.0,802.0" fill="none" stroke="#6d4c41" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="326.0" cy="824.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<circle cx="272.0" cy="802.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<line x1="210.0" y1="824.0" x2="262.0" y2="824.0" stroke="#e53935" stroke-width="4"/>
-<rect x="267.0" y="819.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#e53935" stroke-width="1.5"/>
-<path d="M302.0,824.0 C287.0,824.0 287.0,824.0 272.0,824.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M302.0,824.0 C287.0,824.0 287.0,824.0 272.0,824.0" fill="none" stroke="#e53935" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="302.0" cy="824.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<circle cx="272.0" cy="824.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<line x1="210.0" y1="846.0" x2="262.0" y2="846.0" stroke="#fb8c00" stroke-width="4"/>
-<rect x="267.0" y="841.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#fb8c00" stroke-width="1.5"/>
-<path d="M504.0,920.0 C388.0,920.0 388.0,846.0 272.0,846.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M504.0,920.0 C388.0,920.0 388.0,846.0 272.0,846.0" fill="none" stroke="#fb8c00" stroke-width="3.5" stroke-linecap="round"/>
+<rect x="20.0" y="544.0" width="190.0" height="80.0" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+<circle cx="50.0" cy="584.0" r="16" fill="#fff" stroke="#0d47a1" stroke-width="2"/>
+<text x="138.0" y="578.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">SG90</text>
+<text x="138.0" y="596.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#fff">servo 3 HAND_RIGHT</text>
+<path d="M552.0,560.0 C381.0,560.0 381.0,568.0 210.0,568.0" fill="none" stroke="#6d4c41" stroke-width="3" stroke-opacity="0.55"/>
+<path d="M552.0,584.0 C381.0,584.0 381.0,584.0 210.0,584.0" fill="none" stroke="#e53935" stroke-width="3" stroke-opacity="0.55"/>
+<path d="M552.0,608.0 C381.0,608.0 381.0,600.0 210.0,600.0" fill="none" stroke="#fb8c00" stroke-width="3" stroke-opacity="0.55"/>
+<rect x="543.0" y="549.0" width="18.0" height="70.0" rx="2" fill="#222" stroke="#000" stroke-width="1"/>
+<rect x="548.5" y="556.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="548.5" y="580.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="548.5" y="604.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="539.0" y="545.0" width="26.0" height="78.0" rx="3" fill="#000" stroke="#000" stroke-width="1.5" fill-opacity="0.35"/>
+<rect x="558.0" y="555.0" width="7.0" height="10.0" rx="0" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<rect x="558.0" y="579.0" width="7.0" height="10.0" rx="0" fill="#e53935" stroke="none" stroke-width="1"/>
+<rect x="558.0" y="603.0" width="7.0" height="10.0" rx="0" fill="#fb8c00" stroke="none" stroke-width="1"/>
+<path d="M600.0,560.0 C691.0,560.0 691.0,560.0 782.0,560.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M600.0,560.0 C691.0,560.0 691.0,560.0 782.0,560.0" fill="none" stroke="#6d4c41" stroke-width="3" stroke-linecap="round"/>
+<circle cx="600.0" cy="560.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<circle cx="782.0" cy="560.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<path d="M600.0,584.0 C679.0,584.0 679.0,584.0 758.0,584.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M600.0,584.0 C679.0,584.0 679.0,584.0 758.0,584.0" fill="none" stroke="#e53935" stroke-width="3" stroke-linecap="round"/>
+<circle cx="600.0" cy="584.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
+<circle cx="758.0" cy="584.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
+<path d="M504.0,608.0 C464.0,704.0 464.0,860.0 504.0,920.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M504.0,608.0 C464.0,704.0 464.0,860.0 504.0,920.0" fill="none" stroke="#fb8c00" stroke-width="3" stroke-linecap="round"/>
+<circle cx="504.0" cy="608.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
 <circle cx="504.0" cy="920.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
-<circle cx="272.0" cy="846.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
-<rect x="20.0" y="976.0" width="190.0" height="80.0" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
-<circle cx="180.0" cy="1016.0" r="16" fill="#fff" stroke="#0d47a1" stroke-width="2"/>
-<text x="92.0" y="1010.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">SG90</text>
-<text x="92.0" y="1028.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#fff">servo 4 BODY</text>
-<rect x="262.0" y="982.0" width="20.0" height="68.0" rx="3" fill="#222" stroke="none" stroke-width="1"/>
-<line x1="210.0" y1="994.0" x2="262.0" y2="994.0" stroke="#6d4c41" stroke-width="4"/>
-<rect x="267.0" y="989.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#6d4c41" stroke-width="1.5"/>
-<path d="M326.0,1016.0 C299.0,1016.0 299.0,994.0 272.0,994.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M326.0,1016.0 C299.0,1016.0 299.0,994.0 272.0,994.0" fill="none" stroke="#6d4c41" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="326.0" cy="1016.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<circle cx="272.0" cy="994.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
-<line x1="210.0" y1="1016.0" x2="262.0" y2="1016.0" stroke="#e53935" stroke-width="4"/>
-<rect x="267.0" y="1011.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#e53935" stroke-width="1.5"/>
-<path d="M302.0,1016.0 C287.0,1016.0 287.0,1016.0 272.0,1016.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M302.0,1016.0 C287.0,1016.0 287.0,1016.0 272.0,1016.0" fill="none" stroke="#e53935" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="302.0" cy="1016.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<circle cx="272.0" cy="1016.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<line x1="210.0" y1="1038.0" x2="262.0" y2="1038.0" stroke="#fb8c00" stroke-width="4"/>
-<rect x="267.0" y="1033.0" width="10.0" height="10.0" rx="0" fill="#000" stroke="#fb8c00" stroke-width="1.5"/>
-<path d="M504.0,944.0 C388.0,944.0 388.0,1038.0 272.0,1038.0" fill="none" stroke="#fbfaf7" stroke-width="8.5" stroke-linecap="round"/>
-<path d="M504.0,944.0 C388.0,944.0 388.0,1038.0 272.0,1038.0" fill="none" stroke="#fb8c00" stroke-width="3.5" stroke-linecap="round"/>
-<circle cx="504.0" cy="944.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
-<circle cx="272.0" cy="1038.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
+<rect x="20.0" y="640.0" width="190.0" height="80.0" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+<circle cx="50.0" cy="680.0" r="16" fill="#fff" stroke="#0d47a1" stroke-width="2"/>
+<text x="138.0" y="674.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">SG90</text>
+<text x="138.0" y="692.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#fff">servo 4 BODY</text>
+<path d="M552.0,656.0 C381.0,656.0 381.0,664.0 210.0,664.0" fill="none" stroke="#6d4c41" stroke-width="3" stroke-opacity="0.55"/>
+<path d="M552.0,680.0 C381.0,680.0 381.0,680.0 210.0,680.0" fill="none" stroke="#e53935" stroke-width="3" stroke-opacity="0.55"/>
+<path d="M552.0,704.0 C381.0,704.0 381.0,696.0 210.0,696.0" fill="none" stroke="#fb8c00" stroke-width="3" stroke-opacity="0.55"/>
+<rect x="543.0" y="645.0" width="18.0" height="70.0" rx="2" fill="#222" stroke="#000" stroke-width="1"/>
+<rect x="548.5" y="652.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="548.5" y="676.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="548.5" y="700.5" width="7.0" height="7.0" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="539.0" y="641.0" width="26.0" height="78.0" rx="3" fill="#000" stroke="#000" stroke-width="1.5" fill-opacity="0.35"/>
+<rect x="558.0" y="651.0" width="7.0" height="10.0" rx="0" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<rect x="558.0" y="675.0" width="7.0" height="10.0" rx="0" fill="#e53935" stroke="none" stroke-width="1"/>
+<rect x="558.0" y="699.0" width="7.0" height="10.0" rx="0" fill="#fb8c00" stroke="none" stroke-width="1"/>
+<path d="M600.0,656.0 C691.0,656.0 691.0,656.0 782.0,656.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M600.0,656.0 C691.0,656.0 691.0,656.0 782.0,656.0" fill="none" stroke="#6d4c41" stroke-width="3" stroke-linecap="round"/>
+<circle cx="600.0" cy="656.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<circle cx="782.0" cy="656.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<path d="M600.0,680.0 C679.0,680.0 679.0,680.0 758.0,680.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M600.0,680.0 C679.0,680.0 679.0,680.0 758.0,680.0" fill="none" stroke="#e53935" stroke-width="3" stroke-linecap="round"/>
+<circle cx="600.0" cy="680.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
+<circle cx="758.0" cy="680.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
+<path d="M528.0,704.0 C488.0,800.0 488.0,884.0 528.0,944.0" fill="none" stroke="#fbfaf7" stroke-width="8" stroke-linecap="round"/>
+<path d="M528.0,704.0 C488.0,800.0 488.0,884.0 528.0,944.0" fill="none" stroke="#fb8c00" stroke-width="3" stroke-linecap="round"/>
+<circle cx="528.0" cy="704.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
+<circle cx="528.0" cy="944.0" r="4.5" fill="#fb8c00" stroke="#fff" stroke-width="1"/>
 <rect x="1330.0" y="1196.0" width="120.0" height="62.0" rx="5" fill="#0d47a1" stroke="#000" stroke-width="1.5"/>
 <rect x="1370.0" y="1204.0" width="74.0" height="46.0" rx="2" fill="#111" stroke="none" stroke-width="1"/>
 <text x="1407.0" y="1232.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">OLED</text>
@@ -1237,47 +1249,70 @@
 <circle cx="888.0" cy="896.0" r="4.5" fill="#43a047" stroke="#fff" stroke-width="1"/>
 <circle cx="1338.0" cy="1245.0" r="4.5" fill="#43a047" stroke="#fff" stroke-width="1"/>
 <text x="1390.0" y="1276.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#333">OLED on 4 female-to-male wires</text>
-<line x1="1090.0" y1="704.0" x2="1102.0" y2="716.0" stroke="#888" stroke-width="2"/>
-<line x1="1114.0" y1="728.0" x2="1102.0" y2="716.0" stroke="#888" stroke-width="2"/>
-<circle cx="1102.0" cy="716.0" r="13" fill="#1a237e" stroke="#000" stroke-width="1"/>
-<path d="M1089.0,716.0 A13,13 0 0 0 1115.0,716.0 Z" fill="#9fa8da"/>
-<circle cx="1090.0" cy="704.0" r="3.5" fill="#888" stroke="none" stroke-width="1"/>
-<circle cx="1114.0" cy="728.0" r="3.5" fill="#888" stroke="none" stroke-width="1"/>
-<rect x="1129.0" y="709.0" width="74.2" height="16.0" rx="2" fill="#fbfaf7" stroke="none" stroke-width="1" fill-opacity="0.88"/>
-<text x="1132.0" y="720.0" text-anchor="start" font-size="11" font-weight="bold" fill="#000">C1 1000 uF</text>
+<line x1="1090.0" y1="1040.0" x2="1102.0" y2="1052.0" stroke="#888" stroke-width="2"/>
+<line x1="1114.0" y1="1064.0" x2="1102.0" y2="1052.0" stroke="#888" stroke-width="2"/>
+<circle cx="1102.0" cy="1052.0" r="13" fill="#1a237e" stroke="#000" stroke-width="1"/>
+<path d="M1089.0,1052.0 A13,13 0 0 0 1115.0,1052.0 Z" fill="#9fa8da"/>
+<circle cx="1090.0" cy="1040.0" r="3.5" fill="#888" stroke="none" stroke-width="1"/>
+<circle cx="1114.0" cy="1064.0" r="3.5" fill="#888" stroke="none" stroke-width="1"/>
+<rect x="1129.0" y="1045.0" width="74.2" height="16.0" rx="2" fill="#fbfaf7" stroke="none" stroke-width="1" fill-opacity="0.88"/>
+<text x="1132.0" y="1056.0" text-anchor="start" font-size="11" font-weight="bold" fill="#000">C1 1000 uF</text>
 <ellipse cx="1102.0" cy="575.0" rx="13" ry="7" fill="#ffca28" stroke="#b8860b" stroke-width="1.5"/>
 <line x1="1090.0" y1="584.0" x2="1090.0" y2="578.0" stroke="#888" stroke-width="2"/>
 <line x1="1114.0" y1="584.0" x2="1114.0" y2="578.0" stroke="#888" stroke-width="2"/>
 <rect x="1129.0" y="568.0" width="67.4" height="16.0" rx="2" fill="#fbfaf7" stroke="none" stroke-width="1" fill-opacity="0.88"/>
 <text x="1132.0" y="579.0" text-anchor="start" font-size="11" font-weight="bold" fill="#000">C2 0.1 uF</text>
-<ellipse cx="314.0" cy="887.0" rx="13" ry="7" fill="#ffca28" stroke="#b8860b" stroke-width="1.5"/>
-<line x1="302.0" y1="896.0" x2="302.0" y2="890.0" stroke="#888" stroke-width="2"/>
-<line x1="326.0" y1="896.0" x2="326.0" y2="890.0" stroke="#888" stroke-width="2"/>
-<rect x="243.6" y="880.0" width="67.4" height="16.0" rx="2" fill="#fbfaf7" stroke="none" stroke-width="1" fill-opacity="0.88"/>
-<text x="308.0" y="891.0" text-anchor="end" font-size="11" font-weight="bold" fill="#000">C3 0.1 uF</text>
+<ellipse cx="770.0" cy="623.0" rx="13" ry="7" fill="#ffca28" stroke="#b8860b" stroke-width="1.5"/>
+<line x1="758.0" y1="632.0" x2="758.0" y2="626.0" stroke="#888" stroke-width="2"/>
+<line x1="782.0" y1="632.0" x2="782.0" y2="626.0" stroke="#888" stroke-width="2"/>
+<rect x="793.0" y="616.0" width="67.4" height="16.0" rx="2" fill="#fbfaf7" stroke="none" stroke-width="1" fill-opacity="0.88"/>
+<text x="796.0" y="627.0" text-anchor="start" font-size="11" font-weight="bold" fill="#000">C3 0.1 uF</text>
 <text x="40.0" y="1326.0" text-anchor="start" font-size="13" font-weight="bold" fill="#000">Jumpers (holes on the RIGHT board unless marked L):</text>
-<line x1="40.0" y1="1346.0" x2="68.0" y2="1346.0" stroke="#e53935" stroke-width="5"/>
-<text x="78.0" y="1350.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">rail bridge: right outer + row 8 -&gt; L outer + row 8</text>
+<line x1="40.0" y1="1346.0" x2="68.0" y2="1346.0" stroke="#6d4c41" stroke-width="5"/>
+<text x="78.0" y="1350.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">ground join: b29 (ESP32 GND row) -&gt; right outer - rail row 29</text>
 <line x1="40.0" y1="1367.0" x2="68.0" y2="1367.0" stroke="#6d4c41" stroke-width="5"/>
-<text x="78.0" y="1371.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">rail bridge: right outer - row 10 -&gt; L outer - row 10</text>
-<line x1="40.0" y1="1388.0" x2="68.0" y2="1388.0" stroke="#6d4c41" stroke-width="5"/>
-<text x="78.0" y="1392.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">ground join: b29 (ESP32 GND row) -&gt; right outer - rail</text>
-<line x1="40.0" y1="1409.0" x2="68.0" y2="1409.0" stroke="#fb8c00" stroke-width="5"/>
-<text x="78.0" y="1413.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">signals: e22 D18 -&gt; servo 0, e21 D19 -&gt; servo 1, e16 D23 -&gt; servo 2,</text>
+<text x="78.0" y="1371.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">servo headers: first row j -&gt; blue - rail, same row</text>
+<line x1="40.0" y1="1388.0" x2="68.0" y2="1388.0" stroke="#e53935" stroke-width="5"/>
+<text x="78.0" y="1392.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">                middle row j -&gt; red + rail, same row</text>
+<line x1="40.0" y1="1409.0" x2="68.0" y2="1409.0" stroke="#e53935" stroke-width="5"/>
+<text x="78.0" y="1413.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">servos 0-2: right outer rail. Servos 3-4: right INNER rail, rows 6-11</text>
 <line x1="40.0" y1="1430.0" x2="68.0" y2="1430.0" stroke="#fb8c00" stroke-width="5"/>
-<text x="78.0" y="1434.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">         L f21 D32 -&gt; servo 3, L f22 D33 -&gt; servo 4</text>
-<line x1="40.0" y1="1451.0" x2="68.0" y2="1451.0" stroke="#e53935" stroke-width="5"/>
-<text x="78.0" y="1455.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">each servo red -&gt; + rail, brown -&gt; - rail next to it</text>
-<line x1="40.0" y1="1472.0" x2="68.0" y2="1472.0" stroke="#8e24aa" stroke-width="5"/>
-<text x="78.0" y="1476.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">OLED: GND d29, VCC d30 (3V3), SCL d17 (D22), SDA d20 (D21)</text>
+<text x="78.0" y="1434.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">signals: f14 -&gt; e16 D23 (servo 2), f18 -&gt; e21 D19 (servo 1),</text>
+<line x1="40.0" y1="1451.0" x2="68.0" y2="1451.0" stroke="#fb8c00" stroke-width="5"/>
+<text x="78.0" y="1455.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">         f22 -&gt; e22 D18 (servo 0), L f8 -&gt; L f21 D32 (servo 3),</text>
+<line x1="40.0" y1="1472.0" x2="68.0" y2="1472.0" stroke="#fb8c00" stroke-width="5"/>
+<text x="78.0" y="1476.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">         L g12 -&gt; L g22 D33 (servo 4)</text>
+<line x1="40.0" y1="1493.0" x2="68.0" y2="1493.0" stroke="#8e24aa" stroke-width="5"/>
+<text x="78.0" y="1497.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000" xml:space="preserve">OLED: GND d29, VCC d30 (3V3), SCL d17 (D22), SDA d20 (D21)</text>
 <text x="800.0" y="1326.0" text-anchor="start" font-size="13" font-weight="bold" fill="#000">Placement and module settings:</text>
 <text x="800.0" y="1350.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">ESP32 in rows 16-30 (EN / D23 in row 16): its USB hangs off the bottom end.</text>
 <text x="800.0" y="1371.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">Module on the TOP end of the right board, sockets facing up, off the board.</text>
 <text x="800.0" y="1392.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">Its 4 legs per side: 2 in the red + strip, 2 in the blue - strip, rows 4-5.</text>
 <text x="800.0" y="1413.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">Every rail pair here: red + strip on the left, blue - strip on the right.</text>
 <text x="800.0" y="1434.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">Both jumpers on 5V (5V-VCC pair): both rail pairs of the right board are 5 V.</text>
-<text x="800.0" y="1455.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">The inner pair runs under the ESP32: plug nothing of the ESP32 into it. Switch IN.</text>
-<text x="800.0" y="1476.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">Meter the rail before plugging servos: ~5 V. 9 V battery: ~700 mA at most.</text>
-<text x="800.0" y="1497.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">C1: long leg in the + rail (row 12), striped leg in the - rail (row 13).</text>
-<text x="780.0" y="1570.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#b71c1c">Unplug USB and the module's power while wiring. Plug servos one at a time, test each on the Servo control page.</text>
+<text x="800.0" y="1455.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">Right inner pair: used only in rows 4-12; nothing in it under the ESP32. Switch IN.</text>
+<text x="800.0" y="1476.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">No rail bridges: the left board's rails are not used.</text>
+<text x="800.0" y="1497.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">Meter the rail before plugging servos: ~5 V. 9 V battery: ~700 mA at most.</text>
+<text x="800.0" y="1518.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">C1: long leg in the + rail (row 26), striped leg in the - rail (row 27).</text>
+<text x="60.0" y="1586.0" text-anchor="start" font-size="13" font-weight="bold" fill="#000">Servo adapter, enlarged:</text>
+<rect x="85.6" y="1598.4" width="28.8" height="112.0" rx="2" fill="#222" stroke="#000" stroke-width="1"/>
+<rect x="94.4" y="1610.4" width="11.2" height="11.2" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="94.4" y="1648.8" width="11.2" height="11.2" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="94.4" y="1687.2" width="11.2" height="11.2" rx="0" fill="#d4af37" stroke="none" stroke-width="1"/>
+<rect x="79.2" y="1592.0" width="41.6" height="124.8" rx="3" fill="#000" stroke="#000" stroke-width="1.5" fill-opacity="0.35"/>
+<rect x="109.6" y="1608.0" width="11.2" height="16.0" rx="0" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<rect x="109.6" y="1646.4" width="11.2" height="16.0" rx="0" fill="#e53935" stroke="none" stroke-width="1"/>
+<rect x="109.6" y="1684.8" width="11.2" height="16.0" rx="0" fill="#fb8c00" stroke="none" stroke-width="1"/>
+<line x1="121.0" y1="1616.0" x2="200.0" y2="1616.0" stroke="#6d4c41" stroke-width="5"/>
+<text x="210.0" y="1620.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">brown: row 1 of the block</text>
+<line x1="121.0" y1="1654.4" x2="200.0" y2="1654.4" stroke="#e53935" stroke-width="5"/>
+<text x="210.0" y="1658.4" text-anchor="start" font-size="12" font-weight="normal" fill="#000">red: row 2 of the block</text>
+<line x1="121.0" y1="1692.8" x2="200.0" y2="1692.8" stroke="#fb8c00" stroke-width="5"/>
+<text x="210.0" y="1696.8" text-anchor="start" font-size="12" font-weight="normal" fill="#000">orange: row 3 of the block</text>
+<text x="400.0" y="1612.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">3 pins broken off the 1x40 male header strip, pushed into 3 rows</text>
+<text x="400.0" y="1632.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">of one column (short pin ends into the breadboard).</text>
+<text x="400.0" y="1652.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">The servo plug goes on the long ends: brown on the first row,</text>
+<text x="400.0" y="1672.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">red in the middle, orange on the last. Jumpers start from the</text>
+<text x="400.0" y="1692.0" text-anchor="start" font-size="12" font-weight="normal" fill="#000">free holes of the same three rows.</text>
+<text x="780.0" y="1750.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#b71c1c">Unplug USB and the module's power while wiring. Plug servos one at a time, test each on the Servo control page.</text>
 </svg>

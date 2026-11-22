@@ -246,7 +246,7 @@ def stage_a5() -> None:
     The ESP32 sits in rows 16-30 so its USB socket hangs off the bottom end
     of the boards; the module plugs onto the top end of the right board with
     its sockets facing up, off the board."""
-    s = Svg(1560, 1590)
+    s = Svg(1560, 1770)
     p = 24
     y0 = 440
     NR = 30
@@ -345,7 +345,7 @@ def stage_a5() -> None:
     s.text(xc, ry(E + 8), "ESP32 DevKit V1", 13, "middle", "#fff", "bold")
     s.text(xc, ry(E + 9), "(seen from above)", 11, "middle", "#cfd3d8")
     s.text(xc, ry(E + 10) + 4, "inner rails under it:", 10, "middle", "#cfd3d8")
-    s.text(xc, ry(E + 11), "not used", 10, "middle", "#cfd3d8")
+    s.text(xc, ry(E + 11), "nothing plugged in here", 10, "middle", "#cfd3d8")
     hl = {"D32": SIG, "D33": SIG, "D18": SIG, "D19": SIG, "D23": SIG, "D21": SDA, "D22": SCL,
           "3V3": V33}
     for names, x, anchor, dx in ((LEFT_ROW, xl, "start", 14), (RIGHT_ROW, xr, "end", -14)):
@@ -407,13 +407,8 @@ def stage_a5() -> None:
     s.text(right_a + 42, my0 - 62, "IN option 2: kit 9 V", 11, "middle", "#000", "bold")
     s.text(right_a + 42, my0 - 47, "battery (interim, weak)", 11, "middle")
 
-    # rail bridges to the left board, above the ESP32
-    jumper(rail("RO", "+", 8), rail("LO", "+", 8), V5,
-           (rail("RO", "+", 8)[0] - 200, ry(10)), (rail("LO", "+", 8)[0] + 200, ry(10)))
-    jumper(rail("RO", "-", 10), rail("LO", "-", 10), GND,
-           (rail("RO", "-", 10)[0] - 200, ry(12)), (rail("LO", "-", 10)[0] + 200, ry(12)))
     # ground join: ESP32 GND row to the servo - rail
-    jumper(R("b", E + 14), rail("RO", "-", 28), GND)
+    jumper(R("b", E + 14), rail("RO", "-", 29), GND)
 
     def ecap(pair, r_plus, label, lx, anchor):
         (xp, yp), (xm, ym) = rail(pair, "+", r_plus), rail(pair, "-", r_plus + 1)
@@ -435,37 +430,59 @@ def stage_a5() -> None:
         s.line(xm, ym, xm, ym - 6, "#888", 2)
         s.label(lx, yp - 5, label, 11, anchor, weight="bold")
 
-    def servo(x0, y, title, holes, mirror=False):
-        """x0 = plug x. holes = (brown, red, orange) hole positions."""
-        bxs = x0 - 250 if mirror else x0 + 60
-        s.rect(bxs, y - 40, 190, 80, "#1565c0", "#0d47a1", 2, rx=6)
-        s.circle(bxs + (160 if mirror else 30), y, 16, "#fff", "#0d47a1", 2)
-        tx = bxs + (72 if mirror else 118)
-        s.text(tx, y - 6, "SG90", 13, "middle", "#fff", "bold")
-        s.text(tx, y + 12, title, 11, "middle", "#fff")
-        s.rect(x0 - 8, y - 34, 20, 68, "#222", rx=3)
+    def header_and_plug(x, ytop, scale=1.0):
+        """3-pin header piece (black strip, gold pins) with the servo plug on it."""
+        q = p * scale
+        s.rect(x - 9 * scale, ytop - 11 * scale, 18 * scale, 2 * q + 22 * scale, "#222",
+               "#000", 1, rx=2)
+        for k in range(3):
+            s.rect(x - 3.5 * scale, ytop + k * q - 3.5 * scale, 7 * scale, 7 * scale, PIN)
+        # plug: translucent housing with a colour tab per pin
+        s.rect(x - 13 * scale, ytop - 15 * scale, 26 * scale, 2 * q + 30 * scale, "#000",
+               "#000", 1.5, rx=3, extra=' fill-opacity="0.35"')
         for k, col in enumerate((GND, V5, SIG)):
-            yy = y - 22 + k * 22
-            if mirror:
-                s.line(x0 - 60, yy, x0 - 8, yy, col, 4)
-            else:
-                s.line(x0 + 12, yy, x0 + 60, yy, col, 4)
-            s.rect(x0 - 3, yy - 5, 10, 10, "#000", col, 1.5)
-            jumper(holes[k], (x0 + 2, yy), col)
+            s.rect(x + 6 * scale, ytop + k * q - 5 * scale, 7 * scale, 10 * scale, col)
 
-    # servo signals: D23 row 16, D19 row 21, D18 row 22 (right); D32 row 21, D33 row 22 (left)
-    sx = 1300
-    servo(sx, ry(15), "servo 2 HAND_LEFT",
-          (rail("RO", "-", 15), rail("RO", "+", 15), R("e", E + 1)))
-    servo(sx, ry(21), "servo 1 NECK",
-          (rail("RO", "-", 20), rail("RO", "+", 20), R("e", E + 6)))
-    servo(sx, ry(27), "servo 0 HEAD",
-          (rail("RO", "-", 25), rail("RO", "+", 25), R("e", E + 7)))
-    lx = 270
-    servo(lx, ry(17), "servo 3 HAND_RIGHT",
-          (rail("LO", "-", 17), rail("LO", "+", 17), L("f", E + 6)), mirror=True)
-    servo(lx, ry(25), "servo 4 BODY",
-          (rail("LO", "-", 25), rail("LO", "+", 25), L("f", E + 7)), mirror=True)
+    def servo_body(x0, y, title):
+        s.rect(x0, y - 40, 190, 80, "#1565c0", "#0d47a1", 2, rx=6)
+        s.circle(x0 + 30, y, 16, "#fff", "#0d47a1", 2)
+        s.text(x0 + 118, y - 6, "SG90", 13, "middle", "#fff", "bold")
+        s.text(x0 + 118, y + 12, title, 11, "middle", "#fff")
+
+    def servo_block(side, r0, title, gpio_hole, body_x, scol="f"):
+        """Header in 3 rows r0..r0+2; brown row r0, red r0+1, orange r0+2.
+        side R: right board f-j zone, power from the right outer rail.
+        side L: left board f-j zone above the ESP32, power from the right
+        board's inner rail (the module's left legs)."""
+        H = R if side == "R" else L
+        hcol, rcol = "h", "j"
+        pair = "RO" if side == "R" else "RI"
+        hx, hy = H(hcol, r0)
+        yc = ry(r0 + 1)
+        servo_body(body_x, yc, title)
+        # servo lead from the plug to the servo body (drawn under the jumpers)
+        edge = body_x if body_x > hx else body_x + 190
+        for k, col in enumerate((GND, V5, SIG)):
+            y = ry(r0 + k)
+            s.add(f'<path d="M{hx:.1f},{y:.1f} C{(hx + edge) / 2:.1f},{y:.1f} '
+                  f'{(hx + edge) / 2:.1f},{yc - 16 + k * 16:.1f} {edge:.1f},{yc - 16 + k * 16:.1f}" '
+                  f'fill="none" stroke="{col}" stroke-width="3" stroke-opacity="0.55"/>')
+        header_and_plug(hx, hy)
+        jumper(H(rcol, r0), rail(pair, "-", r0), GND, sw=3)
+        jumper(H(rcol, r0 + 1), rail(pair, "+", r0 + 1), V5, sw=3)
+        jumper(H(scol, r0 + 2), gpio_hole, SIG, sw=3,
+               c0=None if side == "R" else (H(scol, r0 + 2)[0] - 40, ry(r0 + 6)),
+               c1=None if side == "R" else (gpio_hole[0] - 40, gpio_hole[1] - 60))
+
+    # right board, header column h: blocks 12-14, 16-18, 20-22 (free rows 15, 19)
+    sx = 1330
+    servo_block("R", 12, "servo 2 HAND_LEFT", R("e", E + 1), sx)   # D23, row 16
+    servo_block("R", 16, "servo 1 NECK", R("e", E + 6), sx)        # D19, row 21
+    servo_block("R", 20, "servo 0 HEAD", R("e", E + 7), sx)        # D18, row 22
+    # left board f-j zone above the ESP32, header column h: blocks 6-8, 10-12 (free row 9),
+    # power from the right board's inner rail rows 6-12 (nothing on it under the ESP32)
+    servo_block("L", 6, "servo 3 HAND_RIGHT", L("f", E + 6), 20)          # D32, row 21
+    servo_block("L", 10, "servo 4 BODY", L("g", E + 7), 20, scol="g")     # D33, row 22
 
     # OLED on female-to-male wires, below the right board
     ox, oy = 1330, ry(NR) + 40
@@ -482,20 +499,21 @@ def stage_a5() -> None:
         jumper(hole, (ox + 8, py), col, sw=3)
     s.text(ox + 60, oy + 100, "OLED on 4 female-to-male wires", 10, "middle", "#333")
 
-    ecap("RO", 12, "C1 1000 uF", rails["RO"][1] + 18, "start")
+    ecap("RO", 26, "C1 1000 uF", rails["RO"][1] + 18, "start")
     ccap("RO", 7, "C2 0.1 uF", rails["RO"][1] + 18, "start")
-    ccap("LO", 20, "C3 0.1 uF", rails["LO"][1] - 18, "end")
+    ccap("RI", 9, "C3 0.1 uF", rails["RI"][1] + 14, "start")
 
     # notes
     x, y = 40, ry(NR) + 190
     s.text(x, y, "Jumpers (holes on the RIGHT board unless marked L):", 13, weight="bold")
     rows = [
-        (V5, "rail bridge: right outer + row 8 -> L outer + row 8"),
-        (GND, "rail bridge: right outer - row 10 -> L outer - row 10"),
-        (GND, "ground join: b29 (ESP32 GND row) -> right outer - rail"),
-        (SIG, "signals: e22 D18 -> servo 0, e21 D19 -> servo 1, e16 D23 -> servo 2,"),
-        (SIG, "         L f21 D32 -> servo 3, L f22 D33 -> servo 4"),
-        (V5, "each servo red -> + rail, brown -> - rail next to it"),
+        (GND, "ground join: b29 (ESP32 GND row) -> right outer - rail row 29"),
+        (GND, "servo headers: first row j -> blue - rail, same row"),
+        (V5, "                middle row j -> red + rail, same row"),
+        (V5, "servos 0-2: right outer rail. Servos 3-4: right INNER rail, rows 6-11"),
+        (SIG, "signals: f14 -> e16 D23 (servo 2), f18 -> e21 D19 (servo 1),"),
+        (SIG, "         f22 -> e22 D18 (servo 0), L f8 -> L f21 D32 (servo 3),"),
+        (SIG, "         L g12 -> L g22 D33 (servo 4)"),
         (V33, "OLED: GND d29, VCC d30 (3V3), SCL d17 (D22), SDA d20 (D21)"),
     ]
     for i, (col, tx) in enumerate(rows):
@@ -510,13 +528,27 @@ def stage_a5() -> None:
         "Its 4 legs per side: 2 in the red + strip, 2 in the blue - strip, rows 4-5.",
         "Every rail pair here: red + strip on the left, blue - strip on the right.",
         "Both jumpers on 5V (5V-VCC pair): both rail pairs of the right board are 5 V.",
-        "The inner pair runs under the ESP32: plug nothing of the ESP32 into it. Switch IN.",
+        "Right inner pair: used only in rows 4-12; nothing in it under the ESP32. Switch IN.",
+        "No rail bridges: the left board's rails are not used.",
         "Meter the rail before plugging servos: ~5 V. 9 V battery: ~700 mA at most.",
-        "C1: long leg in the + rail (row 12), striped leg in the - rail (row 13).",
+        "C1: long leg in the + rail (row 26), striped leg in the - rail (row 27).",
     ]
     for i, tx in enumerate(notes):
         s.text(x2, y + 24 + i * 21, tx, 12)
-    s.text(780, 1570, "Unplug USB and the module's power while wiring. Plug servos one at a "
+    # detail: header piece + plug
+    dx, dy = 60, ry(NR) + 470
+    s.text(dx, dy - 20, "Servo adapter, enlarged:", 13, weight="bold")
+    header_and_plug(dx + 40, dy + 10, 1.6)
+    for k, (col, name) in enumerate(((GND, "brown"), (V5, "red"), (SIG, "orange"))):
+        yy = dy + 10 + k * p * 1.6
+        s.line(dx + 61, yy, dx + 140, yy, col, 5)
+        s.text(dx + 150, yy + 4, f"{name}: row {k + 1} of the block", 12)
+    s.text(dx + 340, dy + 6, "3 pins broken off the 1x40 male header strip, pushed into 3 rows", 12)
+    s.text(dx + 340, dy + 26, "of one column (short pin ends into the breadboard).", 12)
+    s.text(dx + 340, dy + 46, "The servo plug goes on the long ends: brown on the first row,", 12)
+    s.text(dx + 340, dy + 66, "red in the middle, orange on the last. Jumpers start from the", 12)
+    s.text(dx + 340, dy + 86, "free holes of the same three rows.", 12)
+    s.text(780, 1750, "Unplug USB and the module's power while wiring. Plug servos one at a "
            "time, test each on the Servo control page.", 13, "middle", "#b71c1c", "bold")
     s.save("stage-a5-breadboard.svg")
 

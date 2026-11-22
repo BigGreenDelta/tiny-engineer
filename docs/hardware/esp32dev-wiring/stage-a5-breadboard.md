@@ -28,10 +28,9 @@ Never feed the module from the PC's USB: that is the same weak supply as `VIN`. 
 
 The diagram shows the boards as they lie on the desk: column letters `a`-`j` across the top, row numbers 1-30 down the side. Each board has a rail pair down each long edge, and in every pair the **red `+` strip is on the left and the blue `-` strip on the right**.
 
-- Right board, outer pair (right edge): the servo rail, fed by the module.
-- Right board, inner pair (left edge, under the ESP32): also 5 V from the module, because both module jumpers are on 5V. Nothing plugs into it; it runs under the ESP32, so keep stray jumpers out of it.
-- Left board, outer pair (left edge): joined to the right outer pair by two bridge jumpers, for servos 3 and 4.
-- Left board, inner pair (right edge, under the ESP32): unused.
+- Right board, outer pair (right edge): 5 V from the module's right legs. Feeds servos 0, 1 and 2.
+- Right board, inner pair (left edge): 5 V from the module's **left legs**, because both module jumpers are on 5V. Used only in rows 6-12, above the ESP32, for servos 3 and 4 and C3. Further down it runs under the ESP32: plug nothing into it there.
+- Left board, both pairs: unused. No rail bridges are needed.
 
 ## Parts
 
@@ -40,17 +39,17 @@ The diagram shows the boards as they lie on the desk: column letters `a`-`j` acr
 - 1 x 1000 uF 16 V electrolytic (C1), 2 x 0.1 uF ceramic `104` (C2, C3).
 - 5 x SG90.
 - The OLED on 4 female-to-male wires (the kit has 10).
-- Male-male jumpers: 3 per servo, plus 3 for the ground join and the rail bridges.
+- 5 x 3-pin pieces broken off the 1x40 male header strip (the servo adapters).
+- Male-male jumpers: 3 per servo, plus 1 for the ground join.
 
 ## S1. Power module and rails (everything unplugged)
 
-Done when: the right outer rail reads about 5 V on the meter and the left outer rail matches it.
+Done when: both rail pairs of the right board read about 5 V on the meter.
 
 1. Set **both** module jumpers on `5V` (the jumper on the 5V-VCC pair of each side). Both rail pairs of the right board then carry 5 V.
 2. Plug the module onto the top end of the right board, sockets facing away from the board. On each side its `+` legs go in the red strip and its `-` legs in the blue strip, rows 4-5. If its printed `+` / `-` does not line up with red / blue, stop: turning it round would swap 5 V and ground.
-3. Bridges: red jumper from the right outer `+` (row 8) to the left outer `+` (row 8). Brown jumper from the right outer `-` (row 10) to the left outer `-` (row 10). Both pass above the ESP32's antenna end.
-4. C1 across the right outer rails: **long leg in `+` row 12, striped leg in `-` row 13**. C2 across the right outer rails at row 7. C3 across the left outer rails at row 20.
-5. Feed the module (battery or USB, see above), push the switch in. Meter on DC volts: about 5 V on the right outer rails, and the same on the left outer rails. A minus reading means `+` and `-` are swapped. Switch off.
+3. C1 across the right outer rails: **long leg in `+` row 26, striped leg in `-` row 27**. C2 across the right outer rails at row 7. C3 across the right inner rails at row 9.
+4. Feed the module (battery or USB, see above), push the switch in. Meter on DC volts: about 5 V on the right outer rails, and the same on the right inner rails (measure at row 8). A minus reading means `+` and `-` are swapped. Switch off.
 
 ## S2. ESP32 side (USB still unplugged)
 
@@ -58,7 +57,7 @@ Done when: the ground join and the OLED are in.
 
 | Jumper | From | To |
 | --- | --- | --- |
-| ground join, brown | right board `b29` (ESP32 `GND` row) | right outer `-` rail, row 28 |
+| ground join, brown | right board `b29` (ESP32 `GND` row) | right outer `-` rail, row 29 |
 | OLED GND, brown | OLED `GND` | right board `d29` |
 | OLED VCC, purple | OLED `VCC` | right board `d30` (`3V3`) |
 | OLED SCL, blue | OLED `SCL` | right board `d17` (`D22`) |
@@ -70,20 +69,26 @@ The OLED stays on the ESP32's `3V3` pin, never on the module's rails. The jumper
 
 Done when: all five move on the `Servo control` page.
 
-| Servo | Joint | Orange (signal) from | Red to | Brown to |
-| --- | --- | --- | --- | --- |
-| 0 | HEAD | right board `e22` (`D18`) | right outer `+` row 25 | right outer `-` row 25 |
-| 1 | NECK | right board `e21` (`D19`) | right outer `+` row 20 | right outer `-` row 20 |
-| 2 | HAND_LEFT | right board `e16` (`D23`) | right outer `+` row 15 | right outer `-` row 15 |
-| 3 | HAND_RIGHT | left board `f21` (`D32`) | left outer `+` row 17 | left outer `-` row 17 |
-| 4 | BODY | left board `f22` (`D33`) | left outer `+` row 25 | left outer `-` row 25 |
+Each servo plugs onto a 3-pin header piece instead of loose jumpers. Push the piece's short pin ends into 3 consecutive rows of column `h` (one header per block, one free row between blocks). Push the servo plug onto the long ends: **brown on the first row, red on the middle row, orange on the last row**. Then 3 short jumpers from free holes of those same rows:
 
-Any free hole of the same outer rail strip works for red and brown; the diagram uses the rows in the table, next to each servo. The servo plug is female: push one male end of each jumper into its socket, matching the colours.
+- first row, hole `j` to the blue `-` rail, same row;
+- middle row, hole `j` to the red `+` rail, same row;
+- last row, hole `f` (or `g`) to the servo's GPIO row.
+
+| Servo | Joint | Header (brown / red / orange) | `-` jumper | `+` jumper | Signal jumper |
+| --- | --- | --- | --- | --- | --- |
+| 2 | HAND_LEFT | right `h12` / `h13` / `h14` | `j12` to right outer `-` row 12 | `j13` to right outer `+` row 13 | `f14` to `e16` (`D23`) |
+| 1 | NECK | right `h16` / `h17` / `h18` | `j16` to right outer `-` row 16 | `j17` to right outer `+` row 17 | `f18` to `e21` (`D19`) |
+| 0 | HEAD | right `h20` / `h21` / `h22` | `j20` to right outer `-` row 20 | `j21` to right outer `+` row 21 | `f22` to `e22` (`D18`) |
+| 3 | HAND_RIGHT | left `h6` / `h7` / `h8` | left `j6` to right **inner** `-` row 6 | left `j7` to right **inner** `+` row 7 | left `f8` to left `f21` (`D32`) |
+| 4 | BODY | left `h10` / `h11` / `h12` | left `j10` to right **inner** `-` row 10 | left `j11` to right **inner** `+` row 11 | left `g12` to left `g22` (`D33`) |
+
+Free rows between blocks: 15 and 19 on the right board, 9 on the left board. On the right board, the header rows 12-22 are in the `f-j` half, which the ESP32 does not touch (its pins are in the `a-e` half). On the left board, rows 6-12 are above the ESP32's antenna end (it starts at row 16). The power jumpers for servos 3 and 4 cross the left board's own inner rails (unused) to reach the right board's inner rails.
 
 For each servo:
 
 1. Module switch off, ESP32 USB unplugged.
-2. Wire the servo's three jumpers.
+2. Plug the header piece in, put the servo plug on it, wire the three jumpers.
 3. Plug in the ESP32's USB, switch the module on.
 4. Test it on the web panel's `Servo control` page (`/servo`), servo index as in the table.
 
