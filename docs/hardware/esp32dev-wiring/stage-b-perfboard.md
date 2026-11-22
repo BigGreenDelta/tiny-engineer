@@ -120,7 +120,8 @@ Done when: every line below passes. Meter on continuity (beep).
 | Probe | Probe | Expect |
 | --- | --- | --- |
 | `R4` (+5 V) | `R2` (GND) | **no beep** |
-| `R2` | `M23` (ESP32 GND) | beep (ground join) |
+| `R2` | `C23` (ESP32 left GND) | beep (ground join W3) |
+| `M23` (ESP32 right GND) | `P11` (OLED GND) | beep |
 | `R4` | `C24` (VIN) | **no beep** |
 | `P12` (3V3) | `P11` (GND) | **no beep** |
 | row 2 of each servo header | `R2` | beep |
@@ -128,7 +129,7 @@ Done when: every line below passes. Meter on continuity (beep).
 | row 4 of S0 / S1 / S2 / S3 / S4 | `M16` / `M15` / `M10` / `C15` / `C16` | beep |
 | row 3 of each servo header | row 4 of the same header | **no beep** |
 
-A short beep when probing across C1 can be the capacitor charging from the meter; a steady beep is a short.
+With the ESP32 out, `C23` and `M23` are not joined: the DevKit joins its two GND pins itself once it is plugged in. A short beep when probing across C1 can be the capacitor charging from the meter; a steady beep is a short.
 
 ### S5. First power, then servos one by one
 

@@ -15,7 +15,7 @@ In this stage everything, ESP32 and servos, runs from the PC's USB port through 
 - One or two SG90 servos, with a horn pushed on so you can see the motion. Leave them loose on the desk, not in the robot.
 - Male-male jumper wires from the kit: 3 red, 3 brown, 2 orange (any colour works; matching the servo colours avoids mistakes).
 
-The RGB LED from the status-light lesson can stay: it uses the `f-j` half of rows 18-21, and this stage uses only the `a-e` half.
+The RGB LED from the status-light lesson can stay: its ground jumper sits in `c14` and its other parts in the `f-j` half, and this stage uses different holes.
 
 ## S1. Wire it (USB unplugged)
 
@@ -24,7 +24,7 @@ Done when: every jumper in the table is in place and the capacitor's stripe face
 | # | Jumper | From | To | Net |
 | --- | --- | --- | --- | --- |
 | S1.1 | red | left board `g15` (the `VIN` row) | right board `a20` | +5 V |
-| S1.2 | brown | right board `c14` (the `GND` row) | right board `b22` | GND |
+| S1.2 | brown | right board `e14` (the `GND` row) | right board `b22` | GND |
 | S1.3 | capacitor | long leg (+) in `d20` | striped leg (-) in `d22` | across +5 V / GND |
 | S1.4 | HEAD servo | brown socket from `c22`, red socket from `c20` | orange socket from `e7` (`D18`) | servo 0 |
 
@@ -60,9 +60,9 @@ Done when: servo `1` moves on the same page and the ESP32 does not reset.
 
 If the ESP32 restarts when both servos move (the OLED goes back to the boot screen, the serial log shows `Brownout detector was triggered`), stay with one servo and move on to Stage B.
 
-## Firmware: nothing to flash
+## Firmware: probably nothing to flash
 
-The board already runs the robot firmware from the `esp32dev-ota` environment (the one with Wi-Fi updates). Its pin map is the one in [README.md](README.md), so no reflash is needed for this test.
+The board should already run the robot firmware from the `esp32dev-ota` environment (the one with Wi-Fi updates): if the web panel opens and the OLED shows the face, it does. Its pin map is the one in [README.md](README.md), so no reflash is needed for this test.
 
 If you do need to reflash over USB, use the same environment, from the repo root:
 

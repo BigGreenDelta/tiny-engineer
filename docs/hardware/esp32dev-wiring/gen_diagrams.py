@@ -174,7 +174,7 @@ def stage_a() -> None:
     s.curve(a, b, (a[0], ry(21)), (b[0] - 60, ry(23)), V5)
     dot(a, V5)
     dot(b, V5)
-    a, b = R("c", 14), R("b", 22)
+    a, b = R("e", 14), R("b", 22)
     s.curve(a, b, (R("e", 16)[0], ry(16)), (R("e", 22)[0], ry(24)), GND)
     dot(a, GND)
     dot(b, GND)
@@ -218,7 +218,7 @@ def stage_a() -> None:
     s.text(x, y, "Jumper wires (male-male; push one end into the servo plug):", 13, weight="bold")
     rows = [
         (V5, "red", "left board g15 (VIN row) -> right board a20   = 5 V from the PC's USB"),
-        (GND, "brown", "right board c14 (GND row) -> right board b22"),
+        (GND, "brown", "right board e14 (GND row) -> right board b22"),
         (V5, "red", "c20 -> HEAD servo red,    e20 -> NECK servo red"),
         (GND, "brown", "c22 -> HEAD servo brown,  e22 -> NECK servo brown"),
         (SIG, "orange", "e7 (D18) -> HEAD servo orange,   e6 (D19) -> NECK servo orange"),
@@ -437,15 +437,15 @@ def stage_b() -> None:
     x11, y11 = xy("P11")
     s.rect(x11 - 8, y11 - 9, 16, 3 * p + 18, "#222", rx=2)
     olx = top_x0 + len(COLS) * p + 70
-    s.rect(olx, y11 - 30, 120, 120, "#0d47a1", "#000", 1.5, rx=6)
-    s.rect(olx + 12, y11 + 8, 96, 64, "#111", rx=2)
-    s.text(olx + 60, y11 + 44, "OLED", 12, "middle", "#fff", "bold")
+    s.rect(olx, y11 - 30, 130, 120, "#0d47a1", "#000", 1.5, rx=6)
+    s.rect(olx + 42, y11 - 6, 78, 72, "#111", rx=2)
+    s.text(olx + 81, y11 + 34, "OLED", 12, "middle", "#fff", "bold")
     for k, (name, col) in enumerate((("GND", GND), ("VCC", V33), ("SCL", SCL), ("SDA", SDA))):
         hx, hy = xy(f"P{11 + k}")
         s.circle(hx, hy, 4, col)
-        s.poly([(hx, hy), (hx + 30, hy), (olx - 12, y11 - 16 + k * 0), (olx + 22 + k * 25, y11 - 16)],
-               col, 2.5, halo=False)
-        s.text(olx + 22 + k * 25, y11 - 22, name, 9, "middle", "#fff" if False else "#000")
+        s.line(hx, hy, olx + 4, hy, col, 2.5)
+        s.circle(olx + 4, hy, 3, "#d4af37")
+        s.text(olx + 10, hy + 4, name, 9, "start", "#fff", "bold")
     s.text(olx + 60, y11 + 108, "J6 = 1 x 4 male header", 10, "middle")
     s.text(olx + 60, y11 + 122, "straight 4-wire cable", 10, "middle")
     s.text(olx + 60, y11 + 136, "GND to GND ... SDA to SDA", 10, "middle")

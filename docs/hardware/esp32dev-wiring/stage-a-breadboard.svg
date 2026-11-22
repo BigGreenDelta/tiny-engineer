@@ -627,9 +627,9 @@
 <path d="M208.0,461.0 C208.0,605.0 436.0,653.0 496.0,581.0" fill="none" stroke="#e53935" stroke-width="4" stroke-linecap="round"/>
 <circle cx="208.0" cy="461.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
 <circle cx="496.0" cy="581.0" r="4.5" fill="#e53935" stroke="#fff" stroke-width="1"/>
-<path d="M544.0,437.0 C592.0,485.0 592.0,677.0 520.0,629.0" fill="none" stroke="#fbfaf7" stroke-width="9" stroke-linecap="round"/>
-<path d="M544.0,437.0 C592.0,485.0 592.0,677.0 520.0,629.0" fill="none" stroke="#6d4c41" stroke-width="4" stroke-linecap="round"/>
-<circle cx="544.0" cy="437.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
+<path d="M592.0,437.0 C592.0,485.0 592.0,677.0 520.0,629.0" fill="none" stroke="#fbfaf7" stroke-width="9" stroke-linecap="round"/>
+<path d="M592.0,437.0 C592.0,485.0 592.0,677.0 520.0,629.0" fill="none" stroke="#6d4c41" stroke-width="4" stroke-linecap="round"/>
+<circle cx="592.0" cy="437.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
 <circle cx="520.0" cy="629.0" r="4.5" fill="#6d4c41" stroke="#fff" stroke-width="1"/>
 <line x1="568.0" y1="581.0" x2="568.0" y2="629.0" stroke="#888" stroke-width="2"/>
 <rect x="555.0" y="590.0" width="26.0" height="30.0" rx="5" fill="#1a237e" stroke="#000" stroke-width="1"/>
@@ -690,7 +690,7 @@
 <line x1="40.0" y1="790.0" x2="68.0" y2="790.0" stroke="#e53935" stroke-width="5"/>
 <text x="78.0" y="794.0" text-anchor="start" font-size="13" font-weight="normal" fill="#000" xml:space="preserve">red     left board g15 (VIN row) -&gt; right board a20   = 5 V from the PC's USB</text>
 <line x1="40.0" y1="812.0" x2="68.0" y2="812.0" stroke="#6d4c41" stroke-width="5"/>
-<text x="78.0" y="816.0" text-anchor="start" font-size="13" font-weight="normal" fill="#000" xml:space="preserve">brown   right board c14 (GND row) -&gt; right board b22</text>
+<text x="78.0" y="816.0" text-anchor="start" font-size="13" font-weight="normal" fill="#000" xml:space="preserve">brown   right board e14 (GND row) -&gt; right board b22</text>
 <line x1="40.0" y1="834.0" x2="68.0" y2="834.0" stroke="#e53935" stroke-width="5"/>
 <text x="78.0" y="838.0" text-anchor="start" font-size="13" font-weight="normal" fill="#000" xml:space="preserve">red     c20 -&gt; HEAD servo red,    e20 -&gt; NECK servo red</text>
 <line x1="40.0" y1="856.0" x2="68.0" y2="856.0" stroke="#6d4c41" stroke-width="5"/>

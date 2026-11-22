@@ -1144,21 +1144,25 @@
 <rect x="455.0" y="683.0" width="67.4" height="16.0" rx="2" fill="#fbfaf7" stroke="none" stroke-width="1" fill-opacity="0.88"/>
 <text x="458.0" y="694.0" text-anchor="start" font-size="11" font-weight="bold" fill="#000">C3 0.1 uF</text>
 <rect x="472.0" y="461.0" width="16.0" height="84.0" rx="2" fill="#222" stroke="none" stroke-width="1"/>
-<rect x="616.0" y="440.0" width="120.0" height="120.0" rx="6" fill="#0d47a1" stroke="#000" stroke-width="1.5"/>
-<rect x="628.0" y="478.0" width="96.0" height="64.0" rx="2" fill="#111" stroke="none" stroke-width="1"/>
-<text x="676.0" y="514.0" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">OLED</text>
+<rect x="616.0" y="440.0" width="130.0" height="120.0" rx="6" fill="#0d47a1" stroke="#000" stroke-width="1.5"/>
+<rect x="658.0" y="464.0" width="78.0" height="72.0" rx="2" fill="#111" stroke="none" stroke-width="1"/>
+<text x="697.0" y="504.0" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">OLED</text>
 <circle cx="480.0" cy="470.0" r="4" fill="#6d4c41" stroke="none" stroke-width="1"/>
-<polyline points="480.0,470.0 510.0,470.0 604.0,454.0 638.0,454.0" fill="none" stroke="#6d4c41" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="638.0" y="448.0" text-anchor="middle" font-size="9" font-weight="normal" fill="#000">GND</text>
+<line x1="480.0" y1="470.0" x2="620.0" y2="470.0" stroke="#6d4c41" stroke-width="2.5"/>
+<circle cx="620.0" cy="470.0" r="3" fill="#d4af37" stroke="none" stroke-width="1"/>
+<text x="626.0" y="474.0" text-anchor="start" font-size="9" font-weight="bold" fill="#fff">GND</text>
 <circle cx="480.0" cy="492.0" r="4" fill="#8e24aa" stroke="none" stroke-width="1"/>
-<polyline points="480.0,492.0 510.0,492.0 604.0,454.0 663.0,454.0" fill="none" stroke="#8e24aa" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="663.0" y="448.0" text-anchor="middle" font-size="9" font-weight="normal" fill="#000">VCC</text>
+<line x1="480.0" y1="492.0" x2="620.0" y2="492.0" stroke="#8e24aa" stroke-width="2.5"/>
+<circle cx="620.0" cy="492.0" r="3" fill="#d4af37" stroke="none" stroke-width="1"/>
+<text x="626.0" y="496.0" text-anchor="start" font-size="9" font-weight="bold" fill="#fff">VCC</text>
 <circle cx="480.0" cy="514.0" r="4" fill="#1e88e5" stroke="none" stroke-width="1"/>
-<polyline points="480.0,514.0 510.0,514.0 604.0,454.0 688.0,454.0" fill="none" stroke="#1e88e5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="688.0" y="448.0" text-anchor="middle" font-size="9" font-weight="normal" fill="#000">SCL</text>
+<line x1="480.0" y1="514.0" x2="620.0" y2="514.0" stroke="#1e88e5" stroke-width="2.5"/>
+<circle cx="620.0" cy="514.0" r="3" fill="#d4af37" stroke="none" stroke-width="1"/>
+<text x="626.0" y="518.0" text-anchor="start" font-size="9" font-weight="bold" fill="#fff">SCL</text>
 <circle cx="480.0" cy="536.0" r="4" fill="#43a047" stroke="none" stroke-width="1"/>
-<polyline points="480.0,536.0 510.0,536.0 604.0,454.0 713.0,454.0" fill="none" stroke="#43a047" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="713.0" y="448.0" text-anchor="middle" font-size="9" font-weight="normal" fill="#000">SDA</text>
+<line x1="480.0" y1="536.0" x2="620.0" y2="536.0" stroke="#43a047" stroke-width="2.5"/>
+<circle cx="620.0" cy="536.0" r="3" fill="#d4af37" stroke="none" stroke-width="1"/>
+<text x="626.0" y="540.0" text-anchor="start" font-size="9" font-weight="bold" fill="#fff">SDA</text>
 <text x="676.0" y="578.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#000">J6 = 1 x 4 male header</text>
 <text x="676.0" y="592.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#000">straight 4-wire cable</text>
 <text x="676.0" y="606.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#000">GND to GND ... SDA to SDA</text>
