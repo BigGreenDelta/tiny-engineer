@@ -185,7 +185,29 @@ test("a timed pause runs out on the broker clock", async () => {
   }
 });
 
-test("pause while the robot is offline: nothing is sent when it is back", async () => {
+test("pause during a network blip: the face still up is taken down when the robot is back", async () => {
+  const { robot, broker, post } = await start();
+  try {
+    await post("/anim?name=typing&client=s1&label=tmp");
+    await broker.step();
+    assert.deepEqual(robot.posts, ["typing"]);
+    assert.equal(robot.status.at(-1), "tmp: typing");
+    robot.down = true;
+    await broker.step();
+    await post("/pause");
+    await broker.step();
+    robot.down = false; // back, still showing the broker's face
+    await broker.step();
+    assert.deepEqual(robot.posts, ["typing", "none"]);
+    assert.equal(robot.status.at(-1), "");
+    await broker.step();
+    assert.deepEqual(robot.posts, ["typing", "none"]);
+  } finally {
+    await broker.close();
+  }
+});
+
+test("pause while the robot is offline: a rebooted robot gets nothing when it is back", async () => {
   const { robot, broker, post } = await start();
   try {
     await post("/anim?name=typing&client=s1&label=tmp");

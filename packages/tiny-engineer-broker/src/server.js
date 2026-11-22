@@ -91,6 +91,17 @@ export function createBroker({
   let wasPaused = false;
   /** The broker's face and strip were taken down for this pause. */
   let pauseApplied = false;
+  /**
+   * What the broker had up when POST /pause came in. A robot that drops off
+   * and comes back resets what the referee remembers sending, yet may still
+   * show that face; one that rebooted shows its own and is left alone.
+   * @type {{ face: string | null, strip: boolean } | null}
+   */
+  let upAtPause = null;
+
+  function brokerFaceUp() {
+    return referee.lastSteady !== null && !["none", "sleep"].includes(referee.lastSteady);
+  }
 
   /** Run one poll + write step; never runs twice at once. */
   async function step() {
@@ -166,7 +177,8 @@ export function createBroker({
         if (!pauseApplied) {
           // Take down only what the broker put up: never move servos
           // someone is driving by hand.
-          const shown = referee.lastSteady !== null && !["none", "sleep"].includes(referee.lastSteady);
+          const stillUp = upAtPause?.face != null && referee.robotAnim === upAtPause.face;
+          const shown = brokerFaceUp() || stillUp;
           if (shown) {
             try {
               referee.observe(await robot.setAnim("none"));
@@ -177,7 +189,7 @@ export function createBroker({
               return;
             }
           }
-          if (referee.lastStatus) {
+          if (referee.lastStatus || (stillUp && upAtPause?.strip)) {
             try {
               await robot.setStatus("", STATUS_TTL_S);
               log("status cleared (paused)");
@@ -187,6 +199,7 @@ export function createBroker({
             referee.statusSent("", now());
           }
           pauseApplied = true;
+          upAtPause = null;
         }
         return;
       }
@@ -328,6 +341,9 @@ export function createBroker({
         }
         const parsed = pauseSeconds(body);
         if (!parsed.ok) return send(res, 400, parsed);
+        if (!pause.active(now())) {
+          upAtPause = { face: brokerFaceUp() ? referee.lastSteady : null, strip: Boolean(referee.lastStatus) };
+        }
         pause.start(now(), parsed.seconds);
         const note = parsed.seconds === null ? "paused until resume" : `paused for ${parsed.seconds} s`;
         referee.note(now(), note);
@@ -338,6 +354,7 @@ export function createBroker({
       case "POST /resume": {
         if (!authorized(req)) return send(res, 401, { ok: false, error: "unauthorized" });
         const was = pause.stop();
+        upAtPause = null;
         if (was) {
           referee.note(now(), "resumed");
           log("resumed");
