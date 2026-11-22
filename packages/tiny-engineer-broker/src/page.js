@@ -29,11 +29,13 @@ export function renderPage() {
   .log td { padding:3px 4px; vertical-align:top; }
   .robot { color:var(--accent); }
   .mono { font-family:ui-monospace, monospace; font-size:13px; }
+  .paused { border-color:var(--warn); color:var(--warn); font-weight:600; margin-bottom:12px; }
 </style>
 </head>
 <body>
 <main>
   <h1>Tiny Engineer Broker</h1>
+  <div class="card paused" id="paused" hidden></div>
   <div class="card">
     <div class="muted" id="robot">robot: ...</div>
     <div class="face" id="face">-</div>
@@ -55,6 +57,13 @@ async function refresh() {
   try { s = await (await fetch("state")).json(); } catch { document.getElementById("robot").textContent = "broker unreachable"; return; }
   document.getElementById("robot").textContent = s.robotOk ? "robot: online"
     : "robot: offline since " + time(s.offlineSince) + " (" + (s.error || "?") + "), requests still refereed";
+  const paused = document.getElementById("paused");
+  paused.hidden = !s.pause;
+  if (s.pause) {
+    paused.textContent = "Paused since " + time(s.pause.since) +
+      (s.pause.until === null ? ", until resume" : ", until " + time(s.pause.until)) +
+      ": requests are refereed, nothing is sent to the robot";
+  }
   document.getElementById("face").textContent = s.robot || "-";
   document.getElementById("strip").textContent = s.status
     ? "strip: \u201c" + s.status + "\u201d (" + s.status.length + " chars" + (s.status.length > 21 ? ", scrolls" : "") + ")"

@@ -1,5 +1,5 @@
 # docker compose up -d --build
-# Put TE_ROBOT_URL=... and TE_ROBOT_TOKEN=... in a .env file next to this file (git-ignored).
+# Put TE_ROBOT_URL=..., TE_ROBOT_TOKEN=... and TE_BROKER_TOKEN=... in a .env file next to this file (git-ignored).
 services:
   broker:
     build: .
@@ -11,6 +11,11 @@ services:
     environment:
       TE_ROBOT_URL: ${TE_ROBOT_URL:-http://tiny-engineer.local}
       TE_ROBOT_TOKEN: ${TE_ROBOT_TOKEN:-}
+      TE_BROKER_TOKEN: ${TE_BROKER_TOKEN:-}
       TE_STATE_TTL_S: "300"
       TE_ATTENTION_REPEAT_S: "30"
       TE_ATTENTION_MAX_S: "900"
+    volumes:
+      - state:/data
+volumes:
+  state:

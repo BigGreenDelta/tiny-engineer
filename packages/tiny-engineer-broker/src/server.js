@@ -1,6 +1,8 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import http from "node:http";
 
 import { renderPage } from "./page.js";
+import { Pause, pauseSeconds } from "./pause.js";
 import { ANIMATIONS, Referee, STATUS_TTL_S } from "./referee.js";
 
 const POLL_IDLE_MS = 2000;
@@ -9,6 +11,8 @@ const POLL_OFFLINE_MS = 5000;
 /** How often to read the robot's uptime to spot a quick reboot. */
 const HEALTH_EVERY_MS = 10_000;
 const ROBOT_TIMEOUT_MS = 3000;
+/** Largest request body the broker reads (POST /pause). */
+const BODY_MAX = 1024;
 
 /**
  * Robot HTTP client: GET/POST /anim with the Bearer token when set.
@@ -59,10 +63,19 @@ export function robotClient({ url, token, fetchImpl = fetch }) {
 
 /**
  * The broker: referee + one robot writer loop + HTTP API.
- * @param {{ robot: ReturnType<typeof robotClient>, referee?: Referee,
- *   now?: () => number, log?: (line: string) => void }} opts
+ * `controlToken` guards POST /pause and POST /resume (Bearer); null leaves
+ * them open, like POST /anim.
+ * @param {{ robot: ReturnType<typeof robotClient>, referee?: Referee, pause?: Pause,
+ *   controlToken?: string | null, now?: () => number, log?: (line: string) => void }} opts
  */
-export function createBroker({ robot, referee = new Referee(), now = Date.now, log = () => {} }) {
+export function createBroker({
+  robot,
+  referee = new Referee(),
+  pause = new Pause(),
+  controlToken = null,
+  now = Date.now,
+  log = () => {},
+}) {
   let robotOk = false;
   let lastError = null;
   /** When the robot went offline (or the broker started without it). */
@@ -74,6 +87,10 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
   let again = false;
   let timer = null;
   let stopped = false;
+  /** The pause was on at the last step; its end re-sends the face. */
+  let wasPaused = false;
+  /** The broker's face and strip were taken down for this pause. */
+  let pauseApplied = false;
 
   /** Run one poll + write step; never runs twice at once. */
   async function step() {
@@ -138,6 +155,52 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
         }
       }
       referee.observe(anim);
+      if (pause.active(now())) {
+        if (!wasPaused) {
+          wasPaused = true;
+          pauseApplied = false;
+        }
+        // Alerts filed while paused never play, not even late.
+        referee.queue = [];
+        referee.playing = null;
+        if (!pauseApplied) {
+          // Take down only what the broker put up: never move servos
+          // someone is driving by hand.
+          const shown = referee.lastSteady !== null && !["none", "sleep"].includes(referee.lastSteady);
+          if (shown) {
+            try {
+              referee.observe(await robot.setAnim("none"));
+              referee.sent("none", now());
+              log("-> none (paused)");
+            } catch (err) {
+              markOffline(err);
+              return;
+            }
+          }
+          if (referee.lastStatus) {
+            try {
+              await robot.setStatus("", STATUS_TTL_S);
+              log("status cleared (paused)");
+            } catch (err) {
+              log(`status failed: ${err.message}`);
+            }
+            referee.statusSent("", now());
+          }
+          pauseApplied = true;
+        }
+        return;
+      }
+      if (wasPaused) {
+        wasPaused = false;
+        referee.queue = [];
+        referee.playing = null;
+        // POST /resume logs itself; a timed pause that ran out does not.
+        if (pause.since !== null) {
+          referee.note(now(), "pause ran out, resumed");
+          log("pause ran out, resumed");
+          pause.stop();
+        }
+      }
       // Several writes can be due at once (alert done, then the owner's state).
       for (let i = 0; i < 3; i++) {
         const want = referee.next(now());
@@ -168,7 +231,7 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
 
   function schedule() {
     if (stopped) return;
-    const delay = !robotOk
+    const delay = !robotOk || pause.active(now())
       ? POLL_OFFLINE_MS
       : referee.playing || referee.queue.length
         ? POLL_ALERT_MS
@@ -177,6 +240,20 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
       await step();
       schedule();
     }, delay);
+  }
+
+  /** @param {http.IncomingMessage} req */
+  function authorized(req) {
+    if (!controlToken) return true;
+    const m = /^Bearer\s+(.+)$/i.exec(req.headers.authorization ?? "");
+    if (!m) return false;
+    const digest = (/** @type {string} */ v) => createHash("sha256").update(v).digest();
+    return timingSafeEqual(digest(m[1].trim()), digest(controlToken));
+  }
+
+  function pauseView() {
+    const view = pause.view(now());
+    return { paused: view !== null, since: view?.since ?? null, until: view?.until ?? null };
   }
 
   /**
@@ -201,6 +278,7 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
           robot: robotOk,
           error: lastError,
           offlineSince: robotOk ? null : offlineSince,
+          pause: pause.view(now()),
         });
       case "GET /anim":
         return send(res, 200, { ok: true, animation: referee.robotAnim ?? "none" });
@@ -210,6 +288,7 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
           robotOk,
           error: lastError,
           offlineSince: robotOk ? null : offlineSince,
+          pause: pause.view(now()),
           ...referee.snapshot(now()),
         });
       case "POST /anim": {
@@ -234,7 +313,37 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
           animation: referee.robotAnim ?? "none",
           kind: result.kind,
           owner: snap.owner?.label ?? null,
+          ...(pause.active(now()) ? { paused: true } : {}),
         });
+      }
+      case "GET /pause":
+        return send(res, 200, { ok: true, ...pauseView() });
+      case "POST /pause": {
+        if (!authorized(req)) return send(res, 401, { ok: false, error: "unauthorized" });
+        let body;
+        try {
+          body = await readJson(req);
+        } catch (err) {
+          return send(res, 400, { ok: false, error: err.message });
+        }
+        const parsed = pauseSeconds(body);
+        if (!parsed.ok) return send(res, 400, parsed);
+        pause.start(now(), parsed.seconds);
+        const note = parsed.seconds === null ? "paused until resume" : `paused for ${parsed.seconds} s`;
+        referee.note(now(), note);
+        log(note);
+        void step();
+        return send(res, 200, { ok: true, ...pauseView() });
+      }
+      case "POST /resume": {
+        if (!authorized(req)) return send(res, 401, { ok: false, error: "unauthorized" });
+        const was = pause.stop();
+        if (was) {
+          referee.note(now(), "resumed");
+          log("resumed");
+        }
+        void step();
+        return send(res, 200, { ok: true, ...pauseView(), was_paused: was });
       }
       default:
         return send(res, 404, { ok: false, error: "not found" });
@@ -265,6 +374,25 @@ export function createBroker({ robot, referee = new Referee(), now = Date.now, l
       return new Promise((resolve) => server.close(() => resolve()));
     },
   };
+}
+
+/**
+ * JSON body of at most BODY_MAX bytes; empty gives null.
+ * @param {http.IncomingMessage} req
+ * @returns {Promise<unknown>}
+ */
+async function readJson(req) {
+  let raw = "";
+  for await (const chunk of req) {
+    raw += chunk;
+    if (raw.length > BODY_MAX) throw new Error("body too large");
+  }
+  if (!raw.trim()) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    throw new Error("body is not JSON");
+  }
 }
 
 /**

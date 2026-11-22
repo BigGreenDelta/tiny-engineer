@@ -1,6 +1,7 @@
 # Rootful podman Quadlet: /etc/containers/systemd/tiny-engineer-broker.container
-# Installed by scripts/deploy-broker.sh. TE_ROBOT_URL and TE_ROBOT_TOKEN live
-# in /etc/tiny-engineer-broker.env (mode 600).
+# Installed by scripts/deploy-broker.sh. TE_ROBOT_URL, TE_ROBOT_TOKEN and
+# TE_BROKER_TOKEN live in /etc/tiny-engineer-broker.env (mode 600). The volume
+# keeps the pause switch across restarts and redeploys.
 [Unit]
 Description=Tiny Engineer Broker - one writer for the robot face
 After=network-online.target
@@ -9,6 +10,7 @@ After=network-online.target
 ContainerName=tiny-engineer-broker
 Image=localhost/tiny-engineer-broker:latest
 PublishPort=8790:8790
+Volume=tiny-engineer-broker-state:/data
 Environment=TE_STATE_TTL_S=300
 Environment=TE_ATTENTION_REPEAT_S=30
 Environment=TE_ATTENTION_MAX_S=900

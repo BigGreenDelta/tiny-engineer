@@ -87,14 +87,41 @@ The broker does not depend on the robot being up; it may be off or rebooting for
 - Alerts that waited more than 30 s are dropped instead of playing late.
 - When the robot answers again, or its `uptime_ms` (read every 10 s) went down because it rebooted between polls, the broker forgets what it sent and sends the current face and strip text again.
 
+## Pause
+
+A pause switch for when you test or work on the robot: agent sessions keep posting, the robot stays still.
+
+```bash
+tiny-engineer pause            # until resume
+tiny-engineer pause --for 30m  # resumes by itself after 30 minutes
+tiny-engineer status           # paused or not, and until when
+tiny-engineer resume
+```
+
+- On pause the broker takes down only what it put up: `none` if it showed a state or attention, and an empty strip if it wrote one. A robot the broker left alone gets no write at all, so servos you drive by hand do not move.
+- While paused the broker sends the robot nothing. It still polls `GET /anim` (every 5 s) and keeps refereeing: requests get **200** with `"paused": true`, slots, owner and TTLs keep running, the page shows a banner. Alerts filed while paused (`ring`, `error`, ...) are dropped, never played late.
+- On resume, by hand or when a `--for` pause runs out (seen within 5 s), the broker shows the current face again: the owner's state if one is live, otherwise nothing.
+- The robot's own API stays as it is: `POST /test/servo`, `POST /setup/servo`, the web panel, the button and the sleep timer all work while paused. Only the broker holds back.
+- With `TE_PAUSE_FILE` (set in the image to `/data/pause.json`; the Quadlet and `compose.yaml` mount a volume there) the switch survives a broker restart, a redeploy and a host reboot. A timed pause that ran out while the broker was down is over.
+- The pause is the broker's, not the robot's: a hook that posts to the robot directly is not paused. The firmware has no pause of its own (it would need a reflash); the broker is the only writer, so pausing it covers every session.
+
+`POST /pause` and `POST /resume` need `Authorization: Bearer <TE_BROKER_TOKEN>` when that variable is set; without it they are open, like `POST /anim`. Hooks never need the token. The CLI sends `TINY_ENGINEER_TOKEN`, or reads the token from stdin with `--token-stdin`:
+
+```bash
+op read "op://<vault>/<item>/credential" | tiny-engineer pause --for 1h --token-stdin
+```
+
 ## Broker API
 
 | Route | Reply |
 | --- | --- |
-| `POST /anim?name=&client=&label=` | `{"ok":true,"animation":"<robot now>","kind":"state","owner":"<label>"}`. Unknown `name` gives **400** `unknown animation` |
+| `POST /anim?name=&client=&label=` | `{"ok":true,"animation":"<robot now>","kind":"state","owner":"<label>"}`, plus `"paused":true` while paused. Unknown `name` gives **400** `unknown animation` |
 | `GET /anim` | `{"ok":true,"animation":"<robot now>"}`, the robot's reply shape |
-| `GET /state` | Robot view, owner, every client slot, the queue and the last 200 log lines (each request with its text, each face and strip text sent) |
-| `GET /health` | `{"ok":true,"robot":true}`; `robot` is false when the last poll failed, then `offlineSince` says since when |
+| `GET /state` | Robot view, pause, owner, every client slot, the queue and the last 200 log lines (each request with its text, each face and strip text sent) |
+| `GET /health` | `{"ok":true,"robot":true,"pause":null}`; `robot` is false when the last poll failed, then `offlineSince` says since when; `pause` is `{"since":<ms>,"until":<ms or null>}` while paused |
+| `GET /pause` | `{"ok":true,"paused":false,"since":null,"until":null}`; times in ms since the epoch, `until` null means until resume |
+| `POST /pause` | Optional JSON body `{"for_s":1800}` (1 to 604800); without it, until resume. Pausing again while paused moves the end. Reply as `GET /pause`. **401** without the token when `TE_BROKER_TOKEN` is set, **400** for a bad body |
+| `POST /resume` | Reply as `GET /pause` plus `"was_paused"`. **401** as above |
 | `GET /` | "Who's asking" page: owner, clients, queue and log, refreshed every 2 s |
 
 ## Settings
@@ -109,6 +136,8 @@ Environment variables:
 | `TE_STATE_TTL_S` | `300` | A state with no new request for this long ends |
 | `TE_ATTENTION_REPEAT_S` | `30` | After the robot's own attention wait ends, show it again this long after the last send; `0` shows it once |
 | `TE_ATTENTION_MAX_S` | `900` | A pending attention is dropped after this long |
+| `TE_BROKER_TOKEN` | empty | Bearer token for `POST /pause` and `POST /resume`; empty leaves them open |
+| `TE_PAUSE_FILE` | empty (`/data/pause.json` in the image) | Where the pause switch is kept; empty keeps it in memory only |
 
 ## Only writer
 
