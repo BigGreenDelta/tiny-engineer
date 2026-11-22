@@ -14,6 +14,7 @@ import {
 } from "./commands/parity.js";
 import { runDaemon } from "./daemon/commands.js";
 import { runMonitor } from "./commands/monitor.js";
+import { runPauseCommand } from "./commands/pause.js";
 import { runPort } from "./commands/port.js";
 import { runRules } from "./commands/rules.js";
 import { runWatch } from "./commands/watch.js";
@@ -56,6 +57,9 @@ Commands:
   park                    Center servos and hold PWM (flash-safe)
   health                  Fetch health JSON/summary
   reset [--yes]           Factory-reset device (confirm or --yes)
+  pause [--for <dur>]     Broker: stop agent activity animating the robot (30m, 2h, ...)
+  resume                  Broker: let agent activity animate it again
+  status                  Broker: paused or not, and until when
   monitor                 Print serial LOG frames (via the host daemon)
   watch                   Print outbound events (WebSocket or serial Evt)
   rules list|add|remove   Run a host program when the robot emits an event
@@ -339,6 +343,11 @@ export async function run(argv) {
       return;
     case "reset":
       await runReset(out, rest, global.quiet);
+      return;
+    case "pause":
+    case "resume":
+    case "status":
+      await runPauseCommand(out, command, rest, global.quiet);
       return;
     case "monitor":
       await runMonitor(out, rest);

@@ -119,6 +119,18 @@ tiny-engineer play /tmp/clip.wav --name thinking
 
 WAV for `/play`: 16-bit mono PCM at 22050 Hz. Details: [`api.md#post-play`](api.md#post-play).
 
+### Pause (broker)
+
+With the hooks pointed at the [Tiny Engineer Broker](broker.md), stop agent activity animating the robot while you test or work on it:
+
+```bash
+tiny-engineer pause --for 30m   # or no --for: until resume
+tiny-engineer status
+tiny-engineer resume
+```
+
+The robot's own API (servo tests, setup, the web panel) keeps working while paused. Details, auth and the HTTP routes: [`broker.md#pause`](broker.md#pause).
+
 ### Speaking through the robot (skill)
 
 Install the shared [`tiny-engineer-play`](../skills/tiny-engineer-play/SKILL.md) skill (`curl` + `POST /play`). Same skill works in Claude Code, Cursor, and Antigravity:
