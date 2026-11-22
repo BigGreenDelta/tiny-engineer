@@ -4,7 +4,9 @@ Run with: uv run --no-project --with pywinrm python scripts/winrm_cli.py <comman
 
 Commands:
   ps                       run the PowerShell script on stdin
-  wsl <distro> <user>      run the bash script on stdin inside a WSL distro
+  wsl <distro> <user>      run the bash script on stdin inside a WSL distro;
+                           the script goes over WinRM stdin straight into
+                           wsl.exe, so a secret in it never touches a file
   upload <local> <remote>  copy a file (chunked: WinRM caps the command line)
 
 Connection from the environment, one of:
@@ -85,6 +87,29 @@ def run_ps(s: winrm.Session, script: str) -> int:
     return r.status_code
 
 
+def run_wsl(s: winrm.Session, distro: str, user: str, script: bytes) -> int:
+    """Run a bash script in WSL, fed to wsl.exe on WinRM stdin (no file)."""
+    proto = s.protocol
+    shell = proto.open_shell(codepage=65001)
+    try:
+        # stderr joins stdout inside WSL, so the output keeps its order.
+        command = proto.run_command(
+            shell,
+            "wsl",
+            ["-d", distro, "-u", user, "--", "bash", "-c", '"exec bash -l 2>&1"'],
+            console_mode_stdin=False,
+        )
+        proto.send_command_input(shell, command, script, end=True)
+        out, err, code = proto.get_command_output(shell, command)
+        proto.cleanup_command(shell, command)
+    finally:
+        proto.close_shell(shell)
+    sys.stdout.write(out.decode("utf-8", "replace"))
+    if code:
+        sys.stderr.write(err.decode("utf-8", "replace")[-3000:])
+    return code
+
+
 def ps_quote(text: str) -> str:
     return "'" + text.replace("'", "''") + "'"
 
@@ -101,19 +126,7 @@ def main() -> int:
 
     if cmd == "wsl" and len(sys.argv) == 4:
         distro, user = sys.argv[2], sys.argv[3]
-        b64 = base64.b64encode(sys.stdin.read().encode()).decode()
-        # The script goes through a file: the WinRM command line is short.
-        tmp = "$env:TEMP\\winrm-wsl.b64"
-        s.run_ps(f"Remove-Item -Force {tmp} -ErrorAction SilentlyContinue")
-        for i in range(0, len(b64), CHUNK):
-            s.run_ps(f"Add-Content -NoNewline -Path {tmp} -Value '{b64[i:i + CHUNK]}'")
-        return run_ps(
-            s,
-            '$ProgressPreference = "SilentlyContinue"\n'
-            f"$p = wsl -d {ps_quote(distro)} -u {ps_quote(user)} -- wslpath -u ($env:TEMP + '\\winrm-wsl.b64').Replace('\\','/')\n"
-            f"wsl -d {ps_quote(distro)} -u {ps_quote(user)} -- bash -c \"base64 -d $p | bash -l; rc=`$?; rm -f $p; exit `$rc\" 2>&1 | Out-String\n"
-            "exit $LASTEXITCODE\n",
-        )
+        return run_wsl(s, distro, user, sys.stdin.buffer.read())
 
     if cmd == "upload" and len(sys.argv) == 4:
         local, remote = sys.argv[2], sys.argv[3]
