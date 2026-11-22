@@ -104,6 +104,25 @@ I2S **DIN** is not on J4 (ESP32 → amp only). **SERVO_5V** is the eFuse-protect
 | `SERVO_BOOT_SPEED_DEG_S` | 35 | Boot centering / sleep-pose rate (deg/s) |
 | `PCA9685_OE_WIRED` | `true` | GP5 drives PCA9685 OE (active LOW). Set `false` only if OE is hard-tied off-chip |
 
+## Classic ESP32 DevKit V1 (`env:esp32dev`)
+
+The `esp32dev` and `esp32dev-ota` builds (`TE_BOARD_ESP32DEV`) use another pin map. No PCA9685: each servo has its own LEDC GPIO.
+
+| Function | GPIO | Board label | Constant |
+| --- | --- | --- | --- |
+| Servo 0 HEAD | GPIO18 | `D18` | `SERVO_GPIO[0]` |
+| Servo 1 NECK | GPIO19 | `D19` | `SERVO_GPIO[1]` |
+| Servo 2 HAND_LEFT | GPIO23 | `D23` | `SERVO_GPIO[2]` |
+| Servo 3 HAND_RIGHT | GPIO32 | `D32` | `SERVO_GPIO[3]` |
+| Servo 4 BODY | GPIO33 | `D33` | `SERVO_GPIO[4]` |
+| I2C SDA (OLED) | GPIO21 | `D21` | `I2C_SDA` |
+| I2C SCL (OLED) | GPIO22 | `D22` | `I2C_SCL` |
+| RGB LED R / G / B (optional) | GPIO4 / 16 / 17 | `D4` / `RX2` / `TX2` | `RGB_LED_PINS` |
+| I2S BCLK / LRC / DIN (amp not fitted) | GPIO26 / 25 / 27 | `D26` / `D25` / `D27` | `I2S_*` |
+| Push button default | GPIO0 | `BOOT` | `PUSH_BUTTON_PIN_DEFAULT` |
+
+OLED is 128x64 on this build. Wiring, power and the perfboard layout: [esp32dev-wiring/](esp32dev-wiring/README.md).
+
 ## Pin allocation rules
 
 New hardware **must not** pick pins ad-hoc.
