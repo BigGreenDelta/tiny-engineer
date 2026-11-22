@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" font-family="DejaVu Sans, Arial, sans-serif" font-size="13">
+<rect width="1400" height="900" fill="#fbfaf7"/>
+<text x="700.0" y="32.0" text-anchor="middle" font-size="19" font-weight="bold" fill="#000">tiny-engineer esp32dev: schematic (Stage B)</text>
+<text x="700.0" y="54.0" text-anchor="middle" font-size="13" font-weight="normal" fill="#444">A dot is a connection. Lines that cross with a hop are NOT connected.</text>
+<line x1="250.0" y1="160.0" x2="1210.0" y2="160.0" stroke="#e53935" stroke-width="4"/>
+<line x1="250.0" y1="215.0" x2="1210.0" y2="215.0" stroke="#6d4c41" stroke-width="4"/>
+<text x="1220.0" y="165.0" text-anchor="start" font-size="13" font-weight="bold" fill="#e53935">SERVO_5V</text>
+<text x="1220.0" y="220.0" text-anchor="start" font-size="13" font-weight="bold" fill="#6d4c41">GND</text>
+<rect x="60.0" y="120.0" width="190.0" height="150.0" rx="6" fill="#eceff1" stroke="#455a64" stroke-width="2"/>
+<text x="155.0" y="142.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#000">USB-C breakout</text>
+<text x="155.0" y="158.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#555">(6-pin socket)</text>
+<text x="240.0" y="164.0" text-anchor="end" font-size="12" font-weight="normal" fill="#000">VBUS</text>
+<text x="240.0" y="219.0" text-anchor="end" font-size="12" font-weight="normal" fill="#000">GND</text>
+<text x="90.0" y="186.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#000">CC1</text>
+<rect x="85.0" y="192.0" width="10.0" height="26.0" rx="0" fill="#fff" stroke="#000" stroke-width="1.2"/>
+<text x="99.0" y="210.0" text-anchor="start" font-size="8" font-weight="normal" fill="#000">5.1k</text>
+<line x1="90.0" y1="218.0" x2="90.0" y2="236.0" stroke="#000" stroke-width="1.2"/>
+<line x1="83.0" y1="236.0" x2="97.0" y2="236.0" stroke="#000" stroke-width="1.5"/>
+<text x="140.0" y="186.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#000">CC2</text>
+<rect x="135.0" y="192.0" width="10.0" height="26.0" rx="0" fill="#fff" stroke="#000" stroke-width="1.2"/>
+<text x="149.0" y="210.0" text-anchor="start" font-size="8" font-weight="normal" fill="#000">5.1k</text>
+<line x1="140.0" y1="218.0" x2="140.0" y2="236.0" stroke="#000" stroke-width="1.2"/>
+<line x1="133.0" y1="236.0" x2="147.0" y2="236.0" stroke="#000" stroke-width="1.5"/>
+<text x="155.0" y="258.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#555">on the board already</text>
+<text x="155.0" y="300.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#333">plugs into a 5 V 3 A charger</text>
+<circle cx="250.0" cy="160.0" r="5" fill="#e53935" stroke="none" stroke-width="1"/>
+<circle cx="250.0" cy="215.0" r="5" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<circle cx="305.0" cy="160.0" r="5" fill="#e53935" stroke="none" stroke-width="1"/>
+<circle cx="305.0" cy="215.0" r="5" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<line x1="305.0" y1="160.0" x2="305.0" y2="182.0" stroke="#000" stroke-width="2"/>
+<line x1="305.0" y1="194.0" x2="305.0" y2="215.0" stroke="#000" stroke-width="2"/>
+<line x1="293.0" y1="182.0" x2="317.0" y2="182.0" stroke="#000" stroke-width="2.5"/>
+<path d="M293,197 Q305,189 317,197" fill="none" stroke="#000" stroke-width="2.5"/>
+<text x="290.0" y="178.0" text-anchor="end" font-size="12" font-weight="bold" fill="#000">+</text>
+<text x="305.0" y="245.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#000">C1 1000uF</text>
+<circle cx="385.0" cy="160.0" r="5" fill="#e53935" stroke="none" stroke-width="1"/>
+<circle cx="385.0" cy="215.0" r="5" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<line x1="385.0" y1="160.0" x2="385.0" y2="182.0" stroke="#000" stroke-width="2"/>
+<line x1="385.0" y1="194.0" x2="385.0" y2="215.0" stroke="#000" stroke-width="2"/>
+<line x1="373.0" y1="182.0" x2="397.0" y2="182.0" stroke="#000" stroke-width="2.5"/>
+<line x1="373.0" y1="194.0" x2="397.0" y2="194.0" stroke="#000" stroke-width="2.5"/>
+<text x="385.0" y="245.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#000">C2 0.1uF</text>
+<rect x="415.0" y="290.0" width="110.0" height="80.0" rx="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+<text x="470.0" y="318.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#000">servo 0</text>
+<text x="470.0" y="336.0" text-anchor="middle" font-size="12" font-weight="normal" fill="#000">HEAD</text>
+<text x="470.0" y="352.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#555">SG90</text>
+<circle cx="440.0" cy="160.0" r="5" fill="#e53935" stroke="none" stroke-width="1"/>
+<path d="M440,160 L440,207 A8,8 0 0 1 440,223 L440,290" fill="none" stroke="#e53935" stroke-width="2.5"/>
+<text x="436.0" y="284.0" text-anchor="end" font-size="9" font-weight="normal" fill="#e53935">red</text>
+<circle cx="500.0" cy="215.0" r="5" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<line x1="500.0" y1="215.0" x2="500.0" y2="290.0" stroke="#6d4c41" stroke-width="2.5"/>
+<text x="504.0" y="284.0" text-anchor="start" font-size="9" font-weight="normal" fill="#6d4c41">brown</text>
+<line x1="470.0" y1="370.0" x2="470.0" y2="520.0" stroke="#fb8c00" stroke-width="2.5"/>
+<text x="475.0" y="392.0" text-anchor="start" font-size="9" font-weight="normal" fill="#fb8c00">orange</text>
+<rect x="585.0" y="290.0" width="110.0" height="80.0" rx="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+<text x="640.0" y="318.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#000">servo 1</text>
+<text x="640.0" y="336.0" text-anchor="middle" font-size="12" font-weight="normal" fill="#000">NECK</text>
+<text x="640.0" y="352.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#555">SG90</text>
+<circle cx="610.0" cy="160.0" r="5" fill="#e53935" stroke="none" stroke-width="1"/>
+<path d="M610,160 L610,207 A8,8 0 0 1 610,223 L610,290" fill="none" stroke="#e53935" stroke-width="2.5"/>
+<text x="606.0" y="284.0" text-anchor="end" font-size="9" font-weight="normal" fill="#e53935">red</text>
+<circle cx="670.0" cy="215.0" r="5" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<line x1="670.0" y1="215.0" x2="670.0" y2="290.0" stroke="#6d4c41" stroke-width="2.5"/>
+<text x="674.0" y="284.0" text-anchor="start" font-size="9" font-weight="normal" fill="#6d4c41">brown</text>
+<line x1="640.0" y1="370.0" x2="640.0" y2="520.0" stroke="#fb8c00" stroke-width="2.5"/>
+<text x="645.0" y="392.0" text-anchor="start" font-size="9" font-weight="normal" fill="#fb8c00">orange</text>
+<rect x="755.0" y="290.0" width="110.0" height="80.0" rx="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+<text x="810.0" y="318.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#000">servo 2</text>
+<text x="810.0" y="336.0" text-anchor="middle" font-size="12" font-weight="normal" fill="#000">HAND_LEFT</text>
+<text x="810.0" y="352.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#555">SG90</text>
+<circle cx="780.0" cy="160.0" r="5" fill="#e53935" stroke="none" stroke-width="1"/>
+<path d="M780,160 L780,207 A8,8 0 0 1 780,223 L780,290" fill="none" stroke="#e53935" stroke-width="2.5"/>
+<text x="776.0" y="284.0" text-anchor="end" font-size="9" font-weight="normal" fill="#e53935">red</text>
+<circle cx="840.0" cy="215.0" r="5" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<line x1="840.0" y1="215.0" x2="840.0" y2="290.0" stroke="#6d4c41" stroke-width="2.5"/>
+<text x="844.0" y="284.0" text-anchor="start" font-size="9" font-weight="normal" fill="#6d4c41">brown</text>
+<line x1="810.0" y1="370.0" x2="810.0" y2="520.0" stroke="#fb8c00" stroke-width="2.5"/>
+<text x="815.0" y="392.0" text-anchor="start" font-size="9" font-weight="normal" fill="#fb8c00">orange</text>
+<rect x="925.0" y="290.0" width="110.0" height="80.0" rx="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+<text x="980.0" y="318.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#000">servo 3</text>
+<text x="980.0" y="336.0" text-anchor="middle" font-size="12" font-weight="normal" fill="#000">HAND_RIGHT</text>
+<text x="980.0" y="352.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#555">SG90</text>
+<circle cx="950.0" cy="160.0" r="5" fill="#e53935" stroke="none" stroke-width="1"/>
+<path d="M950,160 L950,207 A8,8 0 0 1 950,223 L950,290" fill="none" stroke="#e53935" stroke-width="2.5"/>
+<text x="946.0" y="284.0" text-anchor="end" font-size="9" font-weight="normal" fill="#e53935">red</text>
+<circle cx="1010.0" cy="215.0" r="5" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<line x1="1010.0" y1="215.0" x2="1010.0" y2="290.0" stroke="#6d4c41" stroke-width="2.5"/>
+<text x="1014.0" y="284.0" text-anchor="start" font-size="9" font-weight="normal" fill="#6d4c41">brown</text>
+<line x1="980.0" y1="370.0" x2="980.0" y2="520.0" stroke="#fb8c00" stroke-width="2.5"/>
+<text x="985.0" y="392.0" text-anchor="start" font-size="9" font-weight="normal" fill="#fb8c00">orange</text>
+<rect x="1095.0" y="290.0" width="110.0" height="80.0" rx="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+<text x="1150.0" y="318.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#000">servo 4</text>
+<text x="1150.0" y="336.0" text-anchor="middle" font-size="12" font-weight="normal" fill="#000">BODY</text>
+<text x="1150.0" y="352.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#555">SG90</text>
+<circle cx="1120.0" cy="160.0" r="5" fill="#e53935" stroke="none" stroke-width="1"/>
+<path d="M1120,160 L1120,207 A8,8 0 0 1 1120,223 L1120,290" fill="none" stroke="#e53935" stroke-width="2.5"/>
+<text x="1116.0" y="284.0" text-anchor="end" font-size="9" font-weight="normal" fill="#e53935">red</text>
+<circle cx="1180.0" cy="215.0" r="5" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<line x1="1180.0" y1="215.0" x2="1180.0" y2="290.0" stroke="#6d4c41" stroke-width="2.5"/>
+<text x="1184.0" y="284.0" text-anchor="start" font-size="9" font-weight="normal" fill="#6d4c41">brown</text>
+<line x1="1150.0" y1="370.0" x2="1150.0" y2="520.0" stroke="#fb8c00" stroke-width="2.5"/>
+<text x="1155.0" y="392.0" text-anchor="start" font-size="9" font-weight="normal" fill="#fb8c00">orange</text>
+<rect x="400.0" y="520.0" width="805.0" height="210.0" rx="8" fill="#f5f5f5" stroke="#2b2f36" stroke-width="2.5"/>
+<text x="802.5" y="610.0" text-anchor="middle" font-size="15" font-weight="bold" fill="#000">ESP32 DevKit V1 (ESP32-D0WD-V3)</text>
+<text x="802.5" y="630.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#555">board labels shown, GPIO number in brackets</text>
+<circle cx="470.0" cy="520.0" r="4" fill="#fb8c00" stroke="none" stroke-width="1"/>
+<text x="470.0" y="540.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#000">D18 (GPIO18)</text>
+<circle cx="640.0" cy="520.0" r="4" fill="#fb8c00" stroke="none" stroke-width="1"/>
+<text x="640.0" y="540.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#000">D19 (GPIO19)</text>
+<circle cx="810.0" cy="520.0" r="4" fill="#fb8c00" stroke="none" stroke-width="1"/>
+<text x="810.0" y="540.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#000">D23 (GPIO23)</text>
+<circle cx="980.0" cy="520.0" r="4" fill="#fb8c00" stroke="none" stroke-width="1"/>
+<text x="980.0" y="540.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#000">D32 (GPIO32)</text>
+<circle cx="1150.0" cy="520.0" r="4" fill="#fb8c00" stroke="none" stroke-width="1"/>
+<text x="1150.0" y="540.0" text-anchor="middle" font-size="11" font-weight="normal" fill="#000">D33 (GPIO33)</text>
+<rect x="1275.0" y="550.0" width="110.0" height="160.0" rx="6" fill="#e3f2fd" stroke="#0d47a1" stroke-width="2"/>
+<text x="1330.0" y="735.0" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">OLED SSD1306</text>
+<text x="1330.0" y="751.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#555">128x64, I2C 0x3C</text>
+<line x1="1205.0" y1="580.0" x2="1275.0" y2="580.0" stroke="#6d4c41" stroke-width="2.5"/>
+<text x="1197.0" y="584.0" text-anchor="end" font-size="11" font-weight="normal" fill="#000">GND</text>
+<text x="1283.0" y="584.0" text-anchor="start" font-size="11" font-weight="normal" fill="#000">GND</text>
+<line x1="1205.0" y1="615.0" x2="1275.0" y2="615.0" stroke="#8e24aa" stroke-width="2.5"/>
+<text x="1197.0" y="619.0" text-anchor="end" font-size="11" font-weight="normal" fill="#000">3V3</text>
+<text x="1283.0" y="619.0" text-anchor="start" font-size="11" font-weight="normal" fill="#000">VCC</text>
+<line x1="1205.0" y1="650.0" x2="1275.0" y2="650.0" stroke="#1e88e5" stroke-width="2.5"/>
+<text x="1197.0" y="654.0" text-anchor="end" font-size="11" font-weight="normal" fill="#000">D22 (GPIO22)</text>
+<text x="1283.0" y="654.0" text-anchor="start" font-size="11" font-weight="normal" fill="#000">SCL</text>
+<line x1="1205.0" y1="685.0" x2="1275.0" y2="685.0" stroke="#43a047" stroke-width="2.5"/>
+<text x="1197.0" y="689.0" text-anchor="end" font-size="11" font-weight="normal" fill="#000">D21 (GPIO21)</text>
+<text x="1283.0" y="689.0" text-anchor="start" font-size="11" font-weight="normal" fill="#000">SDA</text>
+<circle cx="1238.0" cy="580.0" r="4" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<circle cx="1238.0" cy="615.0" r="4" fill="#8e24aa" stroke="none" stroke-width="1"/>
+<text x="1238.0" y="570.0" text-anchor="middle" font-size="10" font-weight="normal" fill="#000">C3 0.1uF</text>
+<line x1="1230.0" y1="594.0" x2="1246.0" y2="594.0" stroke="#000" stroke-width="2"/>
+<line x1="1230.0" y1="601.0" x2="1246.0" y2="601.0" stroke="#000" stroke-width="2"/>
+<line x1="1238.0" y1="580.0" x2="1238.0" y2="594.0" stroke="#000" stroke-width="1.5"/>
+<line x1="1238.0" y1="601.0" x2="1238.0" y2="615.0" stroke="#000" stroke-width="1.5"/>
+<text x="410.0" y="590.0" text-anchor="start" font-size="12" font-weight="bold" fill="#000">VIN</text>
+<line x1="360.0" y1="586.0" x2="400.0" y2="586.0" stroke="#999" stroke-width="2"/>
+<line x1="352.0" y1="578.0" x2="368.0" y2="594.0" stroke="#c62828" stroke-width="3"/>
+<line x1="352.0" y1="594.0" x2="368.0" y2="578.0" stroke="#c62828" stroke-width="3"/>
+<text x="360.0" y="616.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#c62828">not connected</text>
+<text x="410.0" y="690.0" text-anchor="start" font-size="12" font-weight="bold" fill="#000">GND</text>
+<line x1="400.0" y1="686.0" x2="270.0" y2="686.0" stroke="#6d4c41" stroke-width="3"/>
+<polyline points="270,686 270,215" fill="none" stroke="#6d4c41" stroke-width="3"/>
+<circle cx="270.0" cy="215.0" r="6" fill="#6d4c41" stroke="none" stroke-width="1"/>
+<text x="262.0" y="450.0" text-anchor="end" font-size="11" font-weight="bold" fill="#6d4c41">the only</text>
+<text x="262.0" y="465.0" text-anchor="end" font-size="11" font-weight="bold" fill="#6d4c41">ground join</text>
+<rect x="760.0" y="730.0" width="60.0" height="20.0" rx="3" fill="#c9ccd1" stroke="#555" stroke-width="1"/>
+<text x="790.0" y="770.0" text-anchor="middle" font-size="12" font-weight="normal" fill="#000">micro-USB to the PC: ESP32 power + flashing + serial</text>
+<text x="700.0" y="830.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#b71c1c">Two 5 V sources, never joined: the charger feeds only SERVO_5V, the PC feeds only the ESP32. Grounds are joined once.</text>
+<text x="700.0" y="855.0" text-anchor="middle" font-size="12" font-weight="normal" fill="#333">Stage A (breadboard) differs in one place: SERVO_5V comes from the ESP32 VIN pin instead of the USB-C breakout, with 1-2 servos only.</text>
+</svg>
