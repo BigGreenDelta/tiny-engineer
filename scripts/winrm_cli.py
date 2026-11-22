@@ -7,12 +7,23 @@ Commands:
   wsl <distro> <user>      run the bash script on stdin inside a WSL distro
   upload <local> <remote>  copy a file (chunked: WinRM caps the command line)
 
-Connection from the environment: WINRM_URL (http://host:5985/wsman),
-WINRM_USER, WINRM_PASS. NTLM, so the traffic is encrypted on plain HTTP.
+Connection from the environment, one of:
+
+- Certificate (no password): WINRM_URL (https://<ip>:5986/wsman) and
+  WINRM_CERT_OP_ITEM, a 1Password item reference (op://vault/item) with the
+  fields winrm-client-key, winrm-client-cert and winrm-server-cert. They are
+  read with `op read` into memory (memfd), never to a file. The server cert is
+  the only trust anchor and is checked against the URL host (use the IP from
+  its SAN). TLS is capped at 1.2, where WinRM asks for the client cert by
+  renegotiation.
+- NTLM: WINRM_URL (http://host:5985/wsman), WINRM_USER, WINRM_PASS. The
+  traffic is encrypted on plain HTTP.
 """
 
 import base64
 import os
+import ssl
+import subprocess
 import sys
 
 import winrm
@@ -20,12 +31,50 @@ import winrm
 CHUNK = 2000
 
 
+def ram_file(item: str, field: str) -> str:
+    """`op read` one field into a memfd; returns its /proc path."""
+    ref = f"{item.rstrip('/')}/{field}"
+    r = subprocess.run(["op", "read", ref], capture_output=True)
+    if r.returncode:
+        sys.exit(f"error: cannot read {ref} from 1Password: {r.stderr.decode(errors='replace').strip()}")
+    fd = os.memfd_create(field, os.MFD_CLOEXEC)
+    os.write(fd, r.stdout)
+    return f"/proc/self/fd/{fd}"
+
+
 def session() -> winrm.Session:
-    return winrm.Session(
+    item = os.environ.get("WINRM_CERT_OP_ITEM", "").strip()
+    if not item:
+        return winrm.Session(
+            os.environ["WINRM_URL"],
+            auth=(os.environ["WINRM_USER"], os.environ["WINRM_PASS"]),
+            transport="ntlm",
+        )
+
+    from requests.adapters import HTTPAdapter
+    from urllib3.util.ssl_ import create_urllib3_context
+
+    class TLS12(HTTPAdapter):
+        def init_poolmanager(self, *args, **kwargs):
+            ctx = create_urllib3_context()
+            ctx.maximum_version = ssl.TLSVersion.TLSv1_2
+            kwargs["ssl_context"] = ctx
+            return super().init_poolmanager(*args, **kwargs)
+
+    key = ram_file(item, "winrm-client-key")
+    crt = ram_file(item, "winrm-client-cert")
+    srv = ram_file(item, "winrm-server-cert")
+    s = winrm.Session(
         os.environ["WINRM_URL"],
-        auth=(os.environ["WINRM_USER"], os.environ["WINRM_PASS"]),
-        transport="ntlm",
+        auth=(None, None),
+        transport="certificate",
+        cert_pem=crt,
+        cert_key_pem=key,
+        server_cert_validation="validate",
+        ca_trust_path=srv,
     )
+    s.protocol.transport.build_session().mount("https://", TLS12())
+    return s
 
 
 def run_ps(s: winrm.Session, script: str) -> int:
