@@ -1,5 +1,6 @@
 import { Link } from "wouter-preact";
 import { HealthStrip } from "./HealthStrip";
+import { PauseCard } from "./PauseCard";
 
 const CARDS = [
   ["/animations", "Animations", "Pick a gesture — typing, reading, thinking, talking, and more."],
@@ -26,6 +27,7 @@ export function Home() {
         <p>A desk robot that acts out your AI coding assistant while it works.</p>
       </div>
       <HealthStrip />
+      <PauseCard />
       <div className="cards">
         {CARDS.map(([href, title, text]) => (
           <Link key={href} className="card" href={href}>
