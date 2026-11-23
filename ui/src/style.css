@@ -1448,3 +1448,69 @@ footer {
 #config-wifi-connect {
   margin-top: 0;
 }
+
+.pause-card {
+  color: var(--text);
+}
+
+.pause-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  align-items: baseline;
+}
+
+.pause-on {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.pause-actions {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+@media (width >= 400px) {
+  .pause-actions {
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  }
+}
+
+.pause-btn {
+  margin-top: 0;
+  padding: 0.45rem 0.75rem;
+}
+
+.pause-url {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.pause-url input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  color: inherit;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+
+.pause-save {
+  width: auto;
+}
+
+.link-btn {
+  margin-top: 0.4rem;
+  padding: 0;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}

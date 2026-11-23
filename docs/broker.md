@@ -98,6 +98,8 @@ tiny-engineer status           # paused or not, and until when
 tiny-engineer resume
 ```
 
+The robot's web panel has the same switch on its Home page: an "Agent activity" card shows Live or Paused until HH:MM and offers Pause 30 min, Pause 2 h, Pause until resume, and Resume. Give it the broker URL once (kept in that browser's local storage); it polls `GET /pause` every 5 s and sends the robot's API token, which the panel already holds, on `POST /pause` / `POST /resume`. With the panel on https, the broker URL must be https too. The card ships inside the firmware, so it appears after the next flash.
+
 - On pause the broker takes down only what it put up: `none` if it showed a state or attention, and an empty strip if it wrote one. A robot the broker left alone gets no write at all, so servos you drive by hand do not move. Paused while the robot is offline: when it is back, the face is taken down only if the robot still shows it (a network drop); a rebooted robot is left alone.
 - While paused the broker sends the robot nothing. It still polls `GET /anim` (every 5 s) and keeps refereeing: requests get **200** with `"paused": true`, slots, owner and TTLs keep running, the page shows a banner. Alerts filed while paused (`ring`, `error`, ...) are dropped, never played late.
 - On resume, by hand or when a `--for` pause runs out (seen within 5 s), the broker shows the current face again: the owner's state if one is live, otherwise nothing.
