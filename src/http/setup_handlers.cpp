@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "animation.h"
+#include "animation/util.h"
 #include "audio/audio.h"
 #include "display/oled.h"
 #include "hardware/pca9685_servos.h"
@@ -71,8 +72,15 @@ void handleSetupServo(WebServer& server) {
 
   // Outside setup AP an animation or the idle sleep timer would fight the
   // calibration moves: stop the animation and count each move as activity.
+  // Starting None parks every joint (torso and head to mid, hands to their
+  // ends), so switch only when something else is playing, then drop any
+  // pending targets: joints set by earlier calls keep their angles, as in
+  // setup AP.
   if (!wifiProvisioningMode()) {
-    setAnimationImmediately(AnimationId::None);
+    if (getAnimation() != AnimationId::None) {
+      setAnimationImmediately(AnimationId::None);
+    }
+    anim::stopAnimServos();
     noteActivity(millis());
   }
 
