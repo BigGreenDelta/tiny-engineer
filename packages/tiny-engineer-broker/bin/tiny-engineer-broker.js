@@ -31,6 +31,7 @@ const broker = createBroker({
   }),
   pause,
   controlToken,
+  robotToken: token,
   log: (line) => console.log(`${new Date().toISOString()} ${line}`),
 });
 

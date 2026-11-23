@@ -30,7 +30,7 @@ function fakeRobot() {
   return { robot, fetchImpl };
 }
 
-/** @param {{ controlToken?: string | null, pause?: Pause }} [opts] */
+/** @param {{ controlToken?: string | null, robotToken?: string | null, pause?: Pause }} [opts] */
 async function start(opts = {}) {
   const clock = { t: 1_000_000 };
   const { robot, fetchImpl } = fakeRobot();
@@ -38,6 +38,7 @@ async function start(opts = {}) {
     robot: robotClient({ url: "http://robot", fetchImpl }),
     now: () => clock.t,
     controlToken: opts.controlToken ?? null,
+    robotToken: opts.robotToken ?? null,
     pause: opts.pause,
   });
   const addr = await broker.listen(0, "127.0.0.1");
@@ -241,6 +242,23 @@ test("TE_BROKER_TOKEN guards POST /pause and /resume, GET stays open", async () 
     assert.equal((await post("/resume", { token: "s3cret" })).status, 200);
     // Hooks need no token.
     assert.equal((await post("/anim?name=typing&client=s1")).status, 200);
+  } finally {
+    await broker.close();
+  }
+});
+
+test("the robot token also works once TE_BROKER_TOKEN is set; alone it guards nothing", async () => {
+  let { broker, post } = await start({ controlToken: "s3cret", robotToken: "robot" });
+  try {
+    assert.equal((await post("/pause", { token: "robot" })).status, 200);
+    assert.equal((await post("/resume", { token: "robot" })).status, 200);
+    assert.equal((await post("/resume", { token: "nope" })).status, 401);
+  } finally {
+    await broker.close();
+  }
+  ({ broker, post } = await start({ robotToken: "robot" }));
+  try {
+    assert.equal((await post("/pause")).status, 200);
   } finally {
     await broker.close();
   }

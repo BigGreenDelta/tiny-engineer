@@ -105,7 +105,7 @@ tiny-engineer resume
 - With `TE_PAUSE_FILE` (set in the image to `/data/pause.json`; the Quadlet and `compose.yaml` mount a volume there) the switch survives a broker restart, a redeploy and a host reboot. A timed pause that ran out while the broker was down is over.
 - The pause is the broker's, not the robot's: a hook that posts to the robot directly is not paused. The firmware has no pause of its own (it would need a reflash); the broker is the only writer, so pausing it covers every session.
 
-`POST /pause` and `POST /resume` need `Authorization: Bearer <TE_BROKER_TOKEN>` when that variable is set; without it they are open, like `POST /anim`. Hooks never need the token. The CLI takes it from, in order: `--token-stdin`, `TINY_ENGINEER_TOKEN`, or a 1Password reference in `TINY_ENGINEER_BROKER_TOKEN_REF`, read with `op read` into memory on each `pause` / `resume` (`status` needs no token). The reference is not used for a `TINY_ENGINEER_URL` that came only from a project `.env`. With the reference in the user config (`~/.config/tiny-engineer/env`) no secret sits on disk:
+`POST /pause` and `POST /resume` need `Authorization: Bearer <TE_BROKER_TOKEN>` when that variable is set; without it they are open, like `POST /anim`. Once it is set, the robot's `access_token` (`TE_ROBOT_TOKEN`) is taken as well: whoever holds it can drive the robot anyway, and the robot's web panel already has it, so its Pause button needs no second secret. Hooks never need the token. The CLI takes it from, in order: `--token-stdin`, `TINY_ENGINEER_TOKEN`, or a 1Password reference in `TINY_ENGINEER_BROKER_TOKEN_REF`, read with `op read` into memory on each `pause` / `resume` (`status` needs no token). The reference is not used for a `TINY_ENGINEER_URL` that came only from a project `.env`. With the reference in the user config (`~/.config/tiny-engineer/env`) no secret sits on disk:
 
 ```bash
 TINY_ENGINEER_BROKER_TOKEN_REF='op://<vault>/<item>/password'
@@ -140,7 +140,7 @@ Environment variables:
 | `TE_STATE_TTL_S` | `300` | A state with no new request for this long ends |
 | `TE_ATTENTION_REPEAT_S` | `30` | After the robot's own attention wait ends, show it again this long after the last send; `0` shows it once |
 | `TE_ATTENTION_MAX_S` | `900` | A pending attention is dropped after this long |
-| `TE_BROKER_TOKEN` | empty | Bearer token for `POST /pause` and `POST /resume`; empty leaves them open |
+| `TE_BROKER_TOKEN` | empty | Bearer token for `POST /pause` and `POST /resume` (the robot token is then taken too); empty leaves them open |
 | `TE_PAUSE_FILE` | empty (`/data/pause.json` in the image) | Where the pause switch is kept; empty keeps it in memory only |
 
 ## Only writer

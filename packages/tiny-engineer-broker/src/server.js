@@ -64,15 +64,18 @@ export function robotClient({ url, token, fetchImpl = fetch }) {
 /**
  * The broker: referee + one robot writer loop + HTTP API.
  * `controlToken` guards POST /pause and POST /resume (Bearer); null leaves
- * them open, like POST /anim.
+ * them open, like POST /anim. When it is set, `robotToken` is taken too:
+ * whoever holds it can drive the robot anyway (the robot's web panel has it).
  * @param {{ robot: ReturnType<typeof robotClient>, referee?: Referee, pause?: Pause,
- *   controlToken?: string | null, now?: () => number, log?: (line: string) => void }} opts
+ *   controlToken?: string | null, robotToken?: string | null, now?: () => number,
+ *   log?: (line: string) => void }} opts
  */
 export function createBroker({
   robot,
   referee = new Referee(),
   pause = new Pause(),
   controlToken = null,
+  robotToken = null,
   now = Date.now,
   log = () => {},
 }) {
@@ -261,7 +264,12 @@ export function createBroker({
     const m = /^Bearer\s+(.+)$/i.exec(req.headers.authorization ?? "");
     if (!m) return false;
     const digest = (/** @type {string} */ v) => createHash("sha256").update(v).digest();
-    return timingSafeEqual(digest(m[1].trim()), digest(controlToken));
+    const given = digest(m[1].trim());
+    let ok = false;
+    for (const accepted of [controlToken, robotToken]) {
+      if (accepted && timingSafeEqual(given, digest(accepted))) ok = true;
+    }
+    return ok;
   }
 
   function pauseView() {
@@ -423,6 +431,8 @@ function send(res, status, body) {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Authorization, Content-Type",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    // The robot's web panel calls pause/resume from another LAN origin.
+    "Access-Control-Allow-Private-Network": "true",
   });
   res.end(JSON.stringify(body));
 }
